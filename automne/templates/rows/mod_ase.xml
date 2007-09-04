@@ -1,0 +1,521 @@
+<row>
+	<div>
+		<script type="text/javascript">
+			function checkExpandDocs() {
+				var inputs = document.getElementsByTagName('INPUT');
+				var expandDocs = new Array();
+				for (var i = 0; i < inputs.length; i++) {
+					if (inputs[i].type == 'checkbox' && inputs[i].name == 'expandDoc' && inputs[i].checked) {
+						expandDocs[expandDocs.length] = inputs[i].value;
+					}
+				}
+				document.getElementById('expandDocs').value = expandDocs.toString();
+				return true;
+			}
+		</script>
+		<atm-linx type="direct">
+			<selection>
+				<start><nodespec type="node" value="26" /></start>
+			</selection>
+			<display>
+				<htmltemplate>
+					<?php echo '<form id="IntranetSearch" method="get" action="{{href}}#results" onsubmit="checkExpandDocs();return true;">'; ?>
+				</htmltemplate>
+			</display>
+		</atm-linx>
+		<?php echo '<input type="hidden" name="expandDocs" id="expandDocs" value="'.$_REQUEST['expandDocs'].'" />'; ?>
+		<table>
+			<tr>
+				<th colspan="2"><label for="searchKeywords">Mots clés</label></th>
+				<td><?php echo '<input type="text" id="searchKeywords" name="q" value="'.htmlspecialchars($_REQUEST['q']).'" />'; ?> <a href="#" onclick="showHide('searchHelp');return false;" class="help" alt="Cliquez pour afficher ou masquer l'aide" title="Cliquez pour afficher ou masquer l'aide">Aide</a></td>
+			</tr>
+			<tr id="searchHelp">
+				<td colspan="3">
+					<p>Les accents, majuscules ainsi que les termes vides de sens (le, les, de, du, etc.) ne sont pas pris en compte. Les recherches sont <a href="http://fr.wikipedia.org/wiki/Lemmatisation" target="_blank" alt="Voir la définition de Wikipedia" title="Voir la définition de Wikipedia">lemmatisées</a> (cheval équivaut à chevaux, documentation équivaut à documenter et inversement).</p>
+					<h4>Affiner votre recherche :</h4>
+					<p>Les termes proposés pour affiner votre recherche sont des termes importants dans les premiers documents renvoyés par votre recherche.</p>
+					<p>La case à cocher à droite d'un résultat de recherche vous permet d'identifier les documents qui vous semblent correspondre le plus à ce que vous recherchez pour relancer une recherche qui en tiendra compte.</p>
+					<p>Si vos termes de recherche contiennent des mots dans une langue étrangère (anglais), sélectionner cette langue pour la recherche permettra une meilleur analyse lexicale de votre recherche et donc de meilleurs résultats.</p>
+					<h4>Opérateurs :</h4>
+					<table>
+						<tr>
+							<th>AND : </th>
+							<td>Les documents résultant répondront aux deux termes.</td>
+						</tr>
+						<tr>
+							<th>OR : </th>
+							<td>Les documents résultant répondront à l'un des deux termes.</td>
+						</tr>
+						<tr>
+							<th>NOT : </th>
+							<td>Les documents résultant répondront uniquement au terme de gauche.</td>
+						</tr>
+						<tr>
+							<th>XOR : </th>
+							<td>Les documents résultant répondront à l'un des deux termes mais pas au deux.</td>
+						</tr>
+						<tr>
+							<th>( et ) : </th>
+							<td>Vous permet de grouper les expressions.</td>
+						</tr>
+						<tr>
+							<th>+ et - : </th>
+							<td>Opérateurs unaires. Les documents résultant répondront à tous les termes préfixés d'un signe plus et à aucun des termes préfixés d'un signe moins. <br />Exemple : +Cimpa -Airbus</td>
+						</tr>
+						<tr>
+							<th>NEAR : </th>
+							<td>Les documents résultant contiendront les deux termes à 10 mots d'intervalle maximum.<br />Exemple : Cimpa NEAR Airbus</td>
+						</tr>
+						<tr>
+							<th>" " : </th>
+							<td>Permet une recherche de phrase exacte.</td>
+						</tr>
+						<tr>
+							<th>* : </th>
+							<td>Signe joker. Attention l'emploi de cet opérateur peut ralentir votre recherche.</td>
+						</tr>
+					</table>
+					<h4>Préfixes :</h4>
+					<p>Les préfixes suivants vous permettent de restreindre vos recherches sur certaines caractéristiques de documents. Le terme doit suivre le préfixe directement (sans espaces). Vous pouvez combiner ces préfixes avec tout type de recherche par mots clés classique.</p>
+					<table>
+						<tr>
+							<th>"title:" : </th>
+							<td>Le terme suivant ce préfixe sera dans le titre du document.<br />Exemple : title:Airbus</td>
+						</tr>
+						<tr>
+							<th>"filetype:" : </th>
+							<td>Les documents résultant seront des fichiers du format donné <br />Les formats disponibles sont : <?php echo implode(', ',CMS_filter_catalog::getTypes()); ?> <br />Exemple : filetype:pdf</td>
+						</tr>
+						<tr>
+							<th>"language:" : </th>
+							<td>Les documents résultant seront dans la langue donnée <br />Les langues disponibles sont : fr, en <br />Exemple : language:fr</td>
+						</tr>
+					</table>	
+				</td>
+			</tr> 
+			<tr>
+				<th colspan="2"><label for="searchLanguage">Langue</label></th>
+				<td>
+					<select id="searchLanguage" name="language">
+		      			<option value="">Toutes</option>
+						<?php
+						$languages = array(
+							'en' => 'English',
+							'fr' => 'Français',
+						);
+						foreach ($languages as $code => $language) {
+							$selected = ($_REQUEST['language'] == $code) ? ' selected="selected"' : '';
+							echo '<option value="'.$code.'"'.$selected.'>'.$language.'</option>';
+						}
+						?>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th colspan="2"><label for="searchFiletype">Type</label></th>
+				<td>
+					<select id="searchFiletype" name="filetype">
+		      			<option value="">Tous</option>
+						<?php
+						$filetypes = array(
+							'pdf' => 'Portable Document Format (PDF)',
+							'doc,rtf' => 'Microsoft Word (DOC, RTF)',
+							'xls,csv' => 'Microsoft Excel (XLS, CSV)',
+							'ppt,pps' => 'Microsoft PowerPoint (PPS, PPT)',
+							'sxw,odt' => 'Open Office (ODT, SXW)',
+						);
+						foreach ($filetypes as $ext => $type) {
+							$selected = ($_REQUEST['filetype'] == $ext) ? ' selected="selected"' : '';
+							echo '<option value="'.$ext.'"'.$selected.'>'.$type.'</option>';
+						}
+						?>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th colspan="3">Rechercher dans:</th>
+			</tr> 
+			<tr>
+				<th colspan="2">
+					<?php
+					if ((is_array($_REQUEST['modules']) && in_array('polymod_news', $_REQUEST['modules'])) || !$_REQUEST['modules']) {
+						$checked = ' checked="checked"';
+					} else {
+						$checked = '';
+					}
+					echo '<input type="checkbox" name="modules[]" id="polymod_news" value="polymod_news"'.$checked.' />';
+					?>
+					<label for="polymod_news">Actualités</label>
+				</th>
+				<td>
+					<block module="polymod_news" id="news" language="fr">
+						<select name="polymod_news_cat">
+			      			<option value="">Toutes</option>
+					        <atm-function function="selectOptions" object="{['object1']['fields'][1]}" selected="{request:int:polymod_news_cat}"></atm-function>
+						</select>
+					</block>
+				</td>
+			</tr>
+			<tr>
+				<th colspan="2">
+					<?php
+					if ((is_array($_REQUEST['modules']) && in_array('polymod_docs', $_REQUEST['modules'])) || !$_REQUEST['modules']) {
+						$checked = ' checked="checked"';
+					} else {
+						$checked = '';
+					}
+					echo '<input type="checkbox" name="modules[]" id="polymod_docs" value="polymod_docs"'.$checked.' />';
+					?>
+					<label for="polymod_docs">Documents</label>
+				</th>
+				<td>
+					<block module="polymod_docs" id="news" language="fr">
+						<select name="polymod_docs_cat">
+			      			<option value="">Toutes</option>
+					        <atm-function function="selectOptions" object="{['object2']['fields'][17]}" selected="{request:int:polymod_docs_cat}"></atm-function>
+						</select>
+					</block>
+				</td>
+			</tr>
+			<tr>
+				<th colspan="2">
+					<?php
+					if ((is_array($_REQUEST['modules']) && in_array('standard', $_REQUEST['modules'])) || !$_REQUEST['modules']) {
+						$checked = ' checked="checked"';
+					} else {
+						$checked = '';
+					}
+					echo '<input type="checkbox" name="modules[]" id="standard" value="standard"'.$checked.' />';
+					?>
+					<label for="standard">Pages</label>
+				</th>
+				<td>
+					<select name="pageRoot">
+		      			<option value="">Toutes</option>
+						<?php
+						//Departments
+						$departmentRoot = 11;
+						$departments = CMS_tree::getSiblings($departmentRoot, true, true);
+						$selected = ($_REQUEST['pageRoot'] == $departmentRoot) ? ' selected="selected"' : '';
+						echo '<option value="'.$departmentRoot.'"'.$selected.'>Départements</option>';
+						foreach ($departments as $department) {
+							$selected = ($_REQUEST['pageRoot'] == $department->getID()) ? ' selected="selected"' : '';
+							echo '<option value="'.$department->getID().'"'.$selected.'> - '.$department->getTitle(true).'</option>';
+						}
+						//Technical entities
+						$entitiesRoot = 12;
+						$entities = CMS_tree::getSiblings($entitiesRoot, true, true);
+						$selected = ($_REQUEST['pageRoot'] == $entitiesRoot) ? ' selected="selected"' : '';
+						echo '<option value="'.$entitiesRoot.'"'.$selected.'>Entités Techniques</option>';
+						foreach ($entities as $entity) {
+							$selected = ($_REQUEST['pageRoot'] == $entity->getID()) ? ' selected="selected"' : '';
+							echo '<option value="'.$entity->getID().'"'.$selected.'> - '.$entity->getTitle(true).'</option>';
+						}
+						?>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th colspan="2">Date de publication</th>
+				<td><label for="PublicAfter">entre </label>
+					<?php echo '<input type="text" id="PublicAfter" name="PublicAfter" value="'.htmlspecialchars($_REQUEST['PublicAfter']).'" />'; ?><img class="calendar" id="PublicBeforeCalendar" src="/img/Interieur/calendar.gif" onclick="displayCalendar(document.getElementById('PublicAfter'),'fr',this);return false;" title="Calendrier" alt="Calendrier" />
+					<label for="PublicBefore">et </label>
+					<?php echo '<input type="text" id="PublicBefore" name="PublicBefore" value="'.htmlspecialchars($_REQUEST['PublicBefore']).'" />'; ?><img class="calendar" id="PublicAfterCalendar" src="/img/Interieur/calendar.gif" onclick="displayCalendar(document.getElementById('PublicBefore'),'fr',this);return false;" title="Calendrier" alt="Calendrier" />
+				</td>
+			</tr>
+		</table>
+		<input type="submit" value="RECHERCHER" id="submit" />
+		<?php echo '</form>';?>
+	</div>
+	<div id="searchResults">
+	<?php
+	$content ='<a name="results"></a>';
+	//SEARCH
+	require_once($_SERVER["DOCUMENT_ROOT"]."/automne/classes/aseFrontEnd.php");
+	$error = false;
+	if (trim($_REQUEST['q'])) {
+		$starttime = getmicrotime();
+		$pageNB = ((int) $_REQUEST['page']) ? (int) $_REQUEST['page'] : 1;
+		$modules = array();
+		$availableModules = array('standard', 'polymod_news', 'polymod_docs');
+		if (sizeof($_REQUEST['modules'])) {
+			foreach($_REQUEST['modules'] as $module) {
+				if (in_array($module, $availableModules)) {
+					$modules[] = $module;
+				}
+			}
+		}
+		//Create search query
+		$searchQuery = trim($_REQUEST['q']);
+		if ($_REQUEST['language']) {
+			$searchQuery .= ' language:'.$_REQUEST['language'];
+			$searchLanguage = $_REQUEST['language'];
+		} else {
+			$searchLanguage = 'fr';
+		}
+		if ($_REQUEST['filetype']) {
+			$filetypes = explode(',',$_REQUEST['filetype']);
+			$searchQuery .= ' AND (filetype:'.implode(' OR filetype:',$filetypes).')';
+		}
+		$search = new CMS_XapianQuery($searchQuery, $modules, $searchLanguage);
+		//Filters on pages
+		if (sensitiveIO::isPositiveInteger($_REQUEST['pageRoot']) || $_REQUEST['PublicAfter'] || $_REQUEST['PublicBefore']) {
+			//load module interface
+			if ($moduleInterface = CMS_ase_interface_catalog::getModuleInterface(MOD_STANDARD_CODENAME)) {
+				if (sensitiveIO::isPositiveInteger($_REQUEST['pageRoot'])) {
+					//add filter on root page ID
+					$moduleInterface->addFilter('root', $_REQUEST['pageRoot']);
+				}
+				if ($_REQUEST['PublicAfter']) {
+					$dateAfter = new CMS_date();
+					$dateAfter->setFormat($cms_language->getDateFormat());
+					if ($dateAfter->setLocalizedDate($_REQUEST['PublicAfter'])) {
+						$moduleInterface->addFilter('publication date after', $dateAfter);
+					}
+				}
+				if ($_REQUEST['PublicBefore']) {
+					$dateBefore = new CMS_date();
+					$dateBefore->setFormat($cms_language->getDateFormat());
+					if ($dateBefore->setLocalizedDate($_REQUEST['PublicBefore'])) {
+						$moduleInterface->addFilter('publication date before', $dateBefore);
+					}
+				}
+				
+				$search->setModuleInterface(MOD_STANDARD_CODENAME, $moduleInterface);
+			}
+		}
+		//Filters on docs category
+		if (sensitiveIO::isPositiveInteger($_REQUEST['polymod_docs_cat']) || $_REQUEST['PublicAfter'] || $_REQUEST['PublicBefore']) {
+			//load module interface
+			$module = 'polymod_docs';
+			if ($moduleInterface = CMS_ase_interface_catalog::getModuleInterface($module)) {
+				//then add all filters
+				if (sensitiveIO::isPositiveInteger($_REQUEST['polymod_docs_cat'])) {
+					//add filter on category field (id : 17)
+					$moduleInterface->addFilter(17, $_REQUEST['polymod_docs_cat']);
+				}
+				if ($_REQUEST['PublicAfter']) {
+					$dateAfter = new CMS_date();
+					$dateAfter->setFormat($cms_language->getDateFormat());
+					if ($dateAfter->setLocalizedDate($_REQUEST['PublicAfter'])) {
+						$moduleInterface->addFilter('publication date after', $dateAfter);
+					}
+				}
+				if ($_REQUEST['PublicBefore']) {
+					$dateBefore = new CMS_date();
+					$dateBefore->setFormat($cms_language->getDateFormat());
+					if ($dateBefore->setLocalizedDate($_REQUEST['PublicBefore'])) {
+						$moduleInterface->addFilter('publication date before', $dateBefore);
+					}
+				}
+				$search->setModuleInterface($module, $moduleInterface);
+			}
+		}
+		//Filters on news category
+		if (sensitiveIO::isPositiveInteger($_REQUEST['polymod_news_cat']) || $_REQUEST['PublicAfter'] || $_REQUEST['PublicBefore']) {
+			//load module interface
+			$module = 'polymod_news';
+			if ($moduleInterface = CMS_ase_interface_catalog::getModuleInterface($module)) {
+				//then add all filters
+				if (sensitiveIO::isPositiveInteger($_REQUEST['polymod_news_cat'])) {
+					//add filter on category field (id : 1)
+					$moduleInterface->addFilter(1, $_REQUEST['polymod_news_cat']);
+				}
+				if ($_REQUEST['PublicAfter']) {
+					$dateAfter = new CMS_date();
+					$dateAfter->setFormat($cms_language->getDateFormat());
+					if ($dateAfter->setLocalizedDate($_REQUEST['PublicAfter'])) {
+						$moduleInterface->addFilter('publication date after', $dateAfter);
+					}
+				}
+				if ($_REQUEST['PublicBefore']) {
+					$dateBefore = new CMS_date();
+					$dateBefore->setFormat($cms_language->getDateFormat());
+					if ($dateBefore->setLocalizedDate($_REQUEST['PublicBefore'])) {
+						$moduleInterface->addFilter('publication date before', $dateBefore);
+					}
+				}
+				$search->setModuleInterface($module, $moduleInterface);
+			}
+		}
+		//add expand Docs if any
+		if ($_REQUEST['expandDocs']) {
+			$expandDocsIds = explode(',',$_REQUEST['expandDocs']);
+			foreach ($expandDocsIds as $docid) {
+				$search->addRelevantDocument($docid);
+			}
+		}
+		//Then launch search
+		if (!$search->query($pageNB, $resultsNumber)) {
+			$error = true;
+		}
+		$time = getmicrotime() - $starttime;
+	}
+	//RESULTS
+	if (is_object($search)) {
+		$startresultstime = getmicrotime();
+		if ($search->getMatchesNumbers()) {
+			$results = $search->getMatches();
+			//Expand Set
+			$expandSet = $search->getExpandSet();
+			$expandSetContent = '';
+			if (sizeof($expandSet)) {
+				$queryString = '';
+				$queryStrings = explode('&',$_SERVER['QUERY_STRING']);
+				foreach ($queryStrings as $queryValue) {
+					if (substr($queryValue,0,5) !== 'page=' && substr($queryValue,0,1) !== 'q') {
+						$queryString .= '&amp;'.$queryValue;
+					}
+				}
+				$expandSetContent ='<div class="expand"><strong>Affiner votre recherche : </strong>';
+				foreach ($expandSet as $term) {
+					$expandSetContent .='<a href="'.$_SERVER['SCRIPT_NAME'].'?q='.urlencode($_REQUEST['q']).'+'.$term.''.$queryString.'">'.$term.'</a>&nbsp;&nbsp;';
+				}
+				$expandSetContent .='</div><hr />';
+			}
+			//$content .= $expandSetContent;
+			
+			//Results Number
+			$max = ($search->getMatchesNumbers()-(($pageNB-1) * $resultsNumber + 1) >= $resultsNumber) ? ($pageNB * $resultsNumber) : $search->getMatchesNumbers();
+			$content .='
+			<div class="resultscount">Résultats '.(($pageNB-1) * $resultsNumber + 1).' à '.$max.' sur '.$search->getMatchesNumbers('~').' pour votre recherche ('.round($time,3).'s)</div>
+			<hr />
+			<h3>Resultats :</h3>';
+			
+			$queryTerms = $search->getQueryTerms();
+			//Results
+			if (sizeof($results)) {
+				$content .= '
+				<table class="resultSearch">
+					<tr>
+						<th>Intitulé</th>
+						<th>Localisation</th>
+						<th>Date</th>
+						<th>Lang.</th>
+						<th>Version</th>
+						<th><span title="Utiliser le document pour affiner la recherche" class="help">?</span></th>
+					</tr>';
+				foreach ($results as $resultID => $result) {
+					//reset vars
+					$iconHTML = $title = $cat = $date = $lang = $version = '';
+					
+					//ICON
+					$type = $search->getMatchValue($result, 'type');
+					//set document path
+					$iconPath = PATH_MODULES_FILES_FS.'/'.MOD_STANDARD_CODENAME.'/icons/'.$type.'.gif';
+					//file content
+					$icon = new CMS_file($iconPath, FILE_SYSTEM, TYPE_FILE);
+					$iconHTML = ($icon->exists()) ? '<img src="'.PATH_MODULES_FILES_WR.'/'.MOD_STANDARD_CODENAME.'/icons/'.$type.'.gif" alt="'.$type.'" title="'.$type.'" /> ' : '';
+					//TITLE
+					$title = $search->getMatchValue($result, 'HTMLTitle', array('icon' => false));
+					//DATE
+					$date = $search->getMatchValue($result, 'pubDate', array('format' => 'd/m/Y'));
+					//LANGUAGE
+					$languageCode = strtolower($search->getMatchValue($result, 'language'));
+					if ($languageCode == 'fr') {
+						$lang = '<img title="Français" alt="Français" src="/img/Interieur/fr.gif"/>';
+					} elseif ($languageCode == 'en') {
+						$lang = '<img title="English" alt="English" src="/img/Interieur/en.gif"/>';
+					} else {
+						$lang = '--';
+					}
+					
+					switch ($search->getMatchValue($result, 'module')) {
+						case MOD_STANDARD_CODENAME:
+							$page = $search->getMatchValue($result, 'page');
+							$cat = '';
+							if (is_object($page)) {
+								$lineage = CMS_tree::getLineage('3', $page->getID(), false);
+								$count = 0;
+								foreach ($lineage as $ancestor) {
+									if ($ancestor != 3) {
+										$cat .= ($count) ? ' &gt; ' : '';
+										$cat .= '<a href="'.CMS_tree::getPageValue($ancestor,'url').'">'.CMS_tree::getPageValue($ancestor,'title').'</a>';
+										$count++;
+									}
+								}
+							}
+							$version ='--';
+						break;
+						case 'polymod_news':
+							$cat ='<a href="'.CMS_tree::getPageValue(8,'url').'">Actualités</a>';
+							$version ='--';
+						break;
+						case 'polymod_docs':
+							$cat = '<a href="'.CMS_tree::getPageValue(4,'url').'">Documents</a>';
+							$version = '<a href="'.CMS_tree::getPageValue(7,'url').'?search=action&amp;id='.$search->getMatchValue($result, 'itemID').'" onClick="javascript:CMS_openPopUpPage(\''.CMS_tree::getPageValue(7,'url').'?search=action&amp;id='.$search->getMatchValue($result, 'itemID').'\',7,535,353); return false;"><img src="/img/Interieur/version.gif" alt="version" title="version"/></a>';
+						break;
+						default:
+							$title = 'Erreur : Module inconnu : '.$search->getMatchValue($result, 'module').'<br /><br />';
+						break;
+					}
+					$content .= '
+					<tr>
+						<td class="intit">
+							<div class="resultInit">
+								<div class="relevanceContainer">
+									<div class="relevance" style="width:'.$search->getMatchValue($result, 'percent').'%;"></div>
+									<span class="percent help" title="Pourcentage de pertinence">'.$search->getMatchValue($result, 'percent').'%</span>
+								</div>
+								'.$iconHTML.' '.$title.'
+							</div>
+						</td>
+						<td class="cat">'.$cat.'</td>
+						<td class="dat">'.$date.'</td>
+						<td class="lang">'.$lang.'</td>
+						<td class="vers">'.$version.'</td>
+						<td class="aff"><input type="checkbox" name="expandDoc" value="'.$search->getMatchValue($result, 'docid').'"'.((is_array($expandDocsIds) && in_array($search->getMatchValue($result, 'docid'),$expandDocsIds)) ? ' checked="checked"':'').' /></td>
+					</tr>';
+				}
+				$content .= '</table>';
+			}
+			//pages
+			if ($resultsNumber < $search->getMatchesNumbers()) {
+				$max = ($search->getMatchesNumbers()-(($pageNB-1) * $resultsNumber + 1) >= $resultsNumber) ? ($pageNB * $resultsNumber) : $search->getMatchesNumbers();
+				$toPage = 1;
+				$content .= '<br /><div class="pages">Pages : ';
+				$queryString = '';
+				$queryStrings = explode('&',$_SERVER['QUERY_STRING']);
+				$count=0;
+				foreach ($queryStrings as $queryValue) {
+					if (substr($queryValue,0,5) !== 'page=') {
+						$queryString .= ($count) ? '&amp;'.$queryValue : $queryValue;
+						$count++;
+					}
+				}
+				while((($toPage-1)*$resultsNumber) <= $search->getMatchesNumbers()) {
+					if ($toPage != $pageNB) {
+						$content .= '<a href="'.$_SERVER['SCRIPT_NAME'].'?'.$queryString.'&amp;page='.$toPage.'">'.$toPage.'</a>&nbsp;&nbsp;&nbsp;';
+					} else {
+						$content .= '<strong>'.$toPage.'</strong>&nbsp;&nbsp;&nbsp;';
+					}
+					$toPage++;
+				}
+				$content .= '</div><br />';
+			}
+			$content .= '
+			<div class="right"><a href="#top">Top</a></div>
+			<hr />';
+			//Expand Set
+			$content .= $expandSetContent;
+			$content .='<br />';
+		} else {
+			if (!$error) {
+				$content .= '<div class="noresults">Votre recherche ne correspond à aucun document ... </div>';
+			} else {
+				$content .= '<div class="error">Votre recherche a entraîné une erreur, merci de la modifier ... </div>';
+			}
+		}
+	}
+	if (defined('SYSTEM_DEBUG') && SYSTEM_DEBUG && is_object($search) && !$error) {
+		$resultstime = getmicrotime() - $startresultstime;
+		$content .='<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />';
+		$content .='<hr />Displaying results in '.round($resultstime,3).'s.<br />';
+		$content .='<strong>Query : </strong>'.$search->getQueryDesc().'<br />';
+		$content .='<small><strong>Extended Query : </strong>'.$search->getQueryDesc(true).'</small>';
+		$content .='<hr />';
+	}
+	echo $content;
+	?>
+	</div>
+</row>

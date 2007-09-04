@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xapianDB.php,v 1.1.1.1 2007/09/04 15:01:29 sebastien Exp $
+// $Id: xapianDB.php,v 1.2 2007/09/04 15:59:05 sebastien Exp $
 
 /**
   * Class CMS_XapianDB
@@ -50,8 +50,7 @@ class CMS_XapianDB extends CMS_grandFather {
 	 */
 	var $_db = null;
 	
-	var $_availableDBType = array('flint', 'quartz');
-	var $_dbType;
+	var $_dbType = 'flint';
 	/**
 	 * Remove lockfile if exists
 	 * @var		bool
@@ -62,14 +61,6 @@ class CMS_XapianDB extends CMS_grandFather {
 	function CMS_XapianDB($module, $writable = false, $timeout = 60) {
 		//module
 		$this->_module = $module;
-		//DB type
-		$module = CMS_modulesCatalog::getByCodename(MOD_ASE_CODENAME);
-		$dbType = strtolower((string) $module->getParameters('XAPIAN_DB_TYPE'));
-		if (!in_array($dbType, $this->_availableDBType)) {
-			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : unknow DB parameter : '.$dbType.' should be : '.implode(', ',$this->_availableDBType));
-			return false;
-		}
-		$this->_dbType = $dbType;
 		//open DB
 		if ($writable) {
 			//if we need a writable DB, try to open it before timeout

@@ -2,7 +2,7 @@
 ## Contains declaration for module installation : 
 ## All table creation (mandatory) : inject 1/2
 ##
-## @version $Id: mod_ase.sql,v 1.1 2007/09/04 15:23:47 sebastien Exp $
+## @version $Id: mod_ase.sql,v 1.2 2007/09/04 15:58:55 sebastien Exp $
 
 # --------------------------------------------------------
 
@@ -31,3 +31,11 @@ CREATE TABLE `mod_ase_document` (
 
 INSERT INTO `modules` (`id_mod`, `label_mod`, `codename_mod`, `administrationFrontend_mod`, `hasParameters_mod`, `isPolymod_mod`) VALUES 
 ('', 1, 'ase', 'index.php', 1, 0);
+
+
+# 
+# Contenu de la table `mod_standard_rows`
+# 
+
+INSERT INTO `mod_standard_rows` (`id_row`, `label_row`, `definitionFile_row`, `modulesStack_row`, `groupsStack_row`) VALUES 
+('', '[ASE] Recherche - Résultats', 'mod_ase.xml', 'ase', '');

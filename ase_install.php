@@ -2,7 +2,7 @@
 /**
   * Install or update ASE module
   * @author Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>
-  * @version $Id: ase_install.php,v 1.2 2007/09/04 15:42:30 sebastien Exp $
+  * @version $Id: ase_install.php,v 1.3 2007/09/04 15:58:36 sebastien Exp $
   */
 
 require_once($_SERVER["DOCUMENT_ROOT"]."/cms_rc_admin.php");
@@ -20,9 +20,12 @@ if (!$installed) {
 	echo "ASE installation : Not installed : Launch installation ...<br />";
 	if (CMS_patch::executeSqlScript(PATH_REALROOT_FS.'/sql/mod_ase.sql',true)) {
 		CMS_patch::executeSqlScript(PATH_REALROOT_FS.'/sql/mod_ase.sql',false);
-		//copy module parameters file
-		if (CMS_file::copyTo(PATH_TMP_FS.PATH_PACKAGES_WR.'/modules/ase_rc.xml',PATH_PACKAGES_FS.'/modules/ase_rc.xml')) {
+		//copy module parameters file and module row
+		if (CMS_file::copyTo(PATH_TMP_FS.PATH_PACKAGES_WR.'/modules/ase_rc.xml',PATH_PACKAGES_FS.'/modules/ase_rc.xml')
+			&& CMS_file::copyTo(PATH_TMP_FS.PATH_TEMPLATES_ROWS_WR.'/mod_ase.xml',PATH_TEMPLATES_ROWS_FS.'/mod_ase.xml')
+			) {
 			CMS_file::chmodFile(FILES_CHMOD, PATH_PACKAGES_FS.'/modules/ase_rc.xml');
+			CMS_file::chmodFile(FILES_CHMOD, PATH_TEMPLATES_ROWS_FS.'/mod_ase.xml');
 			echo "ASE installation : Installation done.<br /><br />";
 		} else {
 			echo "ASE installation : INSTALLATION ERROR ! Can not copy parameters file ...<br />";
@@ -60,6 +63,6 @@ if (!$installed) {
 		echo "ASE installation : UPDATE ERROR ! Problem for merging modules parameters ...";
 	}
 }
-//$instruction = new CMS_file(PATH_TMP_FS.'/HOW_TO_INSTALL');
-//echo nl2br($instruction->readContent());
+$instruction = new CMS_file(PATH_TMP_FS.'/HOW_TO_INSTALL');
+echo nl2br($instruction->readContent());
 ?>
