@@ -1,0 +1,13 @@
+<cms-module-parameters>
+	<param name="DOCUMENT_MAX_WORDS_TO_INDEX">20000</param>
+	<param name="DOCUMENT_MAX_INDEXABLE_DOCUMENT_LENGTH">300000</param>
+	<param name="DOCUMENT_MIN_INDEXABLE_WORD_LENGTH">0</param>
+	<param name="XAPIAN_RESULTS_EXCLUDED_ROOTS">8,4,9,10,27</param>
+	<param name="XAPIAN_SEARCH_OPENSEARCH_PAGES">26</param>
+	<param name="XAPIAN_SEARCH_MAX_RESULTS_PER_PAGES">50</param>
+	<param name="XAPIAN_SEARCH_DEFAULT_RESULTS_PER_PAGES">20</param>
+	<param name="XAPIAN_SEARCH_MIN_MATCH_RESULTS_CHECK">100</param>
+	<param name="XAPIAN_SEARCH_EXPAND_SET_MAX_NUMBER">10</param>
+	<param name="DOCUMENT_TITLE_WDF">2</param>
+	<param name="XAPIAN_DB_TYPE">flint</param>
+</cms-module-parameters>
