@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: mod_ase_search.php,v 1.1 2007/09/06 16:32:01 sebastien Exp $
+// $Id: mod_ase_search.php,v 1.2 2007/09/06 16:43:55 sebastien Exp $
 
 /**
   * Template CMS_ase_search
@@ -140,7 +140,7 @@ if (is_object($search)) {
 		<div class="right">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_RESULTCOUNT, array((($pageNB - 1) * $resultsNumber + 1), $max, $search->getMatchesNumbers('~'), ), MOD_ASE_CODENAME).' ('.round($time,3).'s)</div>';
 		//Spell correction
 		if ($search->getCorrectedQueryString()) {
-			$content .='<div class="left"><strong>'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_DIDYOUMEAN, false, MOD_ASE_CODENAME).' </strong><a href="'.$_SERVER['SCRIPT_NAME'].'?q='.urlencode($search->getCorrectedQueryString()).'">'.$search->getCorrectedQueryString().'</a> ?</div>';
+			$content .='<div class="left"><strong class="alert">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_DIDYOUMEAN, false, MOD_ASE_CODENAME).' </strong><a href="'.$_SERVER['SCRIPT_NAME'].'?q='.urlencode($search->getCorrectedQueryString()).'">'.$search->getCorrectedQueryString().'</a></div>';
 		}
 		$content .='<h2>'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_RESULTS, false, MOD_ASE_CODENAME).'</h2>';
 		
@@ -163,9 +163,9 @@ if (is_object($search)) {
 				 '.$cms_language->getMessage(MESSAGE_ASE_RESULTS_INDEXED, false, MOD_ASE_CODENAME).' '.$search->getMatchValue($result, 'indexationDate', array('format' => 'm-d-Y')).'
 				 - '.$cms_language->getMessage(MESSAGE_ASE_RESULTS_PUBLISHED, false, MOD_ASE_CODENAME).' '.$search->getMatchValue($result, 'pubDate', array('format' => 'm-d-Y'));
 				if (!is_array($expandDocsIds) || (is_array($expandDocsIds) && !in_array($search->getMatchValue($result, 'docid'), $expandDocsIds))) {
-					$content .= '- <a href="'.$_SERVER['SCRIPT_NAME'].'?q='.urlencode($_REQUEST['q']).'&amp;expandDocs='.($_REQUEST['expandDocs'] ? urlencode($_REQUEST['expandDocs']).','.$search->getMatchValue($result, 'docid') : $search->getMatchValue($result, 'docid')).'" title="'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_RELOAD_USING_THIS_DOC, false, MOD_ASE_CODENAME).'">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_MORERELEVANT, false, MOD_ASE_CODENAME).'</a>';
+					$content .= ' - <a href="'.$_SERVER['SCRIPT_NAME'].'?q='.urlencode($_REQUEST['q']).'&amp;expandDocs='.($_REQUEST['expandDocs'] ? urlencode($_REQUEST['expandDocs']).','.$search->getMatchValue($result, 'docid') : $search->getMatchValue($result, 'docid')).'" title="'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_RELOAD_USING_THIS_DOC, false, MOD_ASE_CODENAME).'">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_MORERELEVANT, false, MOD_ASE_CODENAME).'</a>';
 				} else {
-				 	$content .= '- <span style="color:red;">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_MORERELEVANT, false, MOD_ASE_CODENAME).'</span>';
+				 	$content .= ' - <span class="alert">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_MORERELEVANT, false, MOD_ASE_CODENAME).'</span>';
 				}
 			$content .= '
 			</small><br />
@@ -173,7 +173,7 @@ if (is_object($search)) {
 		}
 		//Spell correction
 		if ($search->getCorrectedQueryString()) {
-			$content .='<div class="left"><strong>'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_DIDYOUMEAN, false, MOD_ASE_CODENAME).' </strong><a href="'.$_SERVER['SCRIPT_NAME'].'?q='.urlencode($search->getCorrectedQueryString()).'">'.$search->getCorrectedQueryString().'</a> ?</div>';
+			$content .='<div class="left"><strong class="alert">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_DIDYOUMEAN, false, MOD_ASE_CODENAME).' </strong><a href="'.$_SERVER['SCRIPT_NAME'].'?q='.urlencode($search->getCorrectedQueryString()).'">'.$search->getCorrectedQueryString().'</a></div>';
 		}
 		//pages
 		if ($resultsNumber < $search->getMatchesNumbers()) {
@@ -212,9 +212,9 @@ if (is_object($search)) {
 		$content .='<br />';
 	} else {
 		if (!$error) {
-			$content .= '<div class="center"><strong style="color:red;">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_NORESULTS, false, MOD_ASE_CODENAME).'</strong></div>';
+			$content .= '<div class="center"><strong class="alert">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_NORESULTS, false, MOD_ASE_CODENAME).'</strong></div>';
 		} else {
-			$content .= '<div class="center"><strong style="color:red;">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_SEARCHERROR, false, MOD_ASE_CODENAME).'</strong></div>';
+			$content .= '<div class="center"><strong class="alert">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_SEARCHERROR, false, MOD_ASE_CODENAME).'</strong></div>';
 		}
 	}
 }
