@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: document.php,v 1.1.1.1 2007/09/04 15:01:29 sebastien Exp $
+// $Id: document.php,v 1.2 2007/09/06 16:30:59 sebastien Exp $
 
 /**
   * Class CMS_ase_document
@@ -407,7 +407,7 @@ class CMS_ase_document extends CMS_grandFather
 	  * @return boolean true on success, false on failure
 	  * @access public
 	  */
-	function getDocumentPosting() {
+	/*function getDocumentPosting() {
 		if (!$this->_isFiltered) {
 			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : document must be filtered first ...');
 			return false;
@@ -416,7 +416,7 @@ class CMS_ase_document extends CMS_grandFather
 			return false;
 		}
 		return $this->_getPosting($this->_plainTextContent);
-	}
+	}*/
 	
 	/**
 	  * Get document title posting terms
@@ -425,12 +425,12 @@ class CMS_ase_document extends CMS_grandFather
 	  * @return boolean true on success, false on failure
 	  * @access public
 	  */
-	function getTitlePosting() {
+	/*function getTitlePosting() {
 		if (!$this->getValue('title')) {
 			return false;
 		}
 		return $this->_getPosting($this->getValue('title'));
-	}
+	}*/
 	
 	/**
 	  * Get text posting terms
@@ -439,7 +439,7 @@ class CMS_ase_document extends CMS_grandFather
 	  * @return boolean true on success, false on failure
 	  * @access public
 	  */
-	function _getPosting(&$text) {
+	/*function _getPosting(&$text) {
 		if (!$text) {
 			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no plain text content to get posting for ...');
 			return false;
@@ -461,19 +461,9 @@ class CMS_ase_document extends CMS_grandFather
 		$this->_filterStopWords($words);
 		//get stems
 		$stems = $this->_stemWords($words);
-		/*
-		$indexer = new TermGenerator();
-		$stemmer = new XapianStem(strtolower($this->getValue('language')));
-		$indexer->set_stemmer($stemmer);
-		$doc = new XapianDocument();
-		$doc->set_data($text);
-		$indexer->set_document($doc);
-		$indexer->index_text($text);
-		pr($indexer->get_description());
-		*/
 		//then return all
 		return array('words' => $words, 'stems' => $stems);
-	}
+	}*/
 	
 	/**
 	  * Filters words according to language stoplist and remove one letter's words in list
@@ -482,7 +472,7 @@ class CMS_ase_document extends CMS_grandFather
 	  * @return boolean true on success, false on failure
 	  * @access private
 	  */
-	function _filterStopWords(&$words) {
+	/*function _filterStopWords(&$words) {
 		//get stop words for document language
 		$stoplist = new CMS_file(PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME.'/stopwords/'.strtolower($this->getValue('language')).'.txt');
 		if (!$stoplist->exists()) {
@@ -503,6 +493,27 @@ class CMS_ase_document extends CMS_grandFather
 		}
 		unset($stopper);
 		return true;
+	}*/
+	
+	function &getStopper() {
+		//get stop words for document language
+		$stoplist = new CMS_file(PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME.'/stopwords/'.strtolower($this->getValue('language')).'.txt');
+		if (!$stoplist->exists()) {
+			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no stopwords list founded for language : '.$this->getValue('language'));
+			return false;
+		}
+		$stopwords = $stoplist->readContent('array');
+		//instanciate stoppper and add stopwords list
+		$stopper = new XapianSimpleStopper();
+		foreach ($stopwords as $stopword) {
+			$stopper->add(utf8_encode($stopword));
+		}
+		return $stopper;
+	}
+	
+	
+	function &getStemmer() {
+		return new XapianStem(strtolower($this->getValue('language')));
 	}
 	
 	/**
@@ -512,7 +523,7 @@ class CMS_ase_document extends CMS_grandFather
 	  * @return array : the stems
 	  * @access private
 	  */
-	function _stemWords($words) {
+	/*function _stemWords($words) {
 		//instanciate stemmer
 		$stemmer = new XapianStem(strtolower($this->getValue('language')));
 		//then stem words
@@ -522,7 +533,7 @@ class CMS_ase_document extends CMS_grandFather
 		}
 		unset($stemmer);
 		return $stems;
-	}
+	}*/
 	
 	/**
 	  * Writes the document reference into persistence (MySQL for now), along with base data.

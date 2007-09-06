@@ -2,7 +2,7 @@
 ## Contains declaration for module installation : 
 ## All table creation (mandatory) : inject 1/2
 ##
-## @version $Id: mod_ase.sql,v 1.2 2007/09/04 15:58:55 sebastien Exp $
+## @version $Id: mod_ase.sql,v 1.3 2007/09/06 16:36:03 sebastien Exp $
 
 # --------------------------------------------------------
 
@@ -38,4 +38,4 @@ INSERT INTO `modules` (`id_mod`, `label_mod`, `codename_mod`, `administrationFro
 # 
 
 INSERT INTO `mod_standard_rows` (`id_row`, `label_row`, `definitionFile_row`, `modulesStack_row`, `groupsStack_row`) VALUES 
-('', '[ASE] Recherche - Résultats', 'mod_ase.xml', 'ase', '');
+('', '[ASE] Moteur de Recherche', 'mod_ase.xml', 'ase', '');

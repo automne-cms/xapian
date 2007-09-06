@@ -1,0 +1,64 @@
+/* $Id: ase.css,v 1.1 2007/09/06 16:32:26 sebastien Exp $ */
+
+h3 {
+	text-align:		center;
+}
+h4 {
+	margin:			0 !important;
+	padding:		0 !important;
+}
+h4 img {
+	vertical-align:	middle;
+}
+hr {
+	text-align:		center;
+	border:			0px;
+	border-top:		1px solid #000000;
+	margin:			10px auto 10px auto !important;
+}
+form {
+	text-align:		center;
+	margin:			20px 0 20px 0;
+}
+.right {
+	text-align:		right;
+}
+.center {
+	text-align:		center;
+}
+p {
+	width:			90%;
+	margin:			0 0 3px 20px;
+	padding:		0px;
+}
+ul {
+	margin-left:	0;
+	padding-left:	0;
+	
+}
+ul li strong {
+	float:			left;
+	width:			88px;
+	text-align:		right;
+}
+ul li p {
+	margin:			0 0 0 92px;
+	position:		relative;
+}
+ul li {
+	white-space:	nowrap;
+	margin-bottom:	10px;
+	list-style:		none;
+}
+div.relevanceContainer {
+	margin-top:		4px;
+	width:			40px;
+	height:			8px;
+	border:			1px solid black;
+	float:			left;
+}
+div.relevance {
+	background-color:green;
+	height:			8px;
+	cursor:			help;
+}

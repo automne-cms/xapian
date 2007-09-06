@@ -1,1 +1,6 @@
-v0.1 : Initial Import
+v0.2 : based on Xapian 1.0.2
+[REFACTOR] : Use new indexing method introduced in Xapian 1.0.0 
+[REFACTOR] : Index datas are now in UTF8
+[FEATURE] : Implement spelling correction
+
+v0.1 : Initial Import, based on Xapian 0.9.9

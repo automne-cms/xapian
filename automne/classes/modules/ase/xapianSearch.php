@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xapianSearch.php,v 1.1.1.1 2007/09/04 15:01:29 sebastien Exp $
+// $Id: xapianSearch.php,v 1.2 2007/09/06 16:30:59 sebastien Exp $
 
 /**
   * Class CMS_XapianQuery
@@ -38,8 +38,14 @@
 define("XAPIAN_QUERY_FLAG_BOOLEAN", XapianQueryParser_FLAG_BOOLEAN); 				//allow use of boolean : AND, OR, etc. and bracketted operations
 define("XAPIAN_QUERY_FLAG_PHRASE", XapianQueryParser_FLAG_PHRASE);					//allow use of quoted phrase
 define("XAPIAN_QUERY_FLAG_LOVEHATE", XapianQueryParser_FLAG_LOVEHATE);				//allow use of +, - operators
-define("XAPIAN_QUERY_FLAG_BOOLEAN_ANY_CASE", XapianQueryParser_FLAG_BOOLEAN_ANY_CASE);//allow use of boolean : AND, and, OR, or, etc. and bracketted operations
+define("XAPIAN_QUERY_FLAG_BOOLEAN_ANY_CASE", XapianQueryParser_FLAG_BOOLEAN_ANY_CASE); //allow use of boolean : AND, and, OR, or, etc. and bracketted operations
 define("XAPIAN_QUERY_FLAG_WILDCARD", XapianQueryParser_FLAG_WILDCARD);				//allow use of * wildcard
+define("XAPIAN_QUERY_FLAG_PURE_NOT", XapianQueryParser_FLAG_PURE_NOT); 				//Allow queries such as 'NOT apples'.
+define("XAPIAN_QUERY_FLAG_PARTIAL", XapianQueryParser_FLAG_PARTIAL); 				//Enable partial matching. (auto add wilcard on last word)
+define("XAPIAN_QUERY_FLAG_SPELLING_CORRECTION", XapianQueryParser_FLAG_SPELLING_CORRECTION); //Enable spelling correction.
+define("XAPIAN_QUERY_FLAG_SYNONYM", XapianQueryParser_FLAG_SYNONYM); 				//Enable synonym operator '~'.
+define("XAPIAN_QUERY_FLAG_AUTO_SYNONYMS", XapianQueryParser_FLAG_AUTO_SYNONYMS); 	//Enable automatic use of synonyms for single terms.
+define("XAPIAN_QUERY_FLAG_AUTO_MULTIWORD_SYNONYMS", XapianQueryParser_FLAG_AUTO_MULTIWORD_SYNONYMS); //Enable automatic use of synonyms for single terms and groups of terms.
 
 define("XAPIAN_STEM_NONE", XapianQueryParser_STEM_NONE);
 define("XAPIAN_STEM_SOME", XapianQueryParser_STEM_SOME);
@@ -71,6 +77,7 @@ class CMS_XapianQuery extends CMS_grandFather {
 	var $_querydesc;
 	var $_querylongdesc;
 	var $_queryTerms = array();
+	var $_correctedQueryString = '';
 	var $_maxResults;
 	var $_resultsPerPage;
 	var $_minMatchResultsCheck;
@@ -80,7 +87,7 @@ class CMS_XapianQuery extends CMS_grandFather {
 	var $_availableMatchInfos = array('docid','xid','uid','module','title','language','indexationDate','percent','relevance','position', 'indexedDatas', 'type');
 	
 	function CMS_XapianQuery($query, $modules = array(), $language, $returnUIDOnly = false) {
-		$this->_query = strtolower($query);
+		$this->_query = utf8_encode($query);
 		if (is_array($modules) && sizeof($modules)) {
 			$this->_modules = $modules;
 		} else {
@@ -92,9 +99,10 @@ class CMS_XapianQuery extends CMS_grandFather {
 		//set enumerators
 		$this->_enumerators = XAPIAN_QUERY_FLAG_BOOLEAN
 							| XAPIAN_QUERY_FLAG_PHRASE
-							| XAPIAN_QUERY_FLAG_LOVEHATE 
+							| XAPIAN_QUERY_FLAG_LOVEHATE
 							| XAPIAN_QUERY_FLAG_BOOLEAN_ANY_CASE
-							| XAPIAN_QUERY_FLAG_WILDCARD ;
+							| XAPIAN_QUERY_FLAG_WILDCARD
+							| XAPIAN_QUERY_FLAG_SPELLING_CORRECTION;
 		if (!$this->_uidOnly) {
 			//load module parameters
 			$module = CMS_modulesCatalog::getByCodename(MOD_ASE_CODENAME);
@@ -156,7 +164,7 @@ class CMS_XapianQuery extends CMS_grandFather {
 		//set stemmer
 		$queryParser->set_stemmer($this->_getStemmer());
 		//set stemming strategy
-		$queryParser->set_stemming_strategy(XAPIAN_STEM_ALL);
+		$queryParser->set_stemming_strategy(XAPIAN_STEM_SOME);
 		//set stopper
 		$stopper = $this->_getStopper();
 		$queryParser->set_stopper($stopper);
@@ -197,11 +205,13 @@ class CMS_XapianQuery extends CMS_grandFather {
 			$queryParser->add_prefix('title', 				'__TITLE__:');
 		}
 		//pre-check query to stop words in phrase query (not properly done by parse_query method ... maybe it is a bug ?)
-		if (strpos($this->_query, '"') !== false) {
+		/*if (strpos($this->_query, '"') !== false) {
 			$this->_query = $this->_filterStopWords($this->_query);
-		}
+		}*/
 		//set user query and enumerators then parse query
 		$query = @$queryParser->parse_query($this->_query,$this->_enumerators);
+		//get corrected query string if any
+		$this->_correctedQueryString = utf8_decode($queryParser->get_corrected_query_string());
 		if (!is_object($query) || !$query->get_length()) {
 			return false;
 		}
@@ -340,17 +350,22 @@ class CMS_XapianQuery extends CMS_grandFather {
 			$expandTerms = array();
 			//instanciate stemmer
 			$stemmer = new XapianStem($this->_language);
+			//pr($this->_queryTerms);
 			while (!$eSetI->equals($expands->end()) && sizeof($expandTerms) < $this->_expandSetNumber) {
 			    $term = $eSetI->get_termname();
 				//only words (starting with W) should compose expand set and it should not already in query
-				if (substr($term,0,1) === 'W' && strlen($term) > 3 && !in_array($stemmer->apply(substr($term,1)), $this->_queryTerms)) {
-					$expandTerms[$stemmer->apply(substr($term,1))] = substr($term,1);
+				if (substr($term,0,1) !== 'Z' && substr($term,0,2) !== '__' && strlen($term) > 3 && !in_array('Z'.$stemmer->apply($term), $this->_queryTerms) && !in_array($term, $this->_queryTerms)) {
+					$expandTerms[$stemmer->apply($term)] = utf8_decode($term);
 				}
 				//iterate eSet
 				$eSetI->next();
 			}
 		}
 		return $expandTerms;
+	}
+	
+	function getCorrectedQueryString() {
+		return $this->_correctedQueryString;
 	}
 	
 	function getQueryTerms() {

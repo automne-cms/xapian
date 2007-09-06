@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: ase.php,v 1.1.1.1 2007/09/04 15:01:29 sebastien Exp $
+// $Id: ase.php,v 1.2 2007/09/06 16:30:54 sebastien Exp $
 
 /**
   * Class CMS_module_ase
@@ -31,6 +31,7 @@
 
 //Polymod Codename
 define("MOD_ASE_CODENAME", "ase");
+define("MOD_ASE_XAPIAN_MIN_VERSION", '1.0.2');
 
 //Check for Xapian librarie before module loading
 $xapianExists = false;
@@ -107,13 +108,15 @@ if ($xapianExists) {
 			$return = array();
 			switch ($treatmentMode) {
 				case MODULE_TREATMENT_PAGECONTENT_TAGS :
-					switch ($visualizationMode) {
-						case PAGE_VISUALMODE_HTML_PUBLIC :
-							$return = array (
-								"atm-meta-tags" => array("selfClosed" => true, "parameters" => array()),
-							);
-						break;
-					}
+					$return = array (
+						"atm-meta-tags" => array("selfClosed" => true, "parameters" => array()),
+					);
+				break;
+				case MODULE_TREATMENT_BLOCK_TAGS :
+					//Call module clientspace content
+					$return = array (
+						"block" => array("selfClosed" => false, "parameters" => array("module" => MOD_ASE_CODENAME)),
+					);
 				break;
 			}
 			return $return;
@@ -134,59 +137,82 @@ if ($xapianExists) {
 		function treatWantedTag(&$tag, $tagContent, $treatmentMode, $visualizationMode, &$treatedObject, $treatmentParameters)
 		{
 			switch ($treatmentMode) {
+				case MODULE_TREATMENT_BLOCK_TAGS:
+					if (!is_a($treatedObject,"CMS_row")) {
+						$this->_raiseError('CMS_module_'.MOD_ASE_CODENAME.' : treatWantedTag : $treatedObject must be a CMS_row object');
+						return false;
+					}
+					if (!is_a($treatmentParameters["page"],"CMS_page")) {
+						$this->_raiseError('CMS_module_'.MOD_ASE_CODENAME.' : treatWantedTag : $treatmentParameters["page"] must be a CMS_page object');
+						return false;
+					}
+					if (!is_a($treatmentParameters["language"],"CMS_language")) {
+						$this->_raiseError('CMS_module_'.MOD_ASE_CODENAME.' : treatWantedTag : $treatmentParameters["language"] must be a CMS_language object');
+						return false;
+					}
+					//Call module clientspace content
+					$cs = new CMS_moduleClientspace($tag->getAttributes());
+					//save the page ID who need this clientspace as a block, so we can add the header code of the module later.
+					$this->moduleUsage($treatmentParameters["page"]->getID(), MOD_ASE_CODENAME, true);
+					return $cs->getClientspaceData(MOD_ASE_CODENAME, $treatmentParameters["language"], $treatmentParameters["page"], $visualizationMode);
+				break;
 				case MODULE_TREATMENT_PAGECONTENT_TAGS:
 					if (!is_a($treatedObject,"CMS_page")) {
 						$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : $treatedObject must be a CMS_page object');
 						return false;
 					}
-					switch ($tag->getName()) {
-						case "atm-meta-tags":
-							if ($visualizationMode == PAGE_VISUALMODE_HTML_PUBLIC) {
-								//get page website
-								$pageWebsite = $treatedObject->getWebsite();
-								//search parameters
-								if ($opensearch = $this->getParameters(XAPIAN_SEARCH_OPENSEARCH_PAGES)) {
-									//extract open search options
-									//allowed format is /search.php or websiteID,/search.php or websiteID,pageID
-									//you can add more couple of values separated with semi-colon
-									$websitesSearch = explode(';',$opensearch);
-									foreach ($websitesSearch as $websiteSearch) {
-										$website = $page = $url = '';
-										$search = explode(',',$websiteSearch);
-										if (sizeof($search) == 2 && sensitiveIO::isPositiveInteger($search[0])) {
-											$website = $search[0];
-											if (sensitiveIO::isPositiveInteger($search[1])) {
-												$page = $search[1];
-											} elseif(substr($search[1],0,1) == '/') {
-												$url = $search[1];
-											}
-										} elseif(sizeof($search) == 1) {
-											$website = $pageWebsite->getID();
-											if (sensitiveIO::isPositiveInteger($search[0])) {
-												$page = $search[0];
-											} elseif(substr($search[0],0,1) == '/') {
-												$url = $search[0];
-											}
-										}
-										if ($website && ($page || $url)) {
-											$searchs[$website] = ($page) ? $page : $url;
-										}
+					
+					if ($visualizationMode == PAGE_VISUALMODE_HTML_PUBLIC && sensitiveIO::isPositiveInteger($this->getParameters(XAPIAN_SEARCH_OPENSEARCH_PAGES))) {
+						//get page website
+						$pageWebsite = $treatedObject->getWebsite();
+						//search parameters
+						if ($opensearch = $this->getParameters(XAPIAN_SEARCH_OPENSEARCH_PAGES)) {
+							//extract open search options
+							//allowed format is /search.php or websiteID,/search.php or websiteID,pageID
+							//you can add more couple of values separated with semi-colon
+							$websitesSearch = explode(';',$opensearch);
+							foreach ($websitesSearch as $websiteSearch) {
+								$website = $page = $url = '';
+								$search = explode(',',$websiteSearch);
+								if (sizeof($search) == 2 && sensitiveIO::isPositiveInteger($search[0])) {
+									$website = $search[0];
+									if (sensitiveIO::isPositiveInteger($search[1])) {
+										$page = $search[1];
+									} elseif(substr($search[1],0,1) == '/') {
+										$url = $search[1];
 									}
-									//if a parameter exists for page website, add link tag to metas
-									if ($searchs[$pageWebsite->getID()]) {
-										$title = APPLICATION_LABEL;
-										if (!$pageWebsite->isMain()) {
-											$title .= ' ('.$pageWebsite->getLabel().')';
-										}
-										$tagContent .= "\n".
-										'	<link rel="search" href="'.$pageWebsite->getURL().PATH_MODULES_FILES_WR.'/'.MOD_ASE_CODENAME.'/opensearch.php?website='.$pageWebsite->getID().'&amp;search='.urlencode($searchs[$pageWebsite->getID()]).'" type="application/opensearchdescription+xml" title="'.htmlspecialchars($title).'" />'."\n";
+								} elseif(sizeof($search) == 1) {
+									$website = $pageWebsite->getID();
+									if (sensitiveIO::isPositiveInteger($search[0])) {
+										$page = $search[0];
+									} elseif(substr($search[0],0,1) == '/') {
+										$url = $search[0];
 									}
 								}
+								if ($website && ($page || $url)) {
+									$searchs[$website] = ($page) ? $page : $url;
+								}
 							}
-							return $tagContent;
-						break;
+							//if a parameter exists for page website, add link tag to metas
+							if ($searchs[$pageWebsite->getID()]) {
+								$title = APPLICATION_LABEL;
+								if (!$pageWebsite->isMain()) {
+									$title .= ' ('.$pageWebsite->getLabel().')';
+								}
+								$tagContent .= "\n".
+								'	<link rel="search" href="'.$pageWebsite->getURL().PATH_MODULES_FILES_WR.'/'.MOD_ASE_CODENAME.'/opensearch.php?website='.$pageWebsite->getID().'&amp;search='.urlencode($searchs[$pageWebsite->getID()]).'" type="application/opensearchdescription+xml" title="'.htmlspecialchars($title).'" />'."\n";
+							}
+						}
 					}
-					return '';
+					//Add module CSS after atm-meta-tags content if page use module rows/templates
+					if ($this->moduleUsage($treatedObject->getID(), MOD_ASE_CODENAME)) {
+						if (file_exists(PATH_REALROOT_FS.'/css/modules/'.MOD_ASE_CODENAME.'.css')) {
+							$tagContent .= 
+							'	<!-- load the style of '.MOD_ASE_CODENAME.' module -->'."\n".
+							'	<link rel="stylesheet" type="text/css" href="/css/modules/'.MOD_ASE_CODENAME.'.css" />'."\n";
+						}
+					}
+					return $tagContent;
 				break;
 			}
 			//in case of no tag treatment, simply return it

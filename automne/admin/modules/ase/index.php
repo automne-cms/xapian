@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: index.php,v 1.1.1.1 2007/09/04 15:01:29 sebastien Exp $
+// $Id: index.php,v 1.2 2007/09/06 16:30:44 sebastien Exp $
 
 /**
   * PHP page : module polymod admin
@@ -52,6 +52,7 @@ define("MESSAGE_PAGE_DB_SIZE", 19);
 define("MESSAGE_PAGE_DB_DOCUMENTS", 20);
 define("MESSAGE_PAGE_ACTION_REINDEX", 21);
 define("MESSAGE_PAGE_ACTION_REINDEXCONFIRM", 22);
+define("MESSAGE_PAGE_XAPIAN_MINVERSION", 26);
 
 //CHECKS user has module clearance
 if (!$cms_user->hasModuleClearance(MOD_ASE_CODENAME, CLEARANCE_MODULE_EDIT)) {
@@ -96,7 +97,11 @@ if (!($xapianVersion = $cms_module->getXapianVersion())) {
 	$content .= '<span class="admin_text_alert">'.$cms_language->getMessage(MESSAGE_PAGE_ERROR_XAPIAN_NOT_FOUND, array(APPLICATION_MAINTAINER_EMAIL), MOD_ASE_CODENAME).'</span>';
 } else {
 	//show version n°
-	$content .= '<dialog-title type="admin_h3">'.$cms_language->getMessage(MESSAGE_PAGE_XAPIAN_VERSION, array($xapianVersion), MOD_ASE_CODENAME).'</dialog-title>';
+	if (version_compare($xapianVersion, MOD_ASE_XAPIAN_MIN_VERSION , '>=' )) {
+		$content .= '<dialog-title type="admin_h3">'.$cms_language->getMessage(MESSAGE_PAGE_XAPIAN_VERSION, array('<span style="color:green;">'.$xapianVersion.'</span>'), MOD_ASE_CODENAME).'</dialog-title>';
+	} else {
+		$content .= '<dialog-title type="admin_h3">'.$cms_language->getMessage(MESSAGE_PAGE_XAPIAN_VERSION, array('<span style="color:red;font-weight:bold;">'.$xapianVersion.'</span>'), MOD_ASE_CODENAME).' - '.$cms_language->getMessage(MESSAGE_PAGE_XAPIAN_MINVERSION, array(MOD_ASE_XAPIAN_MIN_VERSION), MOD_ASE_CODENAME).'</dialog-title>';
+	}
 	//get active filters
 	$content .= '<br /><dialog-title type="admin_h3">'.$cms_language->getMessage(MESSAGE_PAGE_ACTIVE_FILTERS, false, MOD_ASE_CODENAME).'</dialog-title>
 	<table border="0" cellpadding="2" cellspacing="2">

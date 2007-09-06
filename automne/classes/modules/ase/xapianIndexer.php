@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xapianIndexer.php,v 1.1.1.1 2007/09/04 15:01:29 sebastien Exp $
+// $Id: xapianIndexer.php,v 1.2 2007/09/06 16:30:59 sebastien Exp $
 
 /**
   * Class CMS_XapianIndexer
@@ -66,6 +66,13 @@ class CMS_XapianIndexer extends CMS_grandFather {
 	var $_xapianDocument;
 	
 	/**
+	 * Currently database used to store indexed document
+	 * @var		object CMS_XapianDB
+	 * @access	protected
+	 */
+	var $_db;
+	
+	/**
 	  * Constructor.
 	  * initialize object.
 	  *
@@ -96,15 +103,18 @@ class CMS_XapianIndexer extends CMS_grandFather {
 		}
 		//create Xapian document
 		$this->_xapianDocument = new XapianDocument();
-		
+		//load database
+		if (!$this->_loadDatabase()) {
+			return false;
+		}
 		//XID
 		if (!($xid = $this->_getXID())) {
 			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get valid XID for document');
 			return false;
 		}
+		//document datas (only first 500 caracters, more is useless), remove * and trailing spaces also
+		$this->_xapianDocument->set_data(trim(str_replace('*', '',substr($this->_document->getTextContent(),0,500))));
 		
-		//document datas (only first 500 caracters, more is useless)
-		$this->_xapianDocument->set_data(substr($this->_document->getTextContent(),0,500));
 		/* 
 		 * document values
 		 */
@@ -131,19 +141,41 @@ class CMS_XapianIndexer extends CMS_grandFather {
 		//add document module as posting
 		$this->_addPosting('__MODULE__:'.$this->_document->getValue('module'));
 		//add a common posting for all documents (needed for all 'AND NOT' search)
-		$this->_addPosting('__ALL__');
+		//$this->_addPosting('__ALL__');
+		
 		//add all modules attributes
 		$this->_addAttributes($this->_document->getModuleAttributes());
+		
+		//INDEX DOCUMENT
+		//get document stemmer
+		$stemmer = $this->_document->getStemmer();
+		//get document stopper
+		$stopper = $this->_document->getStopper();
+		//create Terms generator for document
+		$indexer = new XapianTermGenerator();
+		//set terms generator infos
+		$indexer->set_flags(XapianTermGenerator_FLAG_SPELLING);
+		$indexer->set_stemmer($stemmer);
+		$indexer->set_stopper($stopper);
+		$indexer->set_database($this->_db->getDatabase());
+		$indexer->set_document($this->_xapianDocument);
+		//index document content
+		$indexer->index_text($this->_prepareTextToIndex($this->_document->getTextContent()));
+		//index document title
 		//get WDF (within-document frequency) value for title from module parameters
 		$module = CMS_modulesCatalog::getByCodename(MOD_ASE_CODENAME);
-		//add title postings (WDF for title is a parameter) and add it as attributes too
-		$this->_addPosting($this->_document->getTitlePosting(), (int) $module->getParameters('DOCUMENT_TITLE_WDF'), 'title');
-		//add document postings
-		$this->_addPosting($this->_document->getDocumentPosting());
+		$indexer->index_text($this->_prepareTextToIndex($this->_document->getValue('title')), (int) $module->getParameters('DOCUMENT_TITLE_WDF'));
+		
+		//pr($this->_xapianDocument->get_description());
 		//save document in Xapian DB
 		$this->_writeToPersistence();
-		//pr($this->_document->getDocumentPosting());
 		return true;
+	}
+	
+	function _prepareTextToIndex($text) {
+		$text = strtr($text,"_’", 
+							" '");
+		return utf8_encode($text);
 	}
 	
 	/**
@@ -175,47 +207,19 @@ class CMS_XapianIndexer extends CMS_grandFather {
 	/**
 	  * Add posting to document
 	  *
-	  * @param mixed $posting : the posting words and stems to add to document array('words' => array(string), 'stems' => array(string))
-	  *		or a string for an unique posting term to add
+	  * @param string $posting : the posting word to add to document
 	  * @param integer $wdf : within-document frequency. Default = 1
 	  * @param string $attribute : add posting as a document attribute too (default : false)
 	  * @return boolean true on success, false on failure
 	  * @access private
 	  */
 	function _addPosting($posting, $wdf = 1, $attribute=false) {
-		if (is_array($posting)) {
-			//add stems
-			if (is_array($posting['stems'])) {
-				$attributes = array();
-				foreach ($posting['stems'] as $stem) {
-					$this->_postings++;
-					$this->_xapianDocument->add_posting($stem, $this->_postings, $wdf);
-					if ($attribute !== false) {
-						$attributes[$attribute][] = $stem;
-					}
-				}
-				if (sizeof($attributes)) {
-					//add all modules attributes
-					$this->_addAttributes($attributes);
-				}
-			}
-			//add words
-			if (is_array($posting['words'])) {
-				foreach ($posting['words'] as $word) {
-					$this->_postings++;
-					//all words must be prefixed by an uppercase W. This allow distinction between words and stems
-					//for now, words are only used for expand sets
-					$this->_xapianDocument->add_posting('W'.$word, $this->_postings, $wdf);
-				}
-			}
-		} elseif (is_string($posting)) {
-			$this->_postings++;
-			$this->_xapianDocument->add_posting($posting, $this->_postings, $wdf);
-			if ($attribute !== false) {
-				$attributes = array();
-				$attributes[$attribute][] = $posting;
-				$this->_addAttributes($attributes);
-			}
+		$this->_postings++;
+		$this->_xapianDocument->add_posting($posting, $this->_postings, $wdf);
+		if ($attribute !== false) {
+			$attributes = array();
+			$attributes[$attribute][] = $posting;
+			$this->_addAttributes($attributes);
 		}
 		return true;
 	}
@@ -235,32 +239,43 @@ class CMS_XapianIndexer extends CMS_grandFather {
 	}
 	
 	/**
+	  * Load database to store indexed document
+	  *
+	  * @return string : the document XID
+	  * @access private
+	  */
+	function _loadDatabase() {
+		//load writable Xapian DB
+		$this->_db = new CMS_XapianDB($this->_document->getValue('module'), true);
+		if (!$this->_db->isWritable()) {
+			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get database for writing ... add task to queue list again');
+			//add script to indexation
+			CMS_scriptsManager::addScript(MOD_ASE_CODENAME, array('task' => 'reindex', 'uid' => $this->_document->getValue('uid'), 'module' => $this->_document->getValue('module')));
+			return false;
+		}
+		return true;
+	}
+	
+	
+	/**
 	  * Write document into persistence (Xapian database)
 	  *
 	  * @return boolean true on success, false on failure
 	  * @access private
 	  */
 	function _writeToPersistence() {
-		//load Xapian DB
-		$db = new CMS_XapianDB($this->_document->getValue('module'), true);
-		if (!$db->isWritable()) {
-			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get database ... add task to queue list again');
-			//add script to indexation
-			CMS_scriptsManager::addScript(MOD_ASE_CODENAME, array('task' => 'reindex', 'uid' => $this->_document->getValue('uid'), 'module' => $this->_document->getValue('module')));
-			return false;
-		}
 		$xid = $this->_getXID();
 		if ($this->_document->getValue('xid')) {
 			//replace document using XID posting (seems to be better than using DB docid directly)
-			$db->replaceDocument($xid, $this->_xapianDocument);
+			$this->_db->replaceDocument($xid, $this->_xapianDocument);
 		} else {
 			//add document
-			$db->addDocument($this->_xapianDocument);
+			$this->_db->addDocument($this->_xapianDocument);
 			//add document XID
 			$this->_document->setValue('xid', $xid);
 		}
 		//end DB transaction (remove lock and destroy object)
-		$db->endTransaction();
+		$this->_db->endTransaction();
 		//write document into persistence
 		$this->_document->writeToPersistence();
 		return true;
