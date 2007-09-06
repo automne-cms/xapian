@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: mod_ase_search.php,v 1.2 2007/09/06 16:43:55 sebastien Exp $
+// $Id: mod_ase_search.php,v 1.3 2007/09/06 16:58:37 sebastien Exp $
 
 /**
   * Template CMS_ase_search
@@ -207,9 +207,8 @@ if (is_object($search)) {
 		<form name="searchbottom" action="'.$_SERVER['SCRIPT_NAME'].'" method="get">
 		<input type="text" style="width:60%;" name="q" value="'.htmlspecialchars($_REQUEST['q']).'" />&nbsp;<input type="submit" value="'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_SEARCH, false, MOD_ASE_CODENAME).'" />
 		&nbsp;&nbsp;&nbsp;<a href="#help">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_HELP, false, MOD_ASE_CODENAME).'</a>
-		</form>';
+		</form><br />';
 		
-		$content .='<br />';
 	} else {
 		if (!$error) {
 			$content .= '<div class="center"><strong class="alert">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_NORESULTS, false, MOD_ASE_CODENAME).'</strong></div>';
@@ -220,7 +219,7 @@ if (is_object($search)) {
 }
 $content .= '
 <a name="help"></a>
-<h3>-= '.$cms_language->getMessage(MESSAGE_ASE_RESULTS_HELP, false, MOD_ASE_CODENAME).' =-</h3>
+<h3>'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_HELP, false, MOD_ASE_CODENAME).'</h3>
 <!--
 <h4>Operators :</h4>
 <ul>
@@ -247,7 +246,7 @@ The following prefixes allow you to restrict your search on document\'s characte
 <p>Les accents, majuscules ainsi que les termes vides de sens (le, les, de, du, etc.) ne sont pas pris en compte. Les recherches sont <a href="http://fr.wikipedia.org/wiki/Lemmatisation" target="_blank" alt="Voir la définition de Wikipedia" title="Voir la définition de Wikipedia">lemmatisées</a> (cheval équivaut à chevaux, documentation équivaut à documenter et inversement).</p>
 <h4>Affiner votre recherche :</h4>
 <p>Les termes proposés pour affiner votre recherche sont des termes importants dans les premiers documents renvoyés par votre recherche.</p>
-<p>La case à cocher à droite d\'un résultat de recherche vous permet d\'identifier les documents qui vous semblent correspondre le plus à ce que vous recherchez pour relancer une recherche qui en tiendra compte.</p>
+<p>Le lien "Ce document est plus pertinent" vous permet d\'identifier les documents qui vous semblent correspondre le plus à ce que vous recherchez pour relancer une recherche qui en tiendra compte.</p>
 <p>Si vos termes de recherche contiennent des mots dans une langue étrangère (anglais), sélectionner cette langue pour la recherche permettra une meilleur analyse lexicale de votre recherche et donc de meilleurs résultats.</p>
 <h4>Opérateurs :</h4>
 <table>
