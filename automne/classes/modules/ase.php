@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: ase.php,v 1.2 2007/09/06 16:30:54 sebastien Exp $
+// $Id: ase.php,v 1.3 2007/09/10 09:32:22 sebastien Exp $
 
 /**
   * Class CMS_module_ase
@@ -345,9 +345,19 @@ if ($xapianExists) {
 				}
 				return true;
 			} elseif ($parameters['task'] == 'reindex') {
-				return CMS_ase_interface_catalog::reindexModuleDocument($parameters);
+				if (!CMS_ase_interface_catalog::reindexModuleDocument($parameters)) {
+					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : cannot index document ... add task to queue list again');
+					//add script to indexation
+					CMS_scriptsManager::addScript(MOD_ASE_CODENAME, $parameters);
+				}
+				return true;
 			} elseif ($parameters['task'] == 'delete') {
-				return CMS_ase_interface_catalog::deleteModuleDocument($parameters);
+				if (!CMS_ase_interface_catalog::deleteModuleDocument($parameters)) {
+					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : cannot delete document ... add task to queue list again');
+					//add script to indexation
+					CMS_scriptsManager::addScript(MOD_ASE_CODENAME, $parameters);
+				}
+				return true;
 			} else {
 				return parent::scriptTask($parameters);
 			}
@@ -365,6 +375,9 @@ if ($xapianExists) {
 		  */
 		function scriptInfo($parameters) {
 			global $cms_language;
+			if (!is_object($cms_language)) {
+				return parent::scriptInfo($parameters);
+			}
 			//get Interface
 			if (!($moduleInterface = CMS_ase_interface_catalog::getModuleInterface($parameters['module']))) {
 				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no interface for module '.$parameters['module']);

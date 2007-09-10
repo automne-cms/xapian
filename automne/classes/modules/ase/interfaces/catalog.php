@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: catalog.php,v 1.1.1.1 2007/09/04 15:01:29 sebastien Exp $
+// $Id: catalog.php,v 1.2 2007/09/10 09:32:10 sebastien Exp $
 
 /**
   * Class CMS_ase_interface_catalog
@@ -116,7 +116,6 @@ class CMS_ase_interface_catalog extends CMS_grandFather {
 		$return = true;
 		$db = new CMS_XapianDB($parameters['module'], true);
 		if (!$db->isWritable()) {
-			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get database ... add task to queue list again');
 			return false;
 		}
 		if (sizeof($parameters['deleteInfos'])) {

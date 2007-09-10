@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xapianDB.php,v 1.2 2007/09/04 15:59:05 sebastien Exp $
+// $Id: xapianDB.php,v 1.3 2007/09/10 09:32:17 sebastien Exp $
 
 /**
   * Class CMS_XapianDB
@@ -202,7 +202,7 @@ class CMS_XapianDB extends CMS_grandFather {
 	}
 	
 	function _loadWritableDatabase($timeout = 60) {
-		@set_time_limit(((int) $timeout) + 30);
+		@set_time_limit(((int) $timeout) + 60);
 		if (!$this->_getDSN()) {
 			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get DB DSN');
 			return false;

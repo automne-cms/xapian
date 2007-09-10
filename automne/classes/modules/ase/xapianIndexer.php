@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xapianIndexer.php,v 1.2 2007/09/06 16:30:59 sebastien Exp $
+// $Id: xapianIndexer.php,v 1.3 2007/09/10 09:32:17 sebastien Exp $
 
 /**
   * Class CMS_XapianIndexer
@@ -104,11 +104,13 @@ class CMS_XapianIndexer extends CMS_grandFather {
 		//create Xapian document
 		$this->_xapianDocument = new XapianDocument();
 		//load database
-		if (!$this->_loadDatabase()) {
+		if (!$this->_loadWritableDatabase()) {
 			return false;
 		}
 		//XID
 		if (!($xid = $this->_getXID())) {
+			//end DB transaction (remove lock and destroy object)
+			$this->_db->endTransaction();
 			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get valid XID for document');
 			return false;
 		}
@@ -166,9 +168,10 @@ class CMS_XapianIndexer extends CMS_grandFather {
 		$module = CMS_modulesCatalog::getByCodename(MOD_ASE_CODENAME);
 		$indexer->index_text($this->_prepareTextToIndex($this->_document->getValue('title')), (int) $module->getParameters('DOCUMENT_TITLE_WDF'));
 		
-		//pr($this->_xapianDocument->get_description());
 		//save document in Xapian DB
 		$this->_writeToPersistence();
+		//end DB transaction (remove lock and destroy object)
+		$this->_db->endTransaction();
 		return true;
 	}
 	
@@ -244,13 +247,12 @@ class CMS_XapianIndexer extends CMS_grandFather {
 	  * @return string : the document XID
 	  * @access private
 	  */
-	function _loadDatabase() {
+	function _loadWritableDatabase() {
 		//load writable Xapian DB
 		$this->_db = new CMS_XapianDB($this->_document->getValue('module'), true);
 		if (!$this->_db->isWritable()) {
-			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get database for writing ... add task to queue list again');
-			//add script to indexation
-			CMS_scriptsManager::addScript(MOD_ASE_CODENAME, array('task' => 'reindex', 'uid' => $this->_document->getValue('uid'), 'module' => $this->_document->getValue('module')));
+			//end DB transaction
+			$this->_db->endTransaction();
 			return false;
 		}
 		return true;
@@ -274,8 +276,6 @@ class CMS_XapianIndexer extends CMS_grandFather {
 			//add document XID
 			$this->_document->setValue('xid', $xid);
 		}
-		//end DB transaction (remove lock and destroy object)
-		$this->_db->endTransaction();
 		//write document into persistence
 		$this->_document->writeToPersistence();
 		return true;
