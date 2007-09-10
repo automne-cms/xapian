@@ -18,7 +18,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: aseFrontEnd.php,v 1.2 2007/09/06 16:30:49 sebastien Exp $
+// $Id: aseFrontEnd.php,v 1.3 2007/09/10 14:59:38 sebastien Exp $
 
 /**
   * Main Include File of the Frontend Package : ASE
@@ -34,6 +34,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/cms_rc_frontend.php");
 require_once(PATH_PACKAGES_FS."/common/date.php");
 require_once(PATH_PACKAGES_FS."/common/href.php");
 require_once(PATH_PACKAGES_FS."/common/stack.php");
+require_once(PATH_PACKAGES_FS."/common/language.php");
 require_once(PATH_PACKAGES_FS."/workflow/resource.php");
 require_once(PATH_PACKAGES_FS."/workflow/resourcestatus.php");
 require_once(PATH_PACKAGES_FS."/tree/tree.php");
