@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: mod_ase_search.php,v 1.4 2007/09/10 10:54:30 sebastien Exp $
+// $Id: mod_ase_search.php,v 1.5 2007/09/10 16:22:38 sebastien Exp $
 
 /**
   * Template CMS_ase_search
@@ -249,7 +249,7 @@ The following prefixes allow you to restrict your search on document\'s characte
 -->
 
 <br /><br />';
-if (defined('SYSTEM_DEBUG') && SYSTEM_DEBUG && is_object($search) && !$error) {
+if (defined('SYSTEM_DEBUG') && SYSTEM_DEBUG && is_object($search) && !$error && is_object($cms_user) && $cms_user->getUserId == 1) {
 	$resultstime = getmicrotime() - $startresultstime;
 	$content .='<hr />Displaying results in '.round($resultstime,3).'s.<br />';
 	$content .='<strong>Query : </strong>'.$search->getQueryDesc();
