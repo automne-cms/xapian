@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xapianDB.php,v 1.3 2007/09/10 09:32:17 sebastien Exp $
+// $Id: xapianDB.php,v 1.4 2007/09/10 10:54:24 sebastien Exp $
 
 /**
   * Class CMS_XapianDB
@@ -212,7 +212,9 @@ class CMS_XapianDB extends CMS_grandFather {
 		$lock = $this->_dsn.'/db_lock';
 		while (is_file($lock)) {
 			if ((getmicrotime()-$starttime) >= $timeout) {
-				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get writable database before timeout ('.$timeout.'s) ...');
+				//$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get writable database before timeout ('.$timeout.'s) ...');
+				//remove lock
+				$this->_removeLock();
 				return false;
 			}
 			usleep(50000); //.05s
@@ -225,7 +227,7 @@ class CMS_XapianDB extends CMS_grandFather {
 		}
 		//create lock file
 		$lockfile = new CMS_file($lock);
-		$lockfile->setContent((string) time());
+		$lockfile->setContent((string) mktime());
 		$lockfile->writeToPersistence();
 		return true;
 	}

@@ -1,67 +1,76 @@
-/* $Id: ase.css,v 1.2 2007/09/06 16:43:43 sebastien Exp $ */
+/* $Id: ase.css,v 1.3 2007/09/10 10:54:36 sebastien Exp $ */
 
-h3 {
-	text-align:		center;
+#aseSearch {
+	padding:			40px 0 0 0;
 }
-h4 {
-	margin:			0 !important;
-	padding:		0 !important;
+#aseSearch h4 {
+	margin:			0;
+	padding:		0;
 }
-h4 img {
+#aseSearch h4 img {
 	vertical-align:	middle;
 }
-hr {
+#aseSearch hr {
 	text-align:		center;
 	border:			0px;
 	border-top:		1px solid #000000;
-	margin:			10px auto 10px auto !important;
+	margin:			10px auto 10px auto;
 }
-form {
+#aseSearch form {
 	text-align:		center;
 	margin:			20px 0 20px 0;
 }
-.right {
+#aseSearch .right {
 	text-align:		right;
 }
-.center {
+#aseSearch .center {
 	text-align:		center;
 }
-.alert {
+#aseSearch .alert {
 	color:			red;
 }
-p {
+#aseSearch .noresults {
+	margin:			100px 0 100px 0;
+	color:			red;
+	text-align:		center;
+	font-weight:	bold;
+}
+#aseSearch p {
 	width:			90%;
 	margin:			0 0 3px 20px;
 	padding:		0px;
 }
-ul {
+#aseSearch ul {
 	margin-left:	0;
 	padding-left:	0;
 	
 }
-ul li strong {
+#aseSearch ul li strong {
 	float:			left;
 	width:			88px;
 	text-align:		right;
 }
-ul li p {
+#aseSearch ul li p {
 	margin:			0 0 0 92px;
 	position:		relative;
 }
-ul li {
+#aseSearch ul li {
 	white-space:	nowrap;
 	margin-bottom:	10px;
 	list-style:		none;
 }
-div.relevanceContainer {
+#aseSearch div.relevanceContainer {
 	margin-top:		4px;
 	width:			40px;
 	height:			8px;
 	border:			1px solid black;
 	float:			left;
 }
-div.relevance {
+#aseSearch div.relevance {
 	background-color:green;
 	height:			8px;
 	cursor:			help;
+}
+#aseHelp {
+	display:		none;
 }

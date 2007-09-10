@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: mod_ase_search.php,v 1.3 2007/09/06 16:58:37 sebastien Exp $
+// $Id: mod_ase_search.php,v 1.4 2007/09/10 10:54:30 sebastien Exp $
 
 /**
   * Template CMS_ase_search
@@ -50,6 +50,7 @@ define("MESSAGE_ASE_RESULTS_SEARCHERROR", 37);
 define("MESSAGE_ASE_RESULTS_RELEVANCE", 38);
 define("MESSAGE_ASE_RESULTS_MORERELEVANT", 39);
 define("MESSAGE_ASE_RESULTS_RELOAD_USING_THIS_DOC", 40);
+define("MESSAGE_ASE_RESULTS_HELP_DETAIL", 41);
 
 //load language
 $cms_language = new CMS_language($defaultSearchLanguage);
@@ -124,11 +125,11 @@ if (trim($_REQUEST['q'])) {
 	$time = getmicrotime() - $starttime;
 }
 
-$content = '';
-$content .= '
+$content = '
+<div id="aseSearch">
 <form name="search" action="'.$_SERVER['SCRIPT_NAME'].'" method="get">
 <input type="text" style="width:60%;" name="q" value="'.htmlspecialchars($_REQUEST['q']).'" />&nbsp;<input type="submit" value="'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_SEARCH, false, MOD_ASE_CODENAME).'" />
-&nbsp;&nbsp;&nbsp;<a href="#help">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_HELP, false, MOD_ASE_CODENAME).'</a>
+&nbsp;&nbsp;&nbsp;<a href="#help" onclick="document.getElementById(\'aseHelp\').style.display=\'block\';">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_HELP, false, MOD_ASE_CODENAME).'</a>
 </form>';
 
 if (is_object($search)) {
@@ -206,20 +207,23 @@ if (is_object($search)) {
 		<br />
 		<form name="searchbottom" action="'.$_SERVER['SCRIPT_NAME'].'" method="get">
 		<input type="text" style="width:60%;" name="q" value="'.htmlspecialchars($_REQUEST['q']).'" />&nbsp;<input type="submit" value="'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_SEARCH, false, MOD_ASE_CODENAME).'" />
-		&nbsp;&nbsp;&nbsp;<a href="#help">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_HELP, false, MOD_ASE_CODENAME).'</a>
+		&nbsp;&nbsp;&nbsp;<a href="#help" onclick="document.getElementById(\'aseHelp\').style.display=\'block\';">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_HELP, false, MOD_ASE_CODENAME).'</a>
 		</form><br />';
 		
 	} else {
 		if (!$error) {
-			$content .= '<div class="center"><strong class="alert">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_NORESULTS, false, MOD_ASE_CODENAME).'</strong></div>';
+			$content .= '<div class="noresults">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_NORESULTS, false, MOD_ASE_CODENAME).'</div>';
 		} else {
-			$content .= '<div class="center"><strong class="alert">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_SEARCHERROR, false, MOD_ASE_CODENAME).'</strong></div>';
+			$content .= '<div class="noresults">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_SEARCHERROR, false, MOD_ASE_CODENAME).'</div>';
 		}
 	}
 }
 $content .= '
-<a name="help"></a>
-<h3>'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_HELP, false, MOD_ASE_CODENAME).'</h3>
+<div id="aseHelp">
+	<a name="help"></a>
+	<h2>'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_HELP, false, MOD_ASE_CODENAME).'</h2>
+	'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_HELP_DETAIL, array(implode(', ',CMS_filter_catalog::getTypes())), MOD_ASE_CODENAME).'
+</div>
 <!--
 <h4>Operators :</h4>
 <ul>
@@ -243,74 +247,7 @@ The following prefixes allow you to restrict your search on document\'s characte
 	<li><strong>"root:" : </strong><p>Matches documents will be below the given page ID <br />Example : root:12</p></li>
 </ul>
 -->
-<p>Les accents, majuscules ainsi que les termes vides de sens (le, les, de, du, etc.) ne sont pas pris en compte. Les recherches sont <a href="http://fr.wikipedia.org/wiki/Lemmatisation" target="_blank" alt="Voir la définition de Wikipedia" title="Voir la définition de Wikipedia">lemmatisées</a> (cheval équivaut à chevaux, documentation équivaut à documenter et inversement).</p>
-<h4>Affiner votre recherche :</h4>
-<p>Les termes proposés pour affiner votre recherche sont des termes importants dans les premiers documents renvoyés par votre recherche.</p>
-<p>Le lien "Ce document est plus pertinent" vous permet d\'identifier les documents qui vous semblent correspondre le plus à ce que vous recherchez pour relancer une recherche qui en tiendra compte.</p>
-<p>Si vos termes de recherche contiennent des mots dans une langue étrangère (anglais), sélectionner cette langue pour la recherche permettra une meilleur analyse lexicale de votre recherche et donc de meilleurs résultats.</p>
-<h4>Opérateurs :</h4>
-<table>
-	<tr>
-		<th>AND : </th>
-		<td>Les documents résultant répondront aux deux termes.</td>
-	</tr>
-	<tr>
-		<th>OR : </th>
-		<td>Les documents résultant répondront à l\'un des deux termes.</td>
-	</tr>
-	<tr>
-		<th>NOT : </th>
-		<td>Les documents résultant répondront uniquement au terme de gauche.</td>
-	</tr>
-	<tr>
-		<th>XOR : </th>
-		<td>Les documents résultant répondront à l\'un des deux termes mais pas au deux.</td>
-	</tr>
-	<tr>
-		<th>( et ) : </th>
-		<td>Vous permet de grouper les expressions.</td>
-	</tr>
-	<tr>
-		<th>+ et - : </th>
-		<td>Opérateurs unaires. Les documents résultant répondront à tous les termes préfixés d\'un signe plus et à aucun des termes préfixés d\'un signe moins. <br />Exemple : +Cimpa -Airbus</td>
-	</tr>
-	<tr>
-		<th>NEAR : </th>
-		<td>Les documents résultant contiendront les deux termes à 10 mots d\'intervalle maximum.<br />Exemple : Cimpa NEAR Airbus</td>
-	</tr>
-	<tr>
-		<th>" " : </th>
-		<td>Permet une recherche de phrase exacte.</td>
-	</tr>
-	<tr>
-		<th>* : </th>
-		<td>Signe joker. Attention l\'emploi de cet opérateur peut ralentir votre recherche.</td>
-	</tr>
-</table>
-<h4>Préfixes :</h4>
-<p>Les préfixes suivants vous permettent de restreindre vos recherches sur certaines caractéristiques de documents. Le terme doit suivre le préfixe directement (sans espaces). Vous pouvez combiner ces préfixes avec tout type de recherche par mots clés classique.</p>
-<table>
-	<tr>
-		<th>"title:" : </th>
-		<td>Le terme suivant ce préfixe sera dans le titre du document.<br />Exemple : title:Airbus</td>
-	</tr>
-	<tr>
-		<th>"filetype:" : </th>
-		<td>Les documents résultant seront des fichiers du format donné <br />Les formats disponibles sont : '.implode(', ',CMS_filter_catalog::getTypes()).'<br />Exemple : filetype:pdf</td>
-	</tr>
-	<tr>
-		<th>"language:" : </th>
-		<td>Les documents résultant seront dans la langue donnée <br />Les langues disponibles sont : fr, en <br />Exemple : language:fr</td>
-	</tr>
-	<tr>
-		<th>"page:" : </th>
-		<td>Les documents résultant seront dans la page donnée<br />Example : page:12</td>
-	</tr>
-	<tr>
-		<th>"root:" : </th>
-		<td>Les documents résultant seront sous la page donnée<br />Example : root:12</td>
-	</tr>
-</table>
+
 <br /><br />';
 if (defined('SYSTEM_DEBUG') && SYSTEM_DEBUG && is_object($search) && !$error) {
 	$resultstime = getmicrotime() - $startresultstime;
@@ -319,5 +256,6 @@ if (defined('SYSTEM_DEBUG') && SYSTEM_DEBUG && is_object($search) && !$error) {
 	$content .='<hr />';
 	$content .='<small><strong>Extended Query : </strong>'.$search->getQueryDesc(true).'</small>';
 }
+$content .= '</div>';
 echo $content;
 ?>

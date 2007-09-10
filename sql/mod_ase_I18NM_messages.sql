@@ -2,7 +2,7 @@
 ## Contains declaration for module installation : 
 ## All messages (mandatory) : inject 2/2
 ##
-## @version $Id: mod_ase_I18NM_messages.sql,v 1.2 2007/09/06 16:36:03 sebastien Exp $
+## @version $Id: mod_ase_I18NM_messages.sql,v 1.3 2007/09/10 10:54:41 sebastien Exp $
 
 DELETE FROM I18NM_messages WHERE module='ase';
 
@@ -38,7 +38,7 @@ INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (2
 INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (30, 'ase', NOW(), 'Résultats : ', 'Results:');
 INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (31, 'ase', NOW(), 'Indexé le', 'Indexed on');
 INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (32, 'ase', NOW(), 'Publié le', 'Published on');
-INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (33, 'ase', NOW(), 'Etendre votre recherche :', 'Expand your query:');
+INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (33, 'ase', NOW(), 'Affiner votre recherche :', 'Expand your query:');
 INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (34, 'ase', NOW(), 'Aide', 'Help');
 INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (35, 'ase', NOW(), 'Pages:', 'Pages :');
 INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (36, 'ase', NOW(), 'Votre recherche ne correspond à aucun document ...', 'Your search did not match any documents...');
@@ -46,3 +46,72 @@ INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (3
 INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (38, 'ase', NOW(), 'Pourcentage de pertinence :', 'Relevance percentage:');
 INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (39, 'ase', NOW(), 'Ce document est plus pertinent', 'This document is more relevant');
 INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (40, 'ase', NOW(), 'Relancer la recherche en utilisant cette information.', 'Reload search using this information.');
+INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (41, 'ase', NOW(), '<p>Les accents, majuscules ainsi que les termes vides de sens (le, les, de, du, etc.) ne sont pas pris en compte. Les recherches sont <a href="http://fr.wikipedia.org/wiki/Lemmatisation" target="_blank" alt="Voir la définition de Wikipedia" title="Voir la définition de Wikipedia">lemmatisées</a> (cheval équivaut à chevaux, documentation équivaut à documenter et inversement). Les mots commençant par une majuscule sont considérés comme des noms propres.</p>
+	<h3>Affiner votre recherche :</h3>
+	<p>Les termes proposés pour affiner votre recherche sont des termes importants dans les premiers documents renvoyés par votre recherche.</p>
+	<p>Le lien "Ce document est plus pertinent" vous permet d\'identifier les documents qui vous semblent correspondre le plus à ce que vous recherchez pour relancer une recherche qui en tiendra compte.</p>
+	<p>Si vos termes de recherche contiennent des mots dans une langue étrangère (anglais), sélectionner cette langue pour la recherche permettra une meilleur analyse lexicale de votre recherche et donc de meilleurs résultats.</p>
+	<h3>Opérateurs :</h3>
+	<table>
+		<tr>
+			<th>AND : </th>
+			<td>Les documents résultant répondront aux deux termes.</td>
+		</tr>
+		<tr>
+			<th>OR : </th>
+			<td>Les documents résultant répondront à l\'un des deux termes.</td>
+		</tr>
+		<tr>
+			<th>NOT : </th>
+			<td>Les documents résultant répondront uniquement au terme de gauche.</td>
+		</tr>
+		<tr>
+			<th>XOR : </th>
+			<td>Les documents résultant répondront à l\'un des deux termes mais pas au deux.</td>
+		</tr>
+		<tr>
+			<th>( et ) : </th>
+			<td>Vous permet de grouper les expressions.</td>
+		</tr>
+		<tr>
+			<th>+ et - : </th>
+			<td>Opérateurs unaires. Les documents résultant répondront à tous les termes préfixés d\'un signe plus et à aucun des termes préfixés d\'un signe moins. <br />Exemple : +Académie -Toulouse</td>
+		</tr>
+		<tr>
+			<th>NEAR : </th>
+			<td>Les documents résultant contiendront les deux termes à 10 mots d\'intervalle maximum.<br />Exemple : Académie NEAR Toulouse</td>
+		</tr>
+		<tr>
+			<th>" " : </th>
+			<td>Permet une recherche de phrase exacte.</td>
+		</tr>
+		<tr>
+			<th>* : </th>
+			<td>Signe joker. Attention l\'emploi de cet opérateur peut ralentir votre recherche.</td>
+		</tr>
+	</table>
+	<h3>Préfixes :</h3>
+	<p>Les préfixes suivants vous permettent de restreindre vos recherches sur certaines caractéristiques de documents. Le terme doit suivre le préfixe directement (sans espaces). Vous pouvez combiner ces préfixes avec tout type de recherche par mots clés classique.</p>
+	<table>
+		<tr>
+			<th>"title:" : </th>
+			<td>Le terme suivant ce préfixe sera dans le titre du document.<br />Exemple : title:Académie</td>
+		</tr>
+		<tr>
+			<th>"filetype:" : </th>
+			<td>Les documents résultant seront des fichiers du format donné <br />Les formats disponibles sont : %s<br />Exemple : filetype:pdf</td>
+		</tr>
+		<tr>
+			<th>"language:" : </th>
+			<td>Les documents résultant seront dans la langue donnée <br />Les langues disponibles sont : fr, en <br />Exemple : language:fr</td>
+		</tr>
+		<!--<tr>
+			<th>"page:" : </th>
+			<td>Les documents résultant seront dans la page donnée<br />Example : page:12</td>
+		</tr>
+		<tr>
+			<th>"root:" : </th>
+			<td>Les documents résultant seront sous la page donnée<br />Example : root:12</td>
+		</tr>-->
+	</table>', 'TODO');
+INSERT INTO I18NM_messages (id, module, timestamp, fr, en) VALUES (42, 'ase', NOW(), '<strong>Moteur de recherche :</strong><br /><strong>&lt;block module=&quot;ase&quot; type=&quot;search&quot; language=&quot;</strong>code<strong>&quot;&gt;&lt;/block&gt;<br /></strong><ul><li><strong>code : </strong>Identifiant de la langue &agrave; utiliser : fr ou en</li></ul>', 'TODO');

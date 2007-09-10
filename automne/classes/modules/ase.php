@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: ase.php,v 1.3 2007/09/10 09:32:22 sebastien Exp $
+// $Id: ase.php,v 1.4 2007/09/10 10:54:19 sebastien Exp $
 
 /**
   * Class CMS_module_ase
@@ -69,6 +69,7 @@ if ($xapianExists) {
 	define("MESSAGE_TASK_QUERY_MODULE", 23);
 	define("MESSAGE_TASK_INDEX_MODULE_DOCUMENT", 24);
 	define("MESSAGE_TASK_DELETE_MODULE_DOCUMENT", 25);
+	define("MESSAGE_MOD_ASE_ROWS_EXPLANATION", 42);
 	
 	//Interfaces objects
 	require_once(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/interfaces/common.php');
@@ -303,6 +304,10 @@ if ($xapianExists) {
 							}
 						}
 					}
+					return $modulesCode;
+				break;
+				case MODULE_TREATMENT_ROWS_EDITION_LABELS :
+					$modulesCode[MOD_ASE_CODENAME] = $treatmentParameters["language"]->getMessage(MESSAGE_MOD_ASE_ROWS_EXPLANATION, false, MOD_ASE_CODENAME);
 					return $modulesCode;
 				break;
 			}
