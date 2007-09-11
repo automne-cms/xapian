@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: mod_ase_search.php,v 1.5 2007/09/10 16:22:38 sebastien Exp $
+// $Id: mod_ase_search.php,v 1.6 2007/09/11 08:58:33 sebastien Exp $
 
 /**
   * Template CMS_ase_search
@@ -181,7 +181,8 @@ if (is_object($search)) {
 			$max = ($search->getMatchesNumbers()-(($pageNB - 1) * $resultsNumber + 1) >= $resultsNumber) ? ($pageNB * $resultsNumber) : $search->getMatchesNumbers();
 			$toPage = 1;
 			$content .= '<br /><div class="center">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_PAGES, false, MOD_ASE_CODENAME).' ';
-			while((($toPage-1)*$resultsNumber) <= $search->getMatchesNumbers()) {
+			//no more than 25 pages (500 first results max)
+			while((($toPage-1)*$resultsNumber) <= $search->getMatchesNumbers() && $toPage <= 25) {
 				if ($toPage != $pageNB) {
 					$content .= '<a href="'.$_SERVER['SCRIPT_NAME'].'?q='.urlencode($_REQUEST['q']).'&amp;page='.$toPage.'&amp;expandDocs='.urlencode($_REQUEST['expandDocs']).'">'.$toPage.'</a>&nbsp;&nbsp;&nbsp;';
 				} else {
@@ -249,7 +250,7 @@ The following prefixes allow you to restrict your search on document\'s characte
 -->
 
 <br /><br />';
-if (defined('SYSTEM_DEBUG') && SYSTEM_DEBUG && is_object($search) && !$error && is_object($cms_user) && $cms_user->getUserId == 1) {
+if (defined('SYSTEM_DEBUG') && SYSTEM_DEBUG && is_object($search) && !$error) {
 	$resultstime = getmicrotime() - $startresultstime;
 	$content .='<hr />Displaying results in '.round($resultstime,3).'s.<br />';
 	$content .='<strong>Query : </strong>'.$search->getQueryDesc();
