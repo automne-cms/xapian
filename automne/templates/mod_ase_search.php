@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: mod_ase_search.php,v 1.7 2007/09/11 09:01:36 sebastien Exp $
+// $Id: mod_ase_search.php,v 1.8 2007/09/11 09:19:01 sebastien Exp $
 
 /**
   * Template CMS_ase_search
@@ -213,6 +213,10 @@ if (is_object($search)) {
 		
 	} else {
 		if (!$error) {
+			//Spell correction
+			if ($search->getCorrectedQueryString()) {
+				$content .='<div class="left"><strong class="alert">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_DIDYOUMEAN, false, MOD_ASE_CODENAME).' </strong><a href="'.$_SERVER['SCRIPT_NAME'].'?q='.urlencode($search->getCorrectedQueryString()).'">'.$search->getCorrectedQueryString().'</a></div>';
+			}
 			$content .= '<div class="noresults">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_NORESULTS, false, MOD_ASE_CODENAME).'</div>';
 		} else {
 			$content .= '<div class="noresults">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_SEARCHERROR, false, MOD_ASE_CODENAME).'</div>';
