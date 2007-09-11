@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xapianDB.php,v 1.4 2007/09/10 10:54:24 sebastien Exp $
+// $Id: xapianDB.php,v 1.5 2007/09/11 08:03:29 sebastien Exp $
 
 /**
   * Class CMS_XapianDB
@@ -177,7 +177,7 @@ class CMS_XapianDB extends CMS_grandFather {
 		if ($this->_dsn) {
 			return $this->_dsn;
 		}
-		$this->_dsn = PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME.'/databases/'.$this->_module.'_'.$this->_dbType;
+		$this->_dsn = PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME.'/databases/'.strtolower($this->_module).'_'.strtolower($this->_dbType);
 		if (!is_dir($this->_dsn)) {
 			$dsnFolder = new CMS_file($this->_dsn, FILE_SYSTEM, TYPE_DIRECTORY);
 			if (!$dsnFolder->writeToPersistence()) {
