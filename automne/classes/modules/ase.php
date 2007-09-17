@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: ase.php,v 1.4 2007/09/10 10:54:19 sebastien Exp $
+// $Id: ase.php,v 1.5 2007/09/17 13:04:58 sebastien Exp $
 
 /**
   * Class CMS_module_ase
@@ -93,7 +93,9 @@ if ($xapianExists) {
 			if (function_exists('xapian_version_string')) {
 				return xapian_version_string();
 			} else {
-				return Xapian::version_string();
+				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can\'t get Xapian version');
+				return false;
+				//return Xapian::version_string();
 			}
 		}
 		
