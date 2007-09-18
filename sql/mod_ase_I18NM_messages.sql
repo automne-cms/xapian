@@ -2,7 +2,7 @@
 ## Contains declaration for module installation : 
 ## All messages (mandatory) : inject 2/2
 ##
-## @version $Id: mod_ase_I18NM_messages.sql,v 1.5 2007/09/11 09:10:08 sebastien Exp $
+## @version $Id: mod_ase_I18NM_messages.sql,v 1.6 2007/09/18 10:03:42 sebastien Exp $
 
 DELETE FROM I18NM_messages WHERE module='ase';
 
@@ -75,11 +75,11 @@ INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (4
 		</tr>
 		<tr>
 			<th>+ et - : </th>
-			<td>Opérateurs unaires. Les documents résultant répondront à tous les termes préfixés d\'un signe plus et à aucun des termes préfixés d\'un signe moins. <br />Exemple : +Académie -Toulouse</td>
+			<td>Opérateurs unaires. Les documents résultant répondront à tous les termes préfixés d\'un signe plus et à aucun des termes préfixés d\'un signe moins. <br />Exemple : +cheval -voiture</td>
 		</tr>
 		<tr>
 			<th>NEAR : </th>
-			<td>Les documents résultant contiendront les deux termes à 10 mots d\'intervalle maximum.<br />Exemple : Académie NEAR Toulouse</td>
+			<td>Les documents résultant contiendront les deux termes à 10 mots d\'intervalle maximum.<br />Exemple : cheval NEAR voiture</td>
 		</tr>
 		<tr>
 			<th>" " : </th>
@@ -95,7 +95,7 @@ INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (4
 	<table>
 		<tr>
 			<th>"title:" : </th>
-			<td>Le terme suivant ce préfixe sera dans le titre du document.<br />Exemple : title:Académie</td>
+			<td>Le terme suivant ce préfixe sera dans le titre du document.<br />Exemple : title:cheval</td>
 		</tr>
 		<tr>
 			<th>"filetype:" : </th>

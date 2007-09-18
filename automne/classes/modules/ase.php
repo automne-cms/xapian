@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: ase.php,v 1.6 2007/09/17 14:48:33 sebastien Exp $
+// $Id: ase.php,v 1.7 2007/09/18 10:03:35 sebastien Exp $
 
 /**
   * Class CMS_module_ase
@@ -35,10 +35,28 @@ define("MOD_ASE_XAPIAN_MIN_VERSION", '1.0.2');
 
 //Check for Xapian librarie before module loading
 $xapianExists = false;
-if(!class_exists('XapianDatabase')) {
+/*if(!class_exists('XapianDatabase')) {
 	@dl ("xapian.so");
 	if(class_exists('XapianDatabase')) {
 		$xapianExists = true;
+	}
+} else {
+	$xapianExists = true;
+}*/
+
+
+// Try to load Xapian extension if it's not already loaded.
+if (!extension_loaded("xapian")) {
+	if (strtolower(substr(PHP_OS, 0, 3)) === 'win') {
+		if (dl('php_xapian.dll')) $xapianExists = true;
+	} else {
+		// PHP_SHLIB_SUFFIX is available as of PHP 4.3.0, for older PHP assume 'so'.
+		// It gives 'dylib' on MacOS X which is for libraries, modules are 'so'.
+		if (PHP_SHLIB_SUFFIX === 'PHP_SHLIB_SUFFIX' || PHP_SHLIB_SUFFIX === 'dylib') {
+			if (dl('xapian.so')) $xapianExists = true;
+		} else {
+			if (dl('xapian.'.PHP_SHLIB_SUFFIX)) $xapianExists = true;
+		}
 	}
 } else {
 	$xapianExists = true;
