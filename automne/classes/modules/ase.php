@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: ase.php,v 1.7 2007/09/18 10:03:35 sebastien Exp $
+// $Id: ase.php,v 1.8 2007/09/18 10:13:34 sebastien Exp $
 
 /**
   * Class CMS_module_ase
@@ -33,18 +33,7 @@
 define("MOD_ASE_CODENAME", "ase");
 define("MOD_ASE_XAPIAN_MIN_VERSION", '1.0.2');
 
-//Check for Xapian librarie before module loading
 $xapianExists = false;
-/*if(!class_exists('XapianDatabase')) {
-	@dl ("xapian.so");
-	if(class_exists('XapianDatabase')) {
-		$xapianExists = true;
-	}
-} else {
-	$xapianExists = true;
-}*/
-
-
 // Try to load Xapian extension if it's not already loaded.
 if (!extension_loaded("xapian")) {
 	if (strtolower(substr(PHP_OS, 0, 3)) === 'win') {
