@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: mod_ase_search.php,v 1.8 2007/09/11 09:19:01 sebastien Exp $
+// $Id: mod_ase_search.php,v 1.9 2007/09/18 13:44:52 sebastien Exp $
 
 /**
   * Template CMS_ase_search
@@ -161,8 +161,7 @@ if (is_object($search)) {
 				<a href="'.$search->getMatchValue($result, 'url').'" title="'.$search->getMatchValue($result, 'url').'">'.CMS_ase_interface::strChop($search->getMatchValue($result, 'url'),60,true).'</a>
 				 - '.$search->getMatchValue($result, 'language').$fileSize.'
 				 - '.$search->getMatchValue($result, 'percent').'%<br />
-				 '.$cms_language->getMessage(MESSAGE_ASE_RESULTS_INDEXED, false, MOD_ASE_CODENAME).' '.$search->getMatchValue($result, 'indexationDate', array('format' => 'm-d-Y')).'
-				 - '.$cms_language->getMessage(MESSAGE_ASE_RESULTS_PUBLISHED, false, MOD_ASE_CODENAME).' '.$search->getMatchValue($result, 'pubDate', array('format' => 'm-d-Y'));
+				 '.$cms_language->getMessage(MESSAGE_ASE_RESULTS_PUBLISHED, false, MOD_ASE_CODENAME).' '.$search->getMatchValue($result, 'pubDate', array('format' => $cms_language->getDateFormat()));
 				if (!is_array($expandDocsIds) || (is_array($expandDocsIds) && !in_array($search->getMatchValue($result, 'docid'), $expandDocsIds))) {
 					$content .= ' - <a href="'.$_SERVER['SCRIPT_NAME'].'?q='.urlencode($_REQUEST['q']).'&amp;expandDocs='.($_REQUEST['expandDocs'] ? urlencode($_REQUEST['expandDocs']).','.$search->getMatchValue($result, 'docid') : $search->getMatchValue($result, 'docid')).'" title="'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_RELOAD_USING_THIS_DOC, false, MOD_ASE_CODENAME).'">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_MORERELEVANT, false, MOD_ASE_CODENAME).'</a>';
 				} else {
