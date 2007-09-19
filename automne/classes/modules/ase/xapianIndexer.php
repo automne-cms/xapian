@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xapianIndexer.php,v 1.3 2007/09/10 09:32:17 sebastien Exp $
+// $Id: xapianIndexer.php,v 1.4 2007/09/19 07:43:02 sebastien Exp $
 
 /**
   * Class CMS_XapianIndexer
@@ -115,7 +115,7 @@ class CMS_XapianIndexer extends CMS_grandFather {
 			return false;
 		}
 		//document datas (only first 500 caracters, more is useless), remove * and trailing spaces also
-		$this->_xapianDocument->set_data(trim(str_replace('*', '',substr($this->_document->getTextContent(),0,500))));
+		$this->_xapianDocument->set_data(strtr(trim(str_replace('*', '',substr($this->_document->getTextContent(),0,500))),"_’", " '"));
 		
 		/* 
 		 * document values
