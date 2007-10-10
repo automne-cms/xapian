@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xapianSearch.php,v 1.3 2007/09/20 09:30:12 sebastien Exp $
+// $Id: xapianSearch.php,v 1.4 2007/10/10 08:46:17 sebastien Exp $
 
 /**
   * Class CMS_XapianQuery
@@ -116,7 +116,7 @@ class CMS_XapianQuery extends CMS_grandFather {
 			return false;
 		}
 		if (in_array($module, $this->_modules)) {
-			$this->_modulesInterfaces[$module] = $interface;
+			$this->_modulesInterfaces[strtolower($module)] = $interface;
 		}
 		return true;
 	}
@@ -173,13 +173,13 @@ class CMS_XapianQuery extends CMS_grandFather {
 				$db->addDatabase(new CMS_XapianDB($module));
 			}
 			//interfaces
-			if (!is_object($this->_modulesInterfaces[$module])) {
+			if (!is_object($this->_modulesInterfaces[strtolower($module)])) {
 				//load module interface
 				if (!($moduleInterface = CMS_ase_interface_catalog::getModuleInterface($module))) {
 					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no interface for module '.$module);
 					return false;
 				}
-				$this->_modulesInterfaces[$module] = $moduleInterface;
+				$this->_modulesInterfaces[strtolower($module)] = $moduleInterface;
 			}
 			$count++;
 		}
@@ -434,7 +434,7 @@ class CMS_XapianQuery extends CMS_grandFather {
 				}
 			}
 			if (is_array($moduleFilters) && sizeof($moduleFilters)) {
-				$moduleQuery = new XapianQuery('__MODULE__:'.$module);
+				$moduleQuery = new XapianQuery('__MODULE__:'.strtolower($module));
 				//if inquery, add it
 				if ($inquery) {
 					$moduleQuery = new XapianQuery(XAPIAN_QUERY_OP_AND, $moduleQuery, $inquery);

@@ -1,3 +1,6 @@
+v0.21
+[BUG] : in search class for modules with uppercase codename
+
 v0.2 : based on Xapian 1.0.2
 [REFACTOR] : Use new indexing method introduced in Xapian 1.0.0 
 [REFACTOR] : Index datas are now in UTF8
