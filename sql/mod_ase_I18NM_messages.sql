@@ -2,7 +2,7 @@
 ## Contains declaration for module installation : 
 ## All messages (mandatory) : inject 2/2
 ##
-## @version $Id: mod_ase_I18NM_messages.sql,v 1.6 2007/09/18 10:03:42 sebastien Exp $
+## @version $Id: mod_ase_I18NM_messages.sql,v 1.7 2007/10/12 10:29:32 sebastien Exp $
 
 DELETE FROM I18NM_messages WHERE module='ase';
 
@@ -44,12 +44,12 @@ INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (3
 INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (36, 'ase', NOW(), 'Votre recherche ne correspond à aucun document ...<br />Suggestions : Vérifiez l\'orthographe des termes de recherche, essayez d\'autres mots, utilisez des mots plus généraux.', 'Your search did not match any documents...<br />Suggestions: Make sure all words are spelled correctly, try different keywords, try more general keywords.');
 INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (37, 'ase', NOW(), 'Votre recherche a entraîné une erreur, merci de la modifier ...', 'Your search involved an error, thank you to modify it...');
 INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (38, 'ase', NOW(), 'Pourcentage de pertinence :', 'Relevance percentage:');
-INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (39, 'ase', NOW(), 'Ce document est plus pertinent', 'This document is more relevant');
-INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (40, 'ase', NOW(), 'Relancer la recherche en utilisant cette information.', 'Reload search using this information.');
+INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (39, 'ase', NOW(), 'Affiner la recherche à partir de ce document', 'Refine search using this document');
+INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (40, 'ase', NOW(), 'Affiner la recherche à partir de ce document', 'Refine search using this document');
 INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (41, 'ase', NOW(), '<p>Les accents, majuscules ainsi que les termes vides de sens (le, les, de, du, etc.) ne sont pas pris en compte. Les recherches sont <a href="http://fr.wikipedia.org/wiki/Lemmatisation" target="_blank" alt="Voir la définition de Wikipedia" title="Voir la définition de Wikipedia">lemmatisées</a> (cheval équivaut à chevaux, documentation équivaut à documenter et inversement). Les mots commençant par une majuscule sont considérés comme des noms propres.</p>
 	<h3>Affiner votre recherche :</h3>
 	<p>Les termes proposés pour affiner votre recherche sont des termes importants dans les premiers documents renvoyés par votre recherche.</p>
-	<p>Le lien "Ce document est plus pertinent" vous permet d\'identifier les documents qui vous semblent correspondre le plus à ce que vous recherchez pour relancer une recherche qui en tiendra compte.</p>
+	<p>Le lien "Affiner la recherche à partir de ce document" vous permet d\'identifier les documents qui vous semblent correspondre le plus à ce que vous recherchez pour relancer une recherche qui en tiendra compte.</p>
 	<p>Si vos termes de recherche contiennent des mots dans une langue étrangère (anglais), sélectionner cette langue pour la recherche permettra une meilleur analyse lexicale de votre recherche et donc de meilleurs résultats.</p>
 	<h3>Opérateurs :</h3>
 	<table>

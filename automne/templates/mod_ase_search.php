@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: mod_ase_search.php,v 1.10 2007/10/12 10:13:14 sebastien Exp $
+// $Id: mod_ase_search.php,v 1.11 2007/10/12 10:29:27 sebastien Exp $
 
 /**
   * Template CMS_ase_search
@@ -66,7 +66,7 @@ if (trim($_REQUEST['q'])) {
 	
 	$modules = array();
 	//restrict search to given modules if any
-	if (sizeof($_REQUEST['modules'])) {
+	if (is_array($_REQUEST['modules']) && $_REQUEST['modules']) {
 		$availableModules = CMS_ase_interface_catalog::getActiveModules();
 		foreach($_REQUEST['modules'] as $module) {
 			if (isset($availableModules[$module])) {
