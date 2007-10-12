@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: mod_ase_search.php,v 1.9 2007/09/18 13:44:52 sebastien Exp $
+// $Id: mod_ase_search.php,v 1.10 2007/10/12 10:13:14 sebastien Exp $
 
 /**
   * Template CMS_ase_search
@@ -59,6 +59,11 @@ $error = false;
 if (trim($_REQUEST['q'])) {
 	$starttime = getmicrotime();
 	$pageNB = ((int) $_REQUEST['page']) ? (int) $_REQUEST['page'] : 1;
+	
+	//////////////////////////////////////////////////////////////////
+	//      Here declare all modules to search (default : all)      //
+	//////////////////////////////////////////////////////////////////
+	
 	$modules = array();
 	//restrict search to given modules if any
 	if (sizeof($_REQUEST['modules'])) {
@@ -72,6 +77,11 @@ if (trim($_REQUEST['q'])) {
 		//else search on all active modules
 		$modules = null;
 	}
+	
+	//////////////////////////////////////////////////////////////////
+	// Here declare all filters which apply on all queried modules  //
+	//////////////////////////////////////////////////////////////////
+	
 	//Create search query
 	$searchQuery = trim($_REQUEST['q']);
 	if ($_REQUEST['language']) {
@@ -84,7 +94,17 @@ if (trim($_REQUEST['q'])) {
 		$filetypes = explode(',',$_REQUEST['filetype']);
 		$searchQuery .= ' AND (filetype:'.implode(' OR filetype:',$filetypes).')';
 	}
+	
+	//////////////////////////////////////////////////////////////////
+	//                       Declare Search                         //
+	//////////////////////////////////////////////////////////////////
+	
 	$search = new CMS_XapianQuery($searchQuery, $modules, $searchLanguage);
+	
+	//////////////////////////////////////////////////////////////////
+	//          Here declare all filters for each modules           //
+	//////////////////////////////////////////////////////////////////
+	
 	//Filters on pages
 	if (sensitiveIO::isPositiveInteger($_REQUEST['pageRoot']) || $_REQUEST['PublicAfter'] || $_REQUEST['PublicBefore']) {
 		//load module interface
@@ -145,7 +165,6 @@ if (is_object($search)) {
 		}
 		$content .='<h2>'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_RESULTS, false, MOD_ASE_CODENAME).'</h2>';
 		
-		$queryTerms = $search->getQueryTerms();
 		//Results
 		foreach ($results as $resultID => $result) {
 			if ($fileSize = $search->getMatchValue($result, 'fileSize')) {
