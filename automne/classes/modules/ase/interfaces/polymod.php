@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: polymod.php,v 1.2 2007/09/20 09:30:12 sebastien Exp $
+// $Id: polymod.php,v 1.3 2007/12/11 11:07:08 sebastien Exp $
 
 /**
   * Class CMS_polymod_ase
@@ -103,12 +103,12 @@ class CMS_polymod_ase extends CMS_ase_interface {
 		$document->setModuleAttribute('language', $language);
 		//instanciate object language as general language
 		$cms_language = new CMS_language($language);
-		
+		//get item label (in first, because a strange bug cause item _objectValues to be reseted next)
+		$itemLabel = $item->getLabel();
 		//add object type id as a module attribute
 		$document->setModuleAttribute('objecttype', $item->getObjectID());
 		//add item id as a module attribute
 		$document->setModuleAttribute('itemid', $item->getID());
-		
 		//set all object attributes and plain text values then get files objets if any
 		$content = '';
 		$files = array();
@@ -137,7 +137,7 @@ class CMS_polymod_ase extends CMS_ase_interface {
 		//add document type as a module attribute
 		$document->setModuleAttribute('type', $type);
 		//set document title
-		$document->setValue('title', $item->getLabel());
+		$document->setValue('title', $itemLabel);
 		return true;
 	}
 	
