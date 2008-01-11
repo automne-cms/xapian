@@ -2,7 +2,7 @@
 ## Contains declaration for module installation : 
 ## All messages (mandatory) : inject 2/2
 ##
-## @version $Id: mod_ase_I18NM_messages.sql,v 1.8 2008/01/11 08:42:13 sebastien Exp $
+## @version $Id: mod_ase_I18NM_messages.sql,v 1.9 2008/01/11 15:51:18 sebastien Exp $
 
 DELETE FROM I18NM_messages WHERE module='ase';
 
@@ -162,7 +162,7 @@ INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (4
 	<table>
 		<tr>
 			<th>"title:" : </th>
-			<td>The word following this prefix will be part of the document's title.<br />Example: title:horse</td>
+			<td>The word following this prefix will be part of the document\'s title.<br />Example: title:horse</td>
 		</tr>
 		<tr>
 			<th>"filetype:" : </th>
