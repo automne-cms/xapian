@@ -1,3 +1,6 @@
+v0.22
+[BUG] : in polymod interface when indexing objects with composed labels
+
 v0.21
 [BUG] : in search class for modules with uppercase codename
 

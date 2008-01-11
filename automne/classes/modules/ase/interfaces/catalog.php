@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: catalog.php,v 1.3 2007/09/20 09:30:12 sebastien Exp $
+// $Id: catalog.php,v 1.4 2008/01/11 08:42:41 sebastien Exp $
 
 /**
   * Class CMS_ase_interface_catalog
@@ -28,12 +28,18 @@
 class CMS_ase_interface_catalog extends CMS_grandFather {
 	
 	function &getModuleInterface($codename) {
-		$interfaceName = (!CMS_modulesCatalog::isPolymod($codename)) ? 'CMS_'.$codename.'_ase' : 'CMS_polymod_ase';
+		$interfaceName = 'CMS_'.$codename.'_ase';
 		if (!class_exists($interfaceName)) {
+			if (CMS_modulesCatalog::isPolymod($codename)) {
+				$interfaceName = 'CMS_polymod_ase';
+				if (class_exists($interfaceName)) {
+					return  new $interfaceName($codename);
+				}
+			}
 			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : module '.$codename.' does have interface with ASE module ...');
 			return false;
 		}
-		return new $interfaceName($codename);
+		return  new $interfaceName($codename);
 	}
 	
 	function getActiveModules() {
@@ -57,8 +63,12 @@ class CMS_ase_interface_catalog extends CMS_grandFather {
 	}
 	
 	function moduleHasInterface($codename) {
-		$interfaceName = (!CMS_modulesCatalog::isPolymod($codename)) ? 'CMS_'.$codename.'_ase' : 'CMS_polymod_ase';
-		if (!class_exists($interfaceName)) {
+		if (!class_exists('CMS_'.$codename.'_ase')) {
+			if (CMS_modulesCatalog::isPolymod($codename)) {
+				if (class_exists('CMS_polymod_ase')) {
+					return true;
+				}
+			}
 			return false;
 		}
 		return true;

@@ -2,7 +2,7 @@
 ## Contains declaration for module installation : 
 ## All messages (mandatory) : inject 2/2
 ##
-## @version $Id: mod_ase_I18NM_messages.sql,v 1.7 2007/10/12 10:29:32 sebastien Exp $
+## @version $Id: mod_ase_I18NM_messages.sql,v 1.8 2008/01/11 08:42:13 sebastien Exp $
 
 DELETE FROM I18NM_messages WHERE module='ase';
 
@@ -113,5 +113,72 @@ INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (4
 			<th>"root:" : </th>
 			<td>Les documents résultant seront sous la page donnée<br />Example : root:12</td>
 		</tr>-->
-	</table>', 'TODO');
+	</table>', '<p>Accents, capital letters as well as words with no proper meaning (the, that, of, a, etc.) will not be taken into account. The engine uses <a href="http://en.wikipedia.org/wiki/Stemming" target="_blank" alt="See Wikipedia definition" title="See Wikipedia definition">stemming</a> search (horse equals horses, documentation equals documents and vice versa). Words beginning with a capital letter will be considered as proper nouns.</p>
+	<h3>Refine your search:</h3>
+	<p>The terms suggested to refine your search are important words from the first documents resulting from your search.</p>
+	<p>The link "Refine your search from this document" enables you to identify the most relevant documents and launch a new search taking them into account.</p>
+	<p>If the terms you use for your search include words in a foreign language, select this language to enable a better lexical analysis of your demand, hence better results.</p>
+	<h3>Operators:</h3>
+	<table>
+		<tr>
+			<th>AND : </th>
+			<td>The resulting documents will respond to both terms.</td>
+		</tr>
+		<tr>
+			<th>OR : </th>
+			<td>The resulting documents will respond to one of the terms.</td>
+		</tr>
+		<tr>
+			<th>NOT : </th>
+			<td>The resulting documents will only respond to the word on the left.</td>
+		</tr>
+		<tr>
+			<th>XOR : </th>
+			<td>The resulting documents will respond to one of the words but not to both.</td>
+		</tr>
+		<tr>
+			<th>( and ) : </th>
+			<td>Allows you to use a group of words.</td>
+		</tr>
+		<tr>
+			<th>+ et - : </th>
+			<td>The resulting documents will respond to all the terms preceeded by + and to no term preceeded by a -. Example: +horse -car</td>
+		</tr>
+		<tr>
+			<th>NEAR : </th>
+			<td>The resulting documents will include both terms separated by no more than 10 words.<br />Exemple: horse NEAR car</td>
+		</tr>
+		<tr>
+			<th>" " : </th>
+			<td>Allows to search for an exact sentence.</td>
+		</tr>
+		<tr>
+			<th>* : </th>
+			<td>Wildcard: Attention, the use of this sign may slow down your search.</td>
+		</tr>
+	</table>
+	<h3>Prefixes :</h3>
+	<p>The following prefixes enable you to limit your search to some characteristics of documents. The word has to follow the prefix immediately, with no space between them. You can combine these prefixes with any kind of classic keyword search.</p>
+	<table>
+		<tr>
+			<th>"title:" : </th>
+			<td>The word following this prefix will be part of the document's title.<br />Example: title:horse</td>
+		</tr>
+		<tr>
+			<th>"filetype:" : </th>
+			<td>This defines the type of document that will respond your search.<br />The available types of documents are: %s<br />Example: filetype:pdf</td>
+		</tr>
+		<tr>
+			<th>"language:" : </th>
+			<td>This defines the language used in the documents that will respond your search. The available languages are: fr, en<br />Example: language:fr</td>
+		</tr>
+		<!--<tr>
+			<th>"page:" : </th>
+			<td>The resulting documents will be located within the specified page.<br />Example: page:12</td>
+		</tr>
+		<tr>
+			<th>"root:" : </th>
+			<td>The resulting documents will be located within sub-pages of the specified root page.<br />Example : root:12</td>
+		</tr>-->
+	</table>');
 INSERT INTO I18NM_messages (id, module, timestamp, fr, en) VALUES (42, 'ase', NOW(), '<strong>Moteur de recherche :</strong><br /><strong>&lt;block module=&quot;ase&quot; type=&quot;search&quot; language=&quot;</strong>code<strong>&quot;&gt;&lt;/block&gt;<br /></strong><ul><li><strong>code : </strong>Identifiant de la langue &agrave; utiliser : fr ou en</li></ul>', 'TODO');
