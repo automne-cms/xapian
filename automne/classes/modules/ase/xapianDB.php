@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xapianDB.php,v 1.6 2007/09/20 09:30:11 sebastien Exp $
+// $Id: xapianDB.php,v 1.7 2008/01/21 13:17:22 sebastien Exp $
 
 /**
   * Class CMS_XapianDB
@@ -208,12 +208,12 @@ class CMS_XapianDB extends CMS_grandFather {
 		$lock = $this->_dsn.'/db_lock';
 		while (is_file($lock)) {
 			if ((getmicrotime()-$starttime) >= $timeout) {
-				//$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get writable database before timeout ('.$timeout.'s) ...');
-				//remove lock
+				//if we can't get DB at the end of the timeout, assume, previous indexation has failed so force remove lock
 				$this->_removeLock();
-				return false;
+				$starttime = getmicrotime();
+			} else {
+				usleep(50000); //.05s
 			}
-			usleep(50000); //.05s
 		}
 		$dbClassName = $this->_dbType.'_open';
 		$this->_db = $dbClassName($this->_getDSN(), DB_CREATE_OR_OPEN);

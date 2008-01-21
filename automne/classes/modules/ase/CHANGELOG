@@ -1,3 +1,6 @@
+v0.23
+[BUG] : in DB interface , remove lock at end of timeout.
+
 v0.22
 [BUG] : in polymod interface when indexing objects with composed labels
 
