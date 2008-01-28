@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xapianIndexer.php,v 1.5 2007/09/20 09:30:12 sebastien Exp $
+// $Id: xapianIndexer.php,v 1.6 2008/01/28 09:04:00 sebastien Exp $
 
 /**
   * Class CMS_XapianIndexer
@@ -90,7 +90,7 @@ class CMS_XapianIndexer extends CMS_grandFather {
 	  * @return boolean true on success/false on failure
 	  * @access public
 	  */
-	function index() {
+	function index($returnIndexableContent = false) {
 		if (!$this->_document->isFiltered()) {
 			if (!$this->_document->filter()) {
 				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not filter document to plain-text format ...');
@@ -168,7 +168,11 @@ class CMS_XapianIndexer extends CMS_grandFather {
 		$this->_writeToPersistence();
 		//end DB transaction (remove lock and destroy object)
 		$this->_db->endTransaction();
-		return true;
+		if (!$returnIndexableContent) {
+			return true;
+		} else {
+			return $this->_document->getTextContent();
+		}
 	}
 	
 	function _prepareTextToIndex($text) {
