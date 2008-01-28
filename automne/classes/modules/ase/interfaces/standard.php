@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: standard.php,v 1.2 2007/09/20 09:30:12 sebastien Exp $
+// $Id: standard.php,v 1.3 2008/01/28 09:04:10 sebastien Exp $
 
 /**
   * Class CMS_standard_ase
@@ -322,6 +322,13 @@ class CMS_standard_ase extends CMS_ase_interface {
 				}
 				$this->_filters['root'][] = $value;
 			break;
+			case 'excludedroot':
+				if (!sensitiveIO::isPositiveInteger($value)) {
+					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : root filter value must be a valid page ID : '.$value);
+					return false;
+				}
+				$this->_filters['excludedroot'][] = $value;
+			break;
 			case 'publication date after':
 				if (!is_a($value,'CMS_date')) {
 					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : publication date after filter value must be a valid CMS_date : '.$value);
@@ -466,6 +473,14 @@ class CMS_standard_ase extends CMS_ase_interface {
 		//merge filters with already set ones if any
 		if (is_array($this->_filters['root']) && sizeof($this->_filters['root'])) {
 			$filters['in']['ancestor'] = $this->_filters['root'];
+		}
+		//merge filters with already set ones if any
+		if (is_array($this->_filters['excludedroot']) && sizeof($this->_filters['excludedroot'])) {
+			if (is_array($filters['out']['ancestor'])) {
+				$filters['out']['ancestor'] = array_merge($this->_filters['excludedroot'],$filters['out']['ancestor']);
+			} else {
+				$filters['out']['ancestor'] = $this->_filters['excludedroot'];
+			}
 		}
 		return $filters;
 	}
