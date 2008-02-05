@@ -1,3 +1,6 @@
+v0.25
+[REFACTOR] : change handling of validation hook (to index or delete objects) because poly_objects (since version 1.01) can be indexed without any resource status
+
 v0.24
 [REFACTOR] : change index method of CMS_XapianIndexer to return indexed text content of document
 
