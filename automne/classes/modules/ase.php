@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: ase.php,v 1.10 2007/12/11 11:07:03 sebastien Exp $
+// $Id: ase.php,v 1.11 2008/02/05 14:56:04 sebastien Exp $
 
 /**
   * Class CMS_module_ase
@@ -244,7 +244,7 @@ if ($xapianExists) {
 				case MODULE_TREATMENT_BEFORE_VALIDATION_TREATMENT :
 					//if validation is accepted and in case of ressource deletion/archive
 					if ($treatmentParameters['result'] == VALIDATION_OPTION_ACCEPT
-						&& ($treatedObject->getProposedLocation() == RESOURCE_LOCATION_DELETED || $treatedObject->getProposedLocation() == RESOURCE_LOCATION_ARCHIVED)) {
+						 && (!$treatedObject->getStatus() || ($treatedObject->getProposedLocation() == RESOURCE_LOCATION_DELETED || $treatedObject->getProposedLocation() == RESOURCE_LOCATION_ARCHIVED))) {
 						//check for module interface existence
 						if (CMS_ase_interface_catalog::moduleHasInterface($treatmentParameters['module'])) {
 							//get Interface
@@ -278,7 +278,7 @@ if ($xapianExists) {
 					}
 					//if validation is accepted and in case of ressource publication
 					if ($treatmentParameters['result'] == VALIDATION_OPTION_ACCEPT
-						 && ($treatedObject->getLocation() != RESOURCE_LOCATION_DELETED && $treatedObject->getLocation() != RESOURCE_LOCATION_ARCHIVED)) {
+						 && (!$treatedObject->getStatus() || ($treatedObject->getLocation() != RESOURCE_LOCATION_DELETED && $treatedObject->getLocation() != RESOURCE_LOCATION_ARCHIVED))) {
 						//check for module interface existence
 						if (CMS_ase_interface_catalog::moduleHasInterface($treatmentParameters['module'])) {
 							//get Interface
