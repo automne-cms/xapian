@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: mod_ase_search.php,v 1.11 2007/10/12 10:29:27 sebastien Exp $
+// $Id: mod_ase_search.php,v 1.12 2008/04/11 18:14:30 sebastien Exp $
 
 /**
   * Template CMS_ase_search
@@ -202,7 +202,7 @@ if (is_object($search)) {
 			//no more than 25 pages (500 first results max)
 			while((($toPage-1)*$resultsNumber) <= $search->getMatchesNumbers() && $toPage <= 25) {
 				if ($toPage != $pageNB) {
-					$content .= '<a href="'.$_SERVER['SCRIPT_NAME'].'?q='.urlencode($_REQUEST['q']).'&amp;page='.$toPage.'&amp;expandDocs='.urlencode($_REQUEST['expandDocs']).'">'.$toPage.'</a>&nbsp;&nbsp;&nbsp;';
+					$content .= '<a href="'.$_SERVER['SCRIPT_NAME'].'?q='.urlencode($_REQUEST['q']).'&amp;page='.$toPage.'&amp;expandDocs='.urlencode($_REQUEST['expandDocs']).'">'.$toPage.'</a>&nbsp;&nbsp; ';
 				} else {
 					$content .= '<strong>'.$toPage.'</strong>&nbsp;&nbsp;&nbsp;';
 				}
@@ -216,7 +216,7 @@ if (is_object($search)) {
 		if (sizeof($expandSet)) {
 			$content .='<hr /><div class="center"><strong>'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_EXPAND, false, MOD_ASE_CODENAME).' </strong>';
 			foreach ($expandSet as $term) {
-				$content .='<a href="'.$_SERVER['SCRIPT_NAME'].'?q='.urlencode($_REQUEST['q']).'+'.urlencode($term).'&amp;expandDocs='.urlencode($_REQUEST['expandDocs']).'">'.$term.'</a>&nbsp;&nbsp;';
+				$content .='<a href="'.$_SERVER['SCRIPT_NAME'].'?q='.urlencode($_REQUEST['q']).'+'.urlencode($term).'&amp;expandDocs='.urlencode($_REQUEST['expandDocs']).'">'.$term.'</a>&nbsp; ';
 			}
 			$content .='</div>';
 		}

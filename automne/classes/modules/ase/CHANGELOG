@@ -1,3 +1,6 @@
+v0.26
+[BUG] : some types of document (plain-text) are UTF-8 encoded without any sort of différence. Detect it then convert encoding
+
 v0.25
 [REFACTOR] : change handling of validation hook (to index or delete objects) because poly_objects (since version 1.01) can be indexed without any resource status
 
