@@ -1,3 +1,7 @@
+v0.27
+[BUG] : in page interrogation (before indexation), page existance is not properly tested
+[BUG] : in page interrogation (before indexation), page index is deleted then indexed again. This is weird, deletion is removed but it should be tested to validate this new usage
+
 v0.26
 [BUG] : some types of document (plain-text) are UTF-8 encoded without any sort of différence. Detect it then convert encoding
 
