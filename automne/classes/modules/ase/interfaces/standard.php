@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: standard.php,v 1.3 2008/01/28 09:04:10 sebastien Exp $
+// $Id: standard.php,v 1.4 2008/04/29 08:23:13 sebastien Exp $
 
 /**
   * Class CMS_standard_ase
@@ -44,7 +44,11 @@ class CMS_standard_ase extends CMS_ase_interface {
 		global $cms_language;
 		if (sensitiveIO::isPositiveInteger($uid)) {
 			$page = CMS_tree::getPageByID($uid);
-			return $cms_language->getMessage(MESSAGE_STANDARD_UID_PAGE_TITLE).' : '.$page->getTitle(true).' ('.$uid.')';
+			if ($page && !$page->hasError()) {
+				return $cms_language->getMessage(MESSAGE_STANDARD_UID_PAGE_TITLE).' : '.$page->getTitle(true).' ('.$uid.')';
+			} else {
+				return $cms_language->getMessage(MESSAGE_STANDARD_UID_PAGE_TITLE).' : Page error ('.$uid.')';
+			}
 		} elseif (substr($uid,0,4) == 'file') {
 			$fileID = (int) array_pop(explode('_',$uid));
 			if (!$fileID) {
@@ -261,7 +265,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 			}
 			//TODO : here we need to add pages without any print content. In this case, only title, description and keywords should be indexed
 			$infos = array(
-				array('task' => 'delete', 'uid' => $uid, 'module' => MOD_STANDARD_CODENAME, 'deleteInfos' => array('page' => $uid)),
+				//array('task' => 'delete', 'uid' => $uid, 'module' => MOD_STANDARD_CODENAME, 'deleteInfos' => array('page' => $uid)),
 				array('uid' => $uid, 'module' => MOD_STANDARD_CODENAME),
 			);
 			//then get file documents for the given page.
