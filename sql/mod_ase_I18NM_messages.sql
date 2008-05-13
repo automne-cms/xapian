@@ -2,7 +2,7 @@
 ## Contains declaration for module installation : 
 ## All messages (mandatory) : inject 2/2
 ##
-## @version $Id: mod_ase_I18NM_messages.sql,v 1.9 2008/01/11 15:51:18 sebastien Exp $
+## @version $Id: mod_ase_I18NM_messages.sql,v 1.10 2008/05/13 16:15:00 jeremie Exp $
 
 DELETE FROM I18NM_messages WHERE module='ase';
 
@@ -182,3 +182,4 @@ INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (4
 		</tr>-->
 	</table>');
 INSERT INTO I18NM_messages (id, module, timestamp, fr, en) VALUES (42, 'ase', NOW(), '<strong>Moteur de recherche :</strong><br /><strong>&lt;block module=&quot;ase&quot; type=&quot;search&quot; language=&quot;</strong>code<strong>&quot;&gt;&lt;/block&gt;<br /></strong><ul><li><strong>code : </strong>Identifiant de la langue &agrave; utiliser : fr ou en</li></ul>', 'TODO');
+INSERT INTO I18NM_messages (id, module, timestamp, fr, en) VALUES (43, 'ase', NOW(), 'Microsoft Word 2007', 'Microsoft Word 2007');
