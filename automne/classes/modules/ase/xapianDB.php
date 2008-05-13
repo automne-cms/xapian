@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xapianDB.php,v 1.7 2008/01/21 13:17:22 sebastien Exp $
+// $Id: xapianDB.php,v 1.8 2008/05/13 16:14:45 jeremie Exp $
 
 /**
   * Class CMS_XapianDB
@@ -160,6 +160,7 @@ class CMS_XapianDB extends CMS_grandFather {
 		//remove lock
 		$lock = $this->_dsn.'/db_lock';
 		@unlink($lock);
+		clearstatcache();
 		return true;
 	}
 	
@@ -210,9 +211,10 @@ class CMS_XapianDB extends CMS_grandFather {
 			if ((getmicrotime()-$starttime) >= $timeout) {
 				//if we can't get DB at the end of the timeout, assume, previous indexation has failed so force remove lock
 				$this->_removeLock();
-				$starttime = getmicrotime();
+				//$starttime = getmicrotime();
 			} else {
 				usleep(50000); //.05s
+				clearstatcache();
 			}
 		}
 		$dbClassName = $this->_dbType.'_open';
