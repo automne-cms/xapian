@@ -16,6 +16,7 @@
 >	/automne/classes/modules/ase/filters/ppt.php
 >	/automne/classes/modules/ase/filters/sxw.php
 >	/automne/classes/modules/ase/filters/xls.php
+>	/automne/classes/modules/ase/filters/docx.php
 >	/automne/classes/modules/ase/interfaces/catalog.php
 >	/automne/classes/modules/ase/interfaces/common.php
 >	/automne/classes/modules/ase/interfaces/polymod.php
@@ -23,6 +24,7 @@
 >	/automne/classes/modules/ase.php
 >	/automne/templates/mod_ase_search.php
 >	/automne_bin/sxwtoplain.sh	x
+>	/automne_bin/docxtoplain.sh	x
 >	/automne_modules_files/ase/opensearch.php
 >	/automne_modules_files/ase/databases/.htaccess
 >	/automne_modules_files/ase/stopwords/.htaccess
