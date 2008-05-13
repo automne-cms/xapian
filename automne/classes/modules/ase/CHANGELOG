@@ -1,3 +1,7 @@
+v0.28
+[BUG] : in indexation process, db lock does not work and can cause infinite loop of index processes
+[FEATURE] : add Microsoft Word 2007 docx support
+
 v0.27
 [BUG] : in page interrogation (before indexation), page existance is not properly tested
 [BUG] : in page interrogation (before indexation), page index is deleted then indexed again. This is weird, deletion is removed but it should be tested to validate this new usage

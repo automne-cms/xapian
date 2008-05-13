@@ -14,10 +14,10 @@
 ## | is available at through the world-wide-web at                        |
 ## | http://www.php.net/license/3_0.txt.                                  |
 ## +----------------------------------------------------------------------+
-## | Author: Cédric Soret <cedric.soret@ws-interactive.fr>                |
+## | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 ## +----------------------------------------------------------------------+
 ##
-## $Id: sxwtoplain.sh,v 1.1.1.1 2007/09/04 15:01:29 sebastien Exp $
+## $Id: sxwtoplain.sh,v 1.2 2008/05/13 16:13:50 jeremie Exp $
 
 ##
 ## Convert Open Office documents (open document format) into plain text
