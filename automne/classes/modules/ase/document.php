@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: document.php,v 1.4 2008/04/11 18:14:07 sebastien Exp $
+// $Id: document.php,v 1.5 2008/05/26 09:40:48 sebastien Exp $
 
 /**
   * Class CMS_ase_document
@@ -367,13 +367,13 @@ class CMS_ase_document extends CMS_grandFather
 	  */
 	function _detectUTF8($string) {
 		return preg_match('%(?:
-		[\xC2-\xDF][\x80-\xBF]        # non-overlong 2-byte
-		|\xE0[\xA0-\xBF][\x80-\xBF]               # excluding overlongs
-		|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}      # straight 3-byte
-		|\xED[\x80-\x9F][\x80-\xBF]               # excluding surrogates
-		|\xF0[\x90-\xBF][\x80-\xBF]{2}    # planes 1-3
-		|[\xF1-\xF3][\x80-\xBF]{3}                  # planes 4-15
-		|\xF4[\x80-\x8F][\x80-\xBF]{2}    # plane 16
+		[\xC2-\xDF][\x80-\xBF]        		# non-overlong 2-byte
+		|\xE0[\xA0-\xBF][\x80-\xBF]			# excluding overlongs
+		|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}	# straight 3-byte
+		|\xED[\x80-\x9F][\x80-\xBF]			# excluding surrogates
+		|\xF0[\x90-\xBF][\x80-\xBF]{2}		# planes 1-3
+		|[\xF1-\xF3][\x80-\xBF]{3}			# planes 4-15
+		|\xF4[\x80-\x8F][\x80-\xBF]{2}		# plane 16
 		)+%xs', $string);
 	}
 	
@@ -418,101 +418,6 @@ class CMS_ase_document extends CMS_grandFather
 		return $this->_plainTextContent;
 	}
 	
-	/**
-	  * Get document posting terms
-	  * Get all documents terms filtered by stopwords list and all document stem according to document language
-	  *
-	  * @return boolean true on success, false on failure
-	  * @access public
-	  */
-	/*function getDocumentPosting() {
-		if (!$this->_isFiltered) {
-			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : document must be filtered first ...');
-			return false;
-		}
-		if (!$this->_plainTextContent) {
-			return false;
-		}
-		return $this->_getPosting($this->_plainTextContent);
-	}*/
-	
-	/**
-	  * Get document title posting terms
-	  * Get all documents terms filtered by stopwords list and all document stem according to document language
-	  *
-	  * @return boolean true on success, false on failure
-	  * @access public
-	  */
-	/*function getTitlePosting() {
-		if (!$this->getValue('title')) {
-			return false;
-		}
-		return $this->_getPosting($this->getValue('title'));
-	}*/
-	
-	/**
-	  * Get text posting terms
-	  * Get all text terms filtered by stopwords list and all document stem according to document language
-	  *
-	  * @return boolean true on success, false on failure
-	  * @access public
-	  */
-	/*function _getPosting(&$text) {
-		if (!$text) {
-			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no plain text content to get posting for ...');
-			return false;
-		}
-		if (!$this->getValue('language') || !is_string($this->getValue('language')) || strlen($this->getValue('language')) != 2) {
-			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no language set for document or language incorrect, set application default instead : '.APPLICATION_DEFAULT_LANGUAGE);
-			$this->setValue('language', APPLICATION_DEFAULT_LANGUAGE);
-		}
-		//remove accents and special characters and lower text
-		$text = strtolower(strtr($text, "’ºÀÁÂÃÄÅÆàáâãäåæÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñÞßÿý", 
-							  			"' aaaaaaaaaaaaaaoooooooooooooeeeeeeeeecceiiiiiiiiuuuuuuuunntsyy"));
-		//explode content on words
-		$words = preg_split('/[\s[:punct:]]+/S', $text, $this->_maxWords, PREG_SPLIT_NO_EMPTY);
-		if (sizeof($words) == $this->_maxWords) {
-			//if we reach the words size limit, unset the last word (the one which contain the rest of the document)
-			unset($words[sizeof($words)-1]);
-		}
-		//remove stopwords
-		$this->_filterStopWords($words);
-		//get stems
-		$stems = $this->_stemWords($words);
-		//then return all
-		return array('words' => $words, 'stems' => $stems);
-	}*/
-	
-	/**
-	  * Filters words according to language stoplist and remove one letter's words in list
-	  *
-	  * @param array &$words the words array to filter (by reference)
-	  * @return boolean true on success, false on failure
-	  * @access private
-	  */
-	/*function _filterStopWords(&$words) {
-		//get stop words for document language
-		$stoplist = new CMS_file(PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME.'/stopwords/'.strtolower($this->getValue('language')).'.txt');
-		if (!$stoplist->exists()) {
-			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no stopwords list founded for language : '.$this->getValue('language'));
-			return false;
-		}
-		$stopwords = $stoplist->readContent('array');
-		//instanciate stoppper and add stopwords list
-		$stopper = new XapianSimpleStopper();
-		foreach ($stopwords as $stopword) {
-			$stopper->add($stopword);
-		}
-		//then filter words
-		foreach ($words as $key => $word) {
-			if (strlen($word) <= $this->_minIndexableWordLength || $stopper->apply($word)) {
-				unset($words[$key]);
-			}
-		}
-		unset($stopper);
-		return true;
-	}*/
-	
 	function &getStopper() {
 		//get stop words for document language
 		$stoplist = new CMS_file(PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME.'/stopwords/'.strtolower($this->getValue('language')).'.txt');
@@ -529,29 +434,9 @@ class CMS_ase_document extends CMS_grandFather
 		return $stopper;
 	}
 	
-	
 	function &getStemmer() {
 		return new XapianStem(strtolower($this->getValue('language')));
 	}
-	
-	/**
-	  * Get all stems from words list according to language
-	  *
-	  * @param array $words the words list to get all stems
-	  * @return array : the stems
-	  * @access private
-	  */
-	/*function _stemWords($words) {
-		//instanciate stemmer
-		$stemmer = new XapianStem(strtolower($this->getValue('language')));
-		//then stem words
-		$stems = array();
-		foreach ($words as $key => $word) {
-			$stems[] = $stemmer->apply($word);
-		}
-		unset($stemmer);
-		return $stems;
-	}*/
 	
 	/**
 	  * Writes the document reference into persistence (MySQL for now), along with base data.
