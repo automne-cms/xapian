@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xapianSearch.php,v 1.4 2007/10/10 08:46:17 sebastien Exp $
+// $Id: xapianSearch.php,v 1.5 2008/08/08 13:26:19 sebastien Exp $
 
 /**
   * Class CMS_XapianQuery
@@ -83,6 +83,9 @@ class CMS_XapianQuery extends CMS_grandFather {
 	var $_availableMatchInfos = array('docid','xid','uid','module','title','language','indexationDate','percent','relevance','position', 'indexedDatas', 'type');
 	
 	function CMS_XapianQuery($query, $modules = array(), $language, $returnUIDOnly = false) {
+		//sanitize query string
+		$query = strtr($query,"_’'", 
+							  "   ");
 		$this->_query = utf8_encode($query);
 		if (is_array($modules) && sizeof($modules)) {
 			$this->_modules = $modules;

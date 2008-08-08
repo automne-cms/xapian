@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xapianIndexer.php,v 1.7 2008/04/11 18:23:27 sebastien Exp $
+// $Id: xapianIndexer.php,v 1.8 2008/08/08 13:26:19 sebastien Exp $
 
 /**
   * Class CMS_XapianIndexer
@@ -176,8 +176,8 @@ class CMS_XapianIndexer extends CMS_grandFather {
 	}
 	
 	function _prepareTextToIndex($text) {
-		$text = strtr($text,"_’", 
-							" '");
+		$text = strtr($text,"_’'", 
+							"   ");
 		return utf8_encode($text);
 	}
 	

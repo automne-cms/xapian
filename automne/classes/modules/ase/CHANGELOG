@@ -1,3 +1,6 @@
+v0.29
+[BUG] : single quotes in indexation and queries cause some problems so remove them
+
 v0.28
 [BUG] : in indexation process, db lock does not work and can cause infinite loop of index processes
 [FEATURE] : add Microsoft Word 2007 docx support
