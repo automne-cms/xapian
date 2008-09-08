@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: mod_ase_search.php,v 1.12 2008/04/11 18:14:30 sebastien Exp $
+// $Id: mod_ase_search.php,v 1.13 2008/09/08 16:18:05 jeremie Exp $
 
 /**
   * Template CMS_ase_search
@@ -54,6 +54,11 @@ define("MESSAGE_ASE_RESULTS_HELP_DETAIL", 41);
 
 //load language
 $cms_language = new CMS_language($defaultSearchLanguage);
+
+// Delete $search if allready exists
+if(isset($search)){
+	unset($search);
+}
 
 $error = false;
 if (trim($_REQUEST['q'])) {
