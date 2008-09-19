@@ -1,5 +1,6 @@
 v0.30
 [BUG] : Delete $search if allready exists to be sure that this variable is available.
+[BUG] : polymod objects are not propery checked for indexation
 
 v0.29
 [BUG] : single quotes in indexation and queries cause some problems so remove them

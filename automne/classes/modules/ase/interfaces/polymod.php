@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: polymod.php,v 1.3 2007/12/11 11:07:08 sebastien Exp $
+// $Id: polymod.php,v 1.4 2008/09/19 16:04:48 sebastien Exp $
 
 /**
   * Class CMS_polymod_ase
@@ -212,6 +212,15 @@ class CMS_polymod_ase extends CMS_ase_interface {
 	
 	function getDeleteInfos($uid) {
 		return array(array('uid' => $uid, 'module' => $this->_codename, 'deleteInfos' => array()));
+	}
+	
+	function getIndexInfos($uid) {
+		//check for indexable object
+		$definition = CMS_poly_object_catalog::getObjectDefinitionByID($uid,true);
+		if(!$definition->getValue('indexable')){
+			return array();
+		}
+		return array(array('uid' => $uid, 'module' => $this->_codename));
 	}
 	
 	/*************************************************************
