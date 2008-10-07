@@ -13,11 +13,11 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: polymod.php,v 1.4 2008/09/19 16:04:48 sebastien Exp $
+// $Id: polymod.php,v 1.5 2008/10/07 14:52:15 sebastien Exp $
 
 /**
   * Class CMS_polymod_ase
-  * 
+  *
   * Represent an interface between polymod modules and ase module
   *
   * @package CMS
@@ -26,7 +26,7 @@
   */
 
 class CMS_polymod_ase extends CMS_ase_interface {
-	
+
 	function isActive() {
 		//Create a search on objects to restrict on viewable ones
 		$sql = "
@@ -41,11 +41,11 @@ class CMS_polymod_ase extends CMS_ase_interface {
 		$q = new CMS_query($sql);
 		return ($q->getNumRows()) ? true : false;
 	}
-	
+
 	/*************************************************************
 	*                   INDEXATION METHODS                       *
 	*************************************************************/
-	
+
 	/**
 	  * Get the title for a given UID
 	  *
@@ -70,7 +70,7 @@ class CMS_polymod_ase extends CMS_ase_interface {
 		$def = $item->getObjectDefinition();
 		return $def->getObjectLabel($cms_language->getCode()).' : '.$item->getLabel().' ('.$uid.')';
 	}
-	
+
 	/**
 	  * Module document info : get infos for a given document :
 	  * - Indexable content/files
@@ -140,7 +140,7 @@ class CMS_polymod_ase extends CMS_ase_interface {
 		$document->setValue('title', $itemLabel);
 		return true;
 	}
-	
+
 	function _getFieldsContent($item, &$content, &$files) {
 		//get object fields definitions
 		$objectFields = CMS_poly_object_catalog::getFieldsDefinition($item->getObjectID());
@@ -181,7 +181,7 @@ class CMS_polymod_ase extends CMS_ase_interface {
 		}
 		return;
 	}
-	
+
 	/**
 	  * Get all objects to index from module
 	  * This is a short list : ie. only the documents from which can gets all documents dependencies
@@ -209,11 +209,11 @@ class CMS_polymod_ase extends CMS_ase_interface {
 		}
 		return $indexableItems;
 	}
-	
+
 	function getDeleteInfos($uid) {
 		return array(array('uid' => $uid, 'module' => $this->_codename, 'deleteInfos' => array()));
 	}
-	
+
 	function getIndexInfos($uid) {
 		//check for indexable object
 		$definition = CMS_poly_object_catalog::getObjectDefinitionByID($uid,true);
@@ -222,11 +222,11 @@ class CMS_polymod_ase extends CMS_ase_interface {
 		}
 		return array(array('uid' => $uid, 'module' => $this->_codename));
 	}
-	
+
 	/*************************************************************
 	*                 SEARCH RESULTS METHODS                     *
 	*************************************************************/
-	
+
 	/**
 	  * Add a search context filter
 	  *
@@ -238,7 +238,7 @@ class CMS_polymod_ase extends CMS_ase_interface {
 		$this->_filters[$type] = $value;
 		return true;
 	}
-	
+
 	/**
 	  * Return context filter
 	  * This method must be as fast as possible (search results performance is at this cost)
@@ -309,7 +309,7 @@ class CMS_polymod_ase extends CMS_ase_interface {
 		}
 		return $filters;
 	}
-	
+
 	/**
 	  * This method help module interface to prepare results (pre-load)
 	  * This method must be as fast as possible (search results performance is at this cost)
@@ -341,7 +341,7 @@ class CMS_polymod_ase extends CMS_ase_interface {
 		}
 		return true;
 	}
-	
+
 	/**
 	  * Get all values name this module can return for a given match result
 	  *
@@ -352,7 +352,7 @@ class CMS_polymod_ase extends CMS_ase_interface {
 	function getAvailableMatchValues($matchInfo) {
 		return array('HTMLTitle', 'item', 'description', 'pubDate', 'url');
 	}
-	
+
 	/**
 	  * Check all search results for this module then return only valid ones
 	  * This method must be as fast as possible (search results performance is at this cost)
@@ -420,7 +420,7 @@ class CMS_polymod_ase extends CMS_ase_interface {
 						//then execute compiled link definition
 						ob_start();
 						eval(sensitiveIO::stripPHPTags($objectDefinition->getValue('compiledIndexURL')));
-						$data = ob_get_contents();
+						$data = trim(ob_get_contents());
 						ob_end_clean();
 						//check if $data has a website url
 						if (substr($data,0,7) != 'http://') {

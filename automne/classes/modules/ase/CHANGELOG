@@ -1,3 +1,6 @@
+v0.31
+[BUG] : in index url, if miss a trim which can cause domain repetition in search results URL
+
 v0.30
 [BUG] : Delete $search if allready exists to be sure that this variable is available.
 [BUG] : polymod objects are not propery checked for indexation
@@ -32,7 +35,7 @@ v0.21
 [BUG] : in search class for modules with uppercase codename
 
 v0.2 : based on Xapian 1.0.2
-[REFACTOR] : Use new indexing method introduced in Xapian 1.0.0 
+[REFACTOR] : Use new indexing method introduced in Xapian 1.0.0
 [REFACTOR] : Index datas are now in UTF8
 [FEATURE] : Implement spelling correction
 
