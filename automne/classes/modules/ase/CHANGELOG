@@ -1,3 +1,6 @@
+v0.32
+[BUG] : if a website use another language than FR and EN
+
 v0.31
 [BUG] : in index url, if miss a trim which can cause domain repetition in search results URL
 

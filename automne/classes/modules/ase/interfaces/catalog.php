@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: catalog.php,v 1.4 2008/01/11 08:42:41 sebastien Exp $
+// $Id: catalog.php,v 1.5 2008/10/16 13:28:39 sebastien Exp $
 
 /**
   * Class CMS_ase_interface_catalog
@@ -46,7 +46,7 @@ class CMS_ase_interface_catalog extends CMS_grandFather {
 		static $activeModules;
 		if (!isset($activeModules)) {
 			$activeModules = array();
-			$modules = CMS_modulesCatalog::getAll();
+			$modules = CMS_modulesCatalog::getAll('codename');
 			foreach ($modules as $module) {
 				if ($module->getCodename() != MOD_ASE_CODENAME) {
 					if (CMS_ase_interface_catalog::moduleHasInterface($module->getCodename())) {
