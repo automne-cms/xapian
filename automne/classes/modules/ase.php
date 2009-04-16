@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: ase.php,v 1.11 2008/02/05 14:56:04 sebastien Exp $
+// $Id: ase.php,v 1.12 2009/04/16 10:13:19 sebastien Exp $
 
 /**
   * Class CMS_module_ase
@@ -333,6 +333,9 @@ if ($xapianExists) {
 		  * @access public
 		  */
 		function scriptTask($parameters) {
+			if (!isset($parameters['retry'])) {
+				$parameters['retry'] = 0;
+			}
 			if ($parameters['task'] == 'queryModule') {
 				//get Interface
 				if (!($moduleInterface = CMS_ase_interface_catalog::getModuleInterface($parameters['module']))) {
@@ -357,16 +360,26 @@ if ($xapianExists) {
 				return true;
 			} elseif ($parameters['task'] == 'reindex') {
 				if (!CMS_ase_interface_catalog::reindexModuleDocument($parameters)) {
-					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : cannot index document ... add task to queue list again');
-					//add script to indexation
-					CMS_scriptsManager::addScript(MOD_ASE_CODENAME, $parameters);
+					if ($parameters['retry'] < 2) {
+						$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : cannot index document ... add task to queue list again (Retry count '.$parameters['retry'].')');
+						$parameters['retry']++;
+						//add script to indexation
+						CMS_scriptsManager::addScript(MOD_ASE_CODENAME, $parameters);
+					} else {
+						$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : cannot index document ... Retry exceed limit, drop it');
+					}
 				}
 				return true;
 			} elseif ($parameters['task'] == 'delete') {
 				if (!CMS_ase_interface_catalog::deleteModuleDocument($parameters)) {
-					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : cannot delete document ... add task to queue list again');
-					//add script to indexation
-					CMS_scriptsManager::addScript(MOD_ASE_CODENAME, $parameters);
+					if ($parameters['retry'] < 2) {
+						$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : cannot delete document ... add task to queue list again (Retry count '.$parameters['retry'].')');
+						$parameters['retry']++;
+						//add script to indexation
+						CMS_scriptsManager::addScript(MOD_ASE_CODENAME, $parameters);
+					} else {
+						$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : cannot delete document ... Retry exceed limit, drop it');
+					}
 				}
 				return true;
 			} else {
