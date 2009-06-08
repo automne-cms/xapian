@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: ase.php,v 1.13 2009/06/08 14:22:13 sebastien Exp $
+// $Id: ase.php,v 1.14 2009/06/08 15:21:01 sebastien Exp $
 
 /**
   * Class CMS_module_ase
@@ -174,7 +174,7 @@ if ($xapianExists) {
 						//get page website
 						$pageWebsite = $treatedObject->getWebsite();
 						//search parameters
-						if ($opensearch = $this->getParameters(XAPIAN_SEARCH_OPENSEARCH_PAGES)) {
+						if ($opensearch = $this->getParameters('XAPIAN_SEARCH_OPENSEARCH_PAGES')) {
 							//extract open search options
 							//allowed format is /search.php or websiteID,/search.php or websiteID,pageID
 							//you can add more couple of values separated with semi-colon
