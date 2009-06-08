@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: polymod.php,v 1.5 2008/10/07 14:52:15 sebastien Exp $
+// $Id: polymod.php,v 1.6 2009/06/08 14:22:14 sebastien Exp $
 
 /**
   * Class CMS_polymod_ase
@@ -378,7 +378,7 @@ class CMS_polymod_ase extends CMS_ase_interface {
 					//set document path
 					$iconPath = PATH_MODULES_FILES_FS.'/'.MOD_STANDARD_CODENAME.'/icons/'.$type.'.gif';
 					//file content
-					$icon = new CMS_file($iconPath, FILE_SYSTEM, TYPE_FILE);
+					$icon = new CMS_file($iconPath, CMS_file::FILE_SYSTEM, CMS_file::TYPE_FILE);
 					$iconHTML = ($icon->exists()) ? '<img src="'.PATH_MODULES_FILES_WR.'/'.MOD_STANDARD_CODENAME.'/icons/'.$type.'.gif" alt="'.$type.'" title="'.$type.'" /> ' : '';
 				}
 				//title
@@ -407,7 +407,7 @@ class CMS_polymod_ase extends CMS_ase_interface {
 				}
 			break;
 			case 'url':
-				if ($parameters['url']) {
+				if (isset($parameters['url'])) {
 					return $parameters['url'];
 				} else {
 					//if indexURL exists for object, use it

@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: standard.php,v 1.4 2008/04/29 08:23:13 sebastien Exp $
+// $Id: standard.php,v 1.5 2009/06/08 14:22:14 sebastien Exp $
 
 /**
   * Class CMS_standard_ase
@@ -148,7 +148,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 			//set document path
 			$filePath = PATH_MODULES_FILES_FS.'/'.MOD_STANDARD_CODENAME.'/public/'.$fileDatas['file'];
 			//file content
-			$file = new CMS_file($filePath, FILE_SYSTEM, TYPE_FILE);
+			$file = new CMS_file($filePath, CMS_file::FILE_SYSTEM, CMS_file::TYPE_FILE);
 			//check file
 			if (!$file->exists()) {
 				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : given file does not exists in file system : '.$filePath);
@@ -166,7 +166,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 			//add document type as a module attribute
 			$document->setModuleAttribute('type', $fileInfos['extension']);
 			//then add file
-			$document->addFile($filePath, $fileInfos['extension'],FILE_SYSTEM);
+			$document->addFile($filePath, $fileInfos['extension'], CMS_file::FILE_SYSTEM);
 			//get page id
 			$pageId = $fileDatas['page'];
 			//set document language from page
@@ -286,13 +286,18 @@ class CMS_standard_ase extends CMS_ase_interface {
 					//set document path
 					$filePath = PATH_MODULES_FILES_FS.'/'.MOD_STANDARD_CODENAME.'/public/'.$data['file'];
 					//file content
-					$file = new CMS_file($filePath, FILE_SYSTEM, TYPE_FILE);
+					$file = new CMS_file($filePath, CMS_file::FILE_SYSTEM, CMS_file::TYPE_FILE);
 					//check file
 					if ($file->exists()) {
 						//check if file type match installed filters
 						$fileinfos = pathinfo($filePath);
-						if (CMS_filter_catalog::getFilterForType($fileinfos['extension'])) {
-							$infos[] = array('uid' => 'file_'.$data['page'].'_'.$data['id'],'module' => MOD_STANDARD_CODENAME);
+						if (isset($fileinfos['extension'])) {
+							if (CMS_filter_catalog::getFilterForType($fileinfos['extension'])) {
+								$infos[] = array('uid' => 'file_'.$data['page'].'_'.$data['id'],'module' => MOD_STANDARD_CODENAME);
+							}
+						} else {
+							$this->raiseError('Cannot get extension for file : '.$filePath);
+							return false;
 						}
 					}
 				}
@@ -384,13 +389,13 @@ class CMS_standard_ase extends CMS_ase_interface {
 				and (publicationDateEnd_rs = '0000-00-00' or publicationDateEnd_rs >= '".$now."')
 		";
 		//if filters exists on date start, add them to query
-		if ($this->_filters['publication date after']) {
+		if (isset($this->_filters['publication date after'])) {
 			$sql .= " and publicationDateStart_rs >= '".$this->_filters['publication date after']->getDBValue(true)."'";
 		}
-		if ($this->_filters['publication date before']) {
+		if (isset($this->_filters['publication date before'])) {
 			$sql .= " and publicationDateStart_rs <= '".$this->_filters['publication date before']->getDBValue(true)."'";
 		}
-		if ($this->_filters['publication date after'] || $this->_filters['publication date before']) {
+		if (isset($this->_filters['publication date after']) || isset($this->_filters['publication date before'])) {
 			$sql .= " and publicationDateStart_rs != '0000-00-00'";
 		}
 		$q = new CMS_query($sql);
@@ -419,15 +424,15 @@ class CMS_standard_ase extends CMS_ase_interface {
 				or (publicationDateEnd_rs != '0000-00-00' and publicationDateEnd_rs < '".$now."'))
 		";
 		//if filters exists on date start, add them to query
-		if ($this->_filters['publication date after'] || $this->_filters['publication date before']) {
+		if (isset($this->_filters['publication date after']) || isset($this->_filters['publication date before'])) {
 			$sql .= " and (";
-			if ($this->_filters['publication date after']) {
+			if (isset($this->_filters['publication date after'])) {
 				$sql .= " publicationDateStart_rs < '".$this->_filters['publication date after']->getDBValue(true)."'";
 			}
-			if ($this->_filters['publication date after'] && $this->_filters['publication date before']) {
+			if (isset($this->_filters['publication date after']) && isset($this->_filters['publication date before'])) {
 				$sql .= " or ";
 			}
-			if ($this->_filters['publication date before']) {
+			if (isset($this->_filters['publication date before'])) {
 				$sql .= " publicationDateStart_rs > '".$this->_filters['publication date before']->getDBValue(true)."'";
 			}
 			$sql .= " or publicationDateStart_rs = '0000-00-00')";
@@ -453,7 +458,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 			}
 		}
 		//compare valid and invalid pages number and get the lower set
-		if (sizeof($validPages)) {
+		if (isset($validPages) && sizeof($validPages)) {
 			if (sizeof($validPages) > sizeof($invalidPages)) {
 				$filters['out']['page'] = $invalidPages;
 			} else {
@@ -467,7 +472,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 		//check for excluded roots pages
 		$module = CMS_modulesCatalog::getByCodename(MOD_ASE_CODENAME);
 		$excludedRoots = preg_split('#[,;]#',$module->getParameters('XAPIAN_RESULTS_EXCLUDED_ROOTS'));
-		if (is_array($excludedRoots) && sizeof($excludedRoots)) {
+		if (isset($excludedRoots) && is_array($excludedRoots) && sizeof($excludedRoots)) {
 			foreach ($excludedRoots as $excludedRoot) {
 				if ($excludedRoot) {
 					$filters['out']['ancestor'][$excludedRoot] = $excludedRoot;
@@ -475,12 +480,12 @@ class CMS_standard_ase extends CMS_ase_interface {
 			}
 		}
 		//merge filters with already set ones if any
-		if (is_array($this->_filters['root']) && sizeof($this->_filters['root'])) {
+		if (isset($this->_filters['root']) && is_array($this->_filters['root']) && sizeof($this->_filters['root'])) {
 			$filters['in']['ancestor'] = $this->_filters['root'];
 		}
 		//merge filters with already set ones if any
-		if (is_array($this->_filters['excludedroot']) && sizeof($this->_filters['excludedroot'])) {
-			if (is_array($filters['out']['ancestor'])) {
+		if (isset($this->_filters['excludedroot']) && is_array($this->_filters['excludedroot']) && sizeof($this->_filters['excludedroot'])) {
+			if (isset($filters['out']['ancestor']) &&  is_array($filters['out']['ancestor'])) {
 				$filters['out']['ancestor'] = array_merge($this->_filters['excludedroot'],$filters['out']['ancestor']);
 			} else {
 				$filters['out']['ancestor'] = $this->_filters['excludedroot'];
@@ -579,7 +584,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 						//set document path
 						$iconPath = PATH_MODULES_FILES_FS.'/'.MOD_STANDARD_CODENAME.'/icons/'.$type.'.gif';
 						//file content
-						$icon = new CMS_file($iconPath, FILE_SYSTEM, TYPE_FILE);
+						$icon = new CMS_file($iconPath, CMS_file::FILE_SYSTEM, CMS_file::TYPE_FILE);
 						$iconHTML = ($icon->exists()) ? '<img src="'.PATH_MODULES_FILES_WR.'/'.MOD_STANDARD_CODENAME.'/icons/'.$type.'.gif" alt="'.$type.'" title="'.$type.'" /> ' : '';
 					}
 					//title
@@ -648,7 +653,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 					//set document path
 					$filePath = PATH_MODULES_FILES_FS.'/'.MOD_STANDARD_CODENAME.'/public/'.$filesDatas[$matchInfo['uid']]['file'];
 					//file content
-					$file = new CMS_file($filePath, FILE_SYSTEM, TYPE_FILE);
+					$file = new CMS_file($filePath, CMS_file::FILE_SYSTEM, CMS_file::TYPE_FILE);
 					//check file
 					return $file->exists();
 				break;

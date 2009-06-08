@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xapianSearch.php,v 1.5 2008/08/08 13:26:19 sebastien Exp $
+// $Id: xapianSearch.php,v 1.6 2009/06/08 14:22:14 sebastien Exp $
 
 /**
   * Class CMS_XapianQuery
@@ -31,31 +31,31 @@
   * @author Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>
   */
 
-define("XAPIAN_QUERY_FLAG_BOOLEAN", XapianQueryParser_FLAG_BOOLEAN); 				//allow use of boolean : AND, OR, etc. and bracketted operations
-define("XAPIAN_QUERY_FLAG_PHRASE", XapianQueryParser_FLAG_PHRASE);					//allow use of quoted phrase
-define("XAPIAN_QUERY_FLAG_LOVEHATE", XapianQueryParser_FLAG_LOVEHATE);				//allow use of +, - operators
-define("XAPIAN_QUERY_FLAG_BOOLEAN_ANY_CASE", XapianQueryParser_FLAG_BOOLEAN_ANY_CASE); //allow use of boolean : AND, and, OR, or, etc. and bracketted operations
-define("XAPIAN_QUERY_FLAG_WILDCARD", XapianQueryParser_FLAG_WILDCARD);				//allow use of * wildcard
-define("XAPIAN_QUERY_FLAG_PURE_NOT", XapianQueryParser_FLAG_PURE_NOT); 				//Allow queries such as 'NOT apples'.
-define("XAPIAN_QUERY_FLAG_PARTIAL", XapianQueryParser_FLAG_PARTIAL); 				//Enable partial matching. (auto add wilcard on last word)
-define("XAPIAN_QUERY_FLAG_SPELLING_CORRECTION", XapianQueryParser_FLAG_SPELLING_CORRECTION); //Enable spelling correction.
-define("XAPIAN_QUERY_FLAG_SYNONYM", XapianQueryParser_FLAG_SYNONYM); 				//Enable synonym operator '~'.
-define("XAPIAN_QUERY_FLAG_AUTO_SYNONYMS", XapianQueryParser_FLAG_AUTO_SYNONYMS); 	//Enable automatic use of synonyms for single terms.
-define("XAPIAN_QUERY_FLAG_AUTO_MULTIWORD_SYNONYMS", XapianQueryParser_FLAG_AUTO_MULTIWORD_SYNONYMS); //Enable automatic use of synonyms for single terms and groups of terms.
+define("XAPIAN_QUERY_FLAG_BOOLEAN", XapianQueryParser::FLAG_BOOLEAN); 				//allow use of boolean : AND, OR, etc. and bracketted operations
+define("XAPIAN_QUERY_FLAG_PHRASE", XapianQueryParser::FLAG_PHRASE);					//allow use of quoted phrase
+define("XAPIAN_QUERY_FLAG_LOVEHATE", XapianQueryParser::FLAG_LOVEHATE);				//allow use of +, - operators
+define("XAPIAN_QUERY_FLAG_BOOLEAN_ANY_CASE", XapianQueryParser::FLAG_BOOLEAN_ANY_CASE); //allow use of boolean : AND, and, OR, or, etc. and bracketted operations
+define("XAPIAN_QUERY_FLAG_WILDCARD", XapianQueryParser::FLAG_WILDCARD);				//allow use of * wildcard
+define("XAPIAN_QUERY_FLAG_PURE_NOT", XapianQueryParser::FLAG_PURE_NOT); 				//Allow queries such as 'NOT apples'.
+define("XAPIAN_QUERY_FLAG_PARTIAL", XapianQueryParser::FLAG_PARTIAL); 				//Enable partial matching. (auto add wilcard on last word)
+define("XAPIAN_QUERY_FLAG_SPELLING_CORRECTION", XapianQueryParser::FLAG_SPELLING_CORRECTION); //Enable spelling correction.
+define("XAPIAN_QUERY_FLAG_SYNONYM", XapianQueryParser::FLAG_SYNONYM); 				//Enable synonym operator '~'.
+define("XAPIAN_QUERY_FLAG_AUTO_SYNONYMS", XapianQueryParser::FLAG_AUTO_SYNONYMS); 	//Enable automatic use of synonyms for single terms.
+define("XAPIAN_QUERY_FLAG_AUTO_MULTIWORD_SYNONYMS", XapianQueryParser::FLAG_AUTO_MULTIWORD_SYNONYMS); //Enable automatic use of synonyms for single terms and groups of terms.
 
-define("XAPIAN_STEM_NONE", XapianQueryParser_STEM_NONE);
-define("XAPIAN_STEM_SOME", XapianQueryParser_STEM_SOME);
-define("XAPIAN_STEM_ALL", XapianQueryParser_STEM_ALL);
+define("XAPIAN_STEM_NONE", XapianQueryParser::STEM_NONE);
+define("XAPIAN_STEM_SOME", XapianQueryParser::STEM_SOME);
+define("XAPIAN_STEM_ALL", XapianQueryParser::STEM_ALL);
 
-define("XAPIAN_QUERY_OP_OR", XapianQuery_OP_OR);
-define("XAPIAN_QUERY_OP_AND", XapianQuery_OP_AND);
-define("XAPIAN_QUERY_OP_AND_NOT", XapianQuery_OP_AND_NOT);
-define("XAPIAN_QUERY_OP_XOR", XapianQuery_OP_XOR);
-define("XAPIAN_QUERY_OP_AND_MAYBE", XapianQuery_OP_AND_MAYBE);
-define("XAPIAN_QUERY_OP_FILTER", XapianQuery_OP_FILTER);
-define("XAPIAN_QUERY_OP_NEAR", XapianQuery_OP_NEAR);
-define("XAPIAN_QUERY_OP_PHRASE", XapianQuery_OP_PHRASE);
-define("XAPIAN_QUERY_OP_ELITE_SET", XapianQuery_OP_ELITE_SET);
+define("XAPIAN_QUERY_OP_OR", XapianQuery::OP_OR);
+define("XAPIAN_QUERY_OP_AND", XapianQuery::OP_AND);
+define("XAPIAN_QUERY_OP_AND_NOT", XapianQuery::OP_AND_NOT);
+define("XAPIAN_QUERY_OP_XOR", XapianQuery::OP_XOR);
+define("XAPIAN_QUERY_OP_AND_MAYBE", XapianQuery::OP_AND_MAYBE);
+define("XAPIAN_QUERY_OP_FILTER", XapianQuery::OP_FILTER);
+define("XAPIAN_QUERY_OP_NEAR", XapianQuery::OP_NEAR);
+define("XAPIAN_QUERY_OP_PHRASE", XapianQuery::OP_PHRASE);
+define("XAPIAN_QUERY_OP_ELITE_SET", XapianQuery::OP_ELITE_SET);
 
 class CMS_XapianQuery extends CMS_grandFather {
 	
@@ -138,6 +138,9 @@ class CMS_XapianQuery extends CMS_grandFather {
 			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : $filters must be an array ...');
 			return false;
 		}
+		if (!isset($this->_filters[$module])) {
+			$this->_filters[$module] = array();
+		}
 		$this->_filters[$module] = array_merge_recursive($this->_filters[$module], $filters);
 		return true;
 	}
@@ -176,7 +179,7 @@ class CMS_XapianQuery extends CMS_grandFather {
 				$db->addDatabase(new CMS_XapianDB($module));
 			}
 			//interfaces
-			if (!is_object($this->_modulesInterfaces[strtolower($module)])) {
+			if (!isset($this->_modulesInterfaces[strtolower($module)]) || !is_object($this->_modulesInterfaces[strtolower($module)])) {
 				//load module interface
 				if (!($moduleInterface = CMS_ase_interface_catalog::getModuleInterface($module))) {
 					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no interface for module '.$module);
@@ -284,11 +287,7 @@ class CMS_XapianQuery extends CMS_grandFather {
 	}
 	
 	function getMatchValue(&$match, $value, $parameters = array()) {
-		/*if (!$this->_matchesInfos[$match['xid']]) {
-			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : unknown match ID : '.$match['xid']);
-			return false;
-		}*/
-		if (!is_array($this->_availableMatchInfos) || (is_array($this->_availableMatchInfos) && in_array($value, $this->_availableMatchInfos))) {
+		if (!isset($this->_availableMatchInfos) || !is_array($this->_availableMatchInfos) || (is_array($this->_availableMatchInfos) && in_array($value, $this->_availableMatchInfos))) {
 			switch ($value) {
 				case 'docid':
 				case 'xid':
@@ -408,7 +407,7 @@ class CMS_XapianQuery extends CMS_grandFather {
 		if (!$this->_uidOnly) {
 			//call module interface to send him the results which depends on it, so if it needs, it can prepare them
 			foreach (array_keys($this->_modulesInterfaces) as $module) {
-				if (is_array($uidList[$module]) && sizeof($uidList[$module])) {
+				if (isset($uidList[$module]) && is_array($uidList[$module]) && sizeof($uidList[$module])) {
 					$this->_modulesInterfaces[$module]->setResultsUID($uidList[$module]);
 				}
 			}
@@ -471,7 +470,7 @@ class CMS_XapianQuery extends CMS_grandFather {
 		return $stopper;
 	}
 	
-	function &_getStemmer() {
+    function _getStemmer() {
 		//return stemmer
 		return new XapianStem($this->_language);
 	}

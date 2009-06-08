@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: catalog.php,v 1.1.1.1 2007/09/04 15:01:29 sebastien Exp $
+// $Id: catalog.php,v 1.2 2009/06/08 14:22:13 sebastien Exp $
 
 /**
   * static Class CMS_filter_catalog
@@ -80,10 +80,11 @@ class CMS_filter_catalog
 	function getTypes() {
 		static $supportedTypes;
 		if(!isset($supportedTypes)) {
+			$supportedTypes = array();
 			$filters = CMS_filter_catalog::getFilters();
 			foreach ($filters as $filterName => $filter) {
 				if ($filter->isActive()) {
-					$supportedTypes = array_merge($filter->getSupportedExtensions(), $supportedTypes);
+					$supportedTypes = array_merge($filter->getSupportedExtensions(), (array)$supportedTypes);
 				}
 			}
 		}
@@ -105,14 +106,14 @@ class CMS_filter_catalog
 			return $filterForType[$type];
 		}
 		//first, try to get a classname like "CMS_filter_{type}"
-		if (class_exists('CMS_filter_'.$type)) {
+		/*if (class_exists('CMS_filter_'.$type)) {
 			$filterClass = 'CMS_filter_'.$type;
 			$filter = new $filterClass();
 			if ($filter->isActive() && in_array($type, $filter->getSupportedExtensions())) {
 				$filterForType[$type] = $filterClass;
 				return $filterForType[$type];
 			}
-		}
+		}*/
 		//else search a filter for given type through  all active filters
 		$filters = CMS_filter_catalog::getFilters();
 		foreach ($filters as $filterName => $filter) {

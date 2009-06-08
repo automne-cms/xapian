@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: document.php,v 1.5 2008/05/26 09:40:48 sebastien Exp $
+// $Id: document.php,v 1.6 2009/06/08 14:22:14 sebastien Exp $
 
 /**
   * Class CMS_ase_document
@@ -120,7 +120,7 @@ class CMS_ase_document extends CMS_grandFather
 	function CMS_ase_document($parameters=array())
 	{
 		$datas = array();
-		if ($parameters['uid'] && $parameters['module'] && !sizeof($dbValues)) {
+		if (isset($parameters['uid']) && isset($parameters['module'])/* && !sizeof($dbValues)*/) {
 			$sql = "
 				select
 					*
@@ -133,20 +133,20 @@ class CMS_ase_document extends CMS_grandFather
 			$q = new CMS_query($sql);
 			if ($q->getNumRows()) {
 				$datas = $q->getArray();
+				if (sizeof($datas) && isset($datas['id_mased'])) {
+					$this->_ID = (int) $datas['id_mased'];
+					$this->_document['uid'] 	= $datas['uid_mased'];
+					$this->_document['xid'] 	= $datas['xid_mased'];
+					$this->_document['module'] 	= $datas['module_mased'];
+					$this->_document['language']= $datas['language_mased'];
+					$this->_document['type'] 	= $datas['type_mased'];
+				}
 			} else {
-				$datas['uid_mased'] 	= strtolower($parameters['uid']);
-				$datas['module_mased'] 	= strtolower($parameters['module']);
+				$this->_document['uid'] 	= strtolower($parameters['uid']);
+				$this->_document['module'] 	= strtolower($parameters['module']);
 			}
 		}
-		if (sizeof($datas)) {
-			$this->_ID = (int) $datas['id'];
-			
-			$this->_document['uid'] 	= $datas['uid_mased'];
-			$this->_document['xid'] 	= $datas['xid_mased'];
-			$this->_document['module'] 	= $datas['module_mased'];
-			$this->_document['language']= $datas['language_mased'];
-			$this->_document['type'] 	= $datas['type_mased'];
-		}
+		
 		//load document parameters
 		//get module words limit for a document
 		$module = CMS_modulesCatalog::getByCodename(MOD_ASE_CODENAME);
@@ -184,9 +184,9 @@ class CMS_ase_document extends CMS_grandFather
 	  * @return boolean true on success, false on failure
 	  * @access private
 	  */
-	function addFile($filepath, $type='', $from = FILE_SYSTEM) {
+	function addFile($filepath, $type='', $from = CMS_file::FILE_SYSTEM) {
 		//check file
-		$file = new CMS_file($filepath, $from, TYPE_FILE);
+		$file = new CMS_file($filepath, $from, CMS_file::TYPE_FILE);
 		if (!$file->exists()) {
 			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : given file does not exists : '.$filepath);
 			return false;
@@ -434,7 +434,7 @@ class CMS_ase_document extends CMS_grandFather
 		return $stopper;
 	}
 	
-	function &getStemmer() {
+	function getStemmer() {
 		return new XapianStem(strtolower($this->getValue('language')));
 	}
 	
@@ -462,11 +462,11 @@ class CMS_ase_document extends CMS_grandFather
 		if ($this->_ID) {
 			$sql = "
 				update
-					".$this->getTableName()."
-				set
 					mod_ase_document
+				set
+					".$sql_fields."
 				where
-					id='".$this->_ID."'
+					id_mased='".$this->_ID."'
 			";
 		} else {
 			//HERE WE USE REPLACE INSTEAD OF INSERT TO AVOID UNIQUE DATAS TO BE A PROBLEM

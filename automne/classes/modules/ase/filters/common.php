@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: common.php,v 1.2 2007/09/20 09:30:12 sebastien Exp $
+// $Id: common.php,v 1.3 2009/06/08 14:22:13 sebastien Exp $
 
 /**
   * Class CMS_filter_common
@@ -96,7 +96,7 @@ class CMS_filter_common extends CMS_grandFather
 	  * @param constant $type : type of source : DATA_TYPE_FILE for a path to a file (default) or DATA_TYPE_CDATA for a string content
 	  * @param constant $from : for file type : type of path : FILE_SYSTEM for a file system path (default) or WEBROOT for a webroot relative path
 	  */
-	function CMS_filter_common($source = false, $type = DATA_TYPE_FILE, $from = FILE_SYSTEM) {
+	function CMS_filter_common($source = false, $type = DATA_TYPE_FILE, $from = CMS_file::FILE_SYSTEM) {
 		//if source is false, do not really load object, this is only for filter activity test purpose
 		if ($source === false) {
 			return;
@@ -113,7 +113,7 @@ class CMS_filter_common extends CMS_grandFather
 		}
 		if ($type == DATA_TYPE_FILE) {
 			//check file
-			$file = new CMS_file($source, $from, TYPE_FILE);
+			$file = new CMS_file($source, $from, CMS_file::TYPE_FILE);
 			if (!$file->exists()) {
 				$this->_raiseError(get_class($this).' : '.__FUNCTION__.' : given file does not exists : '.$source);
 				return;
@@ -143,7 +143,7 @@ class CMS_filter_common extends CMS_grandFather
 				return;
 			}
 			//save source content into temporary file
-			$file = new CMS_file($this->_sourceDocument, FILE_SYSTEM, TYPE_FILE);
+			$file = new CMS_file($this->_sourceDocument, CMS_file::FILE_SYSTEM, CMS_file::TYPE_FILE);
 			if (!$file->setContent($source) || !$file->writeToPersistence()) {
 				$this->_raiseError(get_class($this).' : '.__FUNCTION__.' : can\'t set temporary document content : '.$this->_sourceDocument);
 				return;

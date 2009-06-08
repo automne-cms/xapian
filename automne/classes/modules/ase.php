@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: ase.php,v 1.12 2009/04/16 10:13:19 sebastien Exp $
+// $Id: ase.php,v 1.13 2009/06/08 14:22:13 sebastien Exp $
 
 /**
   * Class CMS_module_ase
@@ -50,6 +50,7 @@ if (!extension_loaded("xapian")) {
 /**
   * ASE requirements
   */
+require_once(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/xapian.php');
 require_once(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/document.php');
 require_once(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/xapianIndexer.php');
 require_once(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/xapianSearch.php');
@@ -169,7 +170,7 @@ if ($xapianExists) {
 						return false;
 					}
 					
-					if ($visualizationMode == PAGE_VISUALMODE_HTML_PUBLIC && sensitiveIO::isPositiveInteger($this->getParameters(XAPIAN_SEARCH_OPENSEARCH_PAGES))) {
+					if ($visualizationMode == PAGE_VISUALMODE_HTML_PUBLIC && sensitiveIO::isPositiveInteger($this->getParameters('XAPIAN_SEARCH_OPENSEARCH_PAGES'))) {
 						//get page website
 						$pageWebsite = $treatedObject->getWebsite();
 						//search parameters
@@ -333,9 +334,6 @@ if ($xapianExists) {
 		  * @access public
 		  */
 		function scriptTask($parameters) {
-			if (!isset($parameters['retry'])) {
-				$parameters['retry'] = 0;
-			}
 			if ($parameters['task'] == 'queryModule') {
 				//get Interface
 				if (!($moduleInterface = CMS_ase_interface_catalog::getModuleInterface($parameters['module']))) {
@@ -360,26 +358,16 @@ if ($xapianExists) {
 				return true;
 			} elseif ($parameters['task'] == 'reindex') {
 				if (!CMS_ase_interface_catalog::reindexModuleDocument($parameters)) {
-					if ($parameters['retry'] < 2) {
-						$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : cannot index document ... add task to queue list again (Retry count '.$parameters['retry'].')');
-						$parameters['retry']++;
-						//add script to indexation
-						CMS_scriptsManager::addScript(MOD_ASE_CODENAME, $parameters);
-					} else {
-						$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : cannot index document ... Retry exceed limit, drop it');
-					}
+					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : cannot index document ... add task to queue list again');
+					//add script to indexation
+					CMS_scriptsManager::addScript(MOD_ASE_CODENAME, $parameters);
 				}
 				return true;
 			} elseif ($parameters['task'] == 'delete') {
 				if (!CMS_ase_interface_catalog::deleteModuleDocument($parameters)) {
-					if ($parameters['retry'] < 2) {
-						$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : cannot delete document ... add task to queue list again (Retry count '.$parameters['retry'].')');
-						$parameters['retry']++;
-						//add script to indexation
-						CMS_scriptsManager::addScript(MOD_ASE_CODENAME, $parameters);
-					} else {
-						$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : cannot delete document ... Retry exceed limit, drop it');
-					}
+					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : cannot delete document ... add task to queue list again');
+					//add script to indexation
+					CMS_scriptsManager::addScript(MOD_ASE_CODENAME, $parameters);
 				}
 				return true;
 			} else {

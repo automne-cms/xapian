@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xapianDB.php,v 1.8 2008/05/13 16:14:45 jeremie Exp $
+// $Id: xapianDB.php,v 1.9 2009/06/08 14:22:14 sebastien Exp $
 
 /**
   * Class CMS_XapianDB
@@ -46,7 +46,6 @@ class CMS_XapianDB extends CMS_grandFather {
 	 */
 	var $_db = null;
 	
-	var $_dbType = 'flint';
 	/**
 	 * Remove lockfile if exists
 	 * @var		bool
@@ -174,9 +173,9 @@ class CMS_XapianDB extends CMS_grandFather {
 		if ($this->_dsn) {
 			return $this->_dsn;
 		}
-		$this->_dsn = PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME.'/databases/'.strtolower($this->_module).'_'.strtolower($this->_dbType);
+		$this->_dsn = PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME.'/databases/'.strtolower($this->_module).'_flint';
 		if (!is_dir($this->_dsn)) {
-			$dsnFolder = new CMS_file($this->_dsn, FILE_SYSTEM, TYPE_DIRECTORY);
+			$dsnFolder = new CMS_file($this->_dsn, CMS_file::FILE_SYSTEM, CMS_file::TYPE_DIRECTORY);
 			if (!$dsnFolder->writeToPersistence()) {
 				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not create DB DSN : '.$this->_dsn);
 				return false;
@@ -190,7 +189,7 @@ class CMS_XapianDB extends CMS_grandFather {
 			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get DB DSN');
 			return false;
 		}
-		$this->_db = new XapianDatabase($this->_getDSN());
+		$this->_db = Xapian::flint_open($this->_getDSN());//new XapianDatabase($this->_getDSN());
 		if (!$this->_db) {
 			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get database ...');
 			return false;
@@ -217,8 +216,7 @@ class CMS_XapianDB extends CMS_grandFather {
 				clearstatcache();
 			}
 		}
-		$dbClassName = $this->_dbType.'_open';
-		$this->_db = $dbClassName($this->_getDSN(), DB_CREATE_OR_OPEN);
+		$this->_db = Xapian::flint_open($this->_getDSN(), Xapian::DB_CREATE_OR_OPEN);
 		if (!$this->_db) {
 			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get writable database ...');
 			return false;

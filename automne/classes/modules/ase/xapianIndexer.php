@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xapianIndexer.php,v 1.8 2008/08/08 13:26:19 sebastien Exp $
+// $Id: xapianIndexer.php,v 1.9 2009/06/08 14:22:14 sebastien Exp $
 
 /**
   * Class CMS_XapianIndexer
@@ -152,7 +152,7 @@ class CMS_XapianIndexer extends CMS_grandFather {
 		//create Terms generator for document
 		$indexer = new XapianTermGenerator();
 		//set terms generator infos
-		$indexer->set_flags(XapianTermGenerator_FLAG_SPELLING);
+		$indexer->set_flags(XapianTermGenerator::FLAG_SPELLING);
 		$indexer->set_stemmer($stemmer);
 		$indexer->set_stopper($stopper);
 		$indexer->set_database($this->_db->getDatabase());

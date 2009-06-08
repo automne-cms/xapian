@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: catalog.php,v 1.5 2008/10/16 13:28:39 sebastien Exp $
+// $Id: catalog.php,v 1.6 2009/06/08 14:22:14 sebastien Exp $
 
 /**
   * Class CMS_ase_interface_catalog
@@ -27,9 +27,17 @@
 
 class CMS_ase_interface_catalog extends CMS_grandFather {
 	
-	function &getModuleInterface($codename) {
+	function getModuleInterface($codename) {
 		$interfaceName = 'CMS_'.$codename.'_ase';
-		if (!class_exists($interfaceName)) {
+	    //load each existing interface, corresponding to all existing files in directory
+	    $packages_dir = dir(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/interfaces/');
+	    $aExceptions = array("catalog.php", "common.php");
+        while (false !== ($file = $packages_dir->read())) {
+	        if (substr($file, strlen($file) - 3) == "php" && !in_array($file, $aExceptions)) {
+		        require_once(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/interfaces/'.$file);		       
+	        }
+        }
+		if (!class_exists($interfaceName, false)) {
 			if (CMS_modulesCatalog::isPolymod($codename)) {
 				$interfaceName = 'CMS_polymod_ase';
 				if (class_exists($interfaceName)) {
@@ -63,7 +71,15 @@ class CMS_ase_interface_catalog extends CMS_grandFather {
 	}
 	
 	function moduleHasInterface($codename) {
-		if (!class_exists('CMS_'.$codename.'_ase')) {
+	    //load each existing interface, corresponding to all existing files in directory
+	    $packages_dir = dir(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/interfaces/');
+	    $aExceptions = array("catalog.php", "common.php");
+        while (false !== ($file = $packages_dir->read())) {
+	        if (substr($file, strlen($file) - 3) == "php" && !in_array($file, $aExceptions)) {
+		        require_once(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/interfaces/'.$file);		       
+	        }
+        }
+		if (!class_exists('CMS_'.$codename.'_ase', false)) {
 			if (CMS_modulesCatalog::isPolymod($codename)) {
 				if (class_exists('CMS_polymod_ase')) {
 					return true;

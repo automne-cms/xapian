@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: html.php,v 1.1.1.1 2007/09/04 15:01:29 sebastien Exp $
+// $Id: html.php,v 1.2 2009/06/08 14:22:13 sebastien Exp $
 
 /**
   * Class CMS_filter_html
