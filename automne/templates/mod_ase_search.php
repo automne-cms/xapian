@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: mod_ase_search.php,v 1.13 2008/09/08 16:18:05 jeremie Exp $
+// $Id: mod_ase_search.php,v 1.14 2009/06/08 15:07:59 sebastien Exp $
 
 /**
   * Template CMS_ase_search
@@ -29,11 +29,14 @@
   * @author Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>
   */
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/cms_rc_frontend.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/automne/classes/aseFrontEnd.php");
 //use this language if $_REQUEST['language'] or filter "language:" are not specified.
 //This is used also for texts language
 $defaultSearchLanguage = $mod_ase["language"];
+
+//force loading module ase
+if (!class_exists('CMS_module_ase')) {
+	die('Cannot find ase module ...');
+}
 
 //Message from ase module
 define("MESSAGE_ASE_RESULTS_SEARCH", 27);
@@ -61,9 +64,9 @@ if(isset($search)){
 }
 
 $error = false;
-if (trim($_REQUEST['q'])) {
+if (isset($_REQUEST['q']) && trim($_REQUEST['q'])) {
 	$starttime = getmicrotime();
-	$pageNB = ((int) $_REQUEST['page']) ? (int) $_REQUEST['page'] : 1;
+	$pageNB = (isset($_REQUEST['page']) && (int) $_REQUEST['page']) ? (int) $_REQUEST['page'] : 1;
 	
 	//////////////////////////////////////////////////////////////////
 	//      Here declare all modules to search (default : all)      //
@@ -71,7 +74,7 @@ if (trim($_REQUEST['q'])) {
 	
 	$modules = array();
 	//restrict search to given modules if any
-	if (is_array($_REQUEST['modules']) && $_REQUEST['modules']) {
+	if (isset($_REQUEST['modules']) && is_array($_REQUEST['modules']) ) {
 		$availableModules = CMS_ase_interface_catalog::getActiveModules();
 		foreach($_REQUEST['modules'] as $module) {
 			if (isset($availableModules[$module])) {
@@ -88,14 +91,14 @@ if (trim($_REQUEST['q'])) {
 	//////////////////////////////////////////////////////////////////
 	
 	//Create search query
-	$searchQuery = trim($_REQUEST['q']);
-	if ($_REQUEST['language']) {
+	$searchQuery = isset($_REQUEST['q']) ? trim($_REQUEST['q']) : '';
+	if (isset($_REQUEST['language'])) {
 		$searchQuery .= ' language:'.$_REQUEST['language'];
 		$searchLanguage = $_REQUEST['language'];
 	} else {
 		$searchLanguage = $defaultSearchLanguage;
 	}
-	if ($_REQUEST['filetype']) {
+	if (isset($_REQUEST['filetype'])) {
 		$filetypes = explode(',',$_REQUEST['filetype']);
 		$searchQuery .= ' AND (filetype:'.implode(' OR filetype:',$filetypes).')';
 	}
@@ -111,21 +114,21 @@ if (trim($_REQUEST['q'])) {
 	//////////////////////////////////////////////////////////////////
 	
 	//Filters on pages
-	if (sensitiveIO::isPositiveInteger($_REQUEST['pageRoot']) || $_REQUEST['PublicAfter'] || $_REQUEST['PublicBefore']) {
+	if ((isset($_REQUEST['pageRoot']) && sensitiveIO::isPositiveInteger($_REQUEST['pageRoot'])) || isset($_REQUEST['PublicAfter']) || isset($_REQUEST['PublicBefore'])) {
 		//load module interface
 		if ($moduleInterface = CMS_ase_interface_catalog::getModuleInterface(MOD_STANDARD_CODENAME)) {
-			if (sensitiveIO::isPositiveInteger($_REQUEST['pageRoot'])) {
+			if (isset($_REQUEST['pageRoot']) && sensitiveIO::isPositiveInteger($_REQUEST['pageRoot'])) {
 				//add filter on root page ID
 				$moduleInterface->addFilter('root', $_REQUEST['pageRoot']);
 			}
-			if ($_REQUEST['PublicAfter']) {
+			if (isset($_REQUEST['PublicAfter'])) {
 				$dateAfter = new CMS_date();
 				$dateAfter->setFormat($cms_language->getDateFormat());
 				if ($dateAfter->setLocalizedDate($_REQUEST['PublicAfter'])) {
 					$moduleInterface->addFilter('publication date after', $dateAfter);
 				}
 			}
-			if ($_REQUEST['PublicBefore']) {
+			if (isset($_REQUEST['PublicBefore'])) {
 				$dateBefore = new CMS_date();
 				$dateBefore->setFormat($cms_language->getDateFormat());
 				if ($dateBefore->setLocalizedDate($_REQUEST['PublicBefore'])) {
@@ -137,10 +140,12 @@ if (trim($_REQUEST['q'])) {
 	}
 	
 	//add expand Docs if any
-	if ($_REQUEST['expandDocs']) {
+	if (isset($_REQUEST['expandDocs'])) {
 		$expandDocsIds = explode(',',$_REQUEST['expandDocs']);
 		foreach ($expandDocsIds as $docid) {
-			$search->addRelevantDocument($docid);
+			if ($docid) {
+				$search->addRelevantDocument($docid);
+			}
 		}
 	}
 	//Then launch search
@@ -153,11 +158,11 @@ if (trim($_REQUEST['q'])) {
 $content = '
 <div id="aseSearch">
 <form name="search" action="'.$_SERVER['SCRIPT_NAME'].'" method="get">
-<input type="text" style="width:60%;" name="q" value="'.htmlspecialchars($_REQUEST['q']).'" />&nbsp;<input type="submit" value="'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_SEARCH, false, MOD_ASE_CODENAME).'" />
+<input type="text" style="width:60%;" name="q" value="'.(isset($_REQUEST['q']) ? htmlspecialchars($_REQUEST['q']) : '').'" />&nbsp;<input type="submit" value="'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_SEARCH, false, MOD_ASE_CODENAME).'" />
 &nbsp;&nbsp;&nbsp;<a href="#help" onclick="document.getElementById(\'aseHelp\').style.display=\'block\';">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_HELP, false, MOD_ASE_CODENAME).'</a>
 </form>';
 
-if (is_object($search)) {
+if (isset($search) && is_object($search)) {
 	$startresultstime = getmicrotime();
 	if ($search->getMatchesNumbers()) {
 		$results = $search->getMatches();
@@ -186,8 +191,8 @@ if (is_object($search)) {
 				 - '.$search->getMatchValue($result, 'language').$fileSize.'
 				 - '.$search->getMatchValue($result, 'percent').'%<br />
 				 '.$cms_language->getMessage(MESSAGE_ASE_RESULTS_PUBLISHED, false, MOD_ASE_CODENAME).' '.$search->getMatchValue($result, 'pubDate', array('format' => $cms_language->getDateFormat()));
-				if (!is_array($expandDocsIds) || (is_array($expandDocsIds) && !in_array($search->getMatchValue($result, 'docid'), $expandDocsIds))) {
-					$content .= ' - <a href="'.$_SERVER['SCRIPT_NAME'].'?q='.urlencode($_REQUEST['q']).'&amp;expandDocs='.($_REQUEST['expandDocs'] ? urlencode($_REQUEST['expandDocs']).','.$search->getMatchValue($result, 'docid') : $search->getMatchValue($result, 'docid')).'" title="'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_RELOAD_USING_THIS_DOC, false, MOD_ASE_CODENAME).'">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_MORERELEVANT, false, MOD_ASE_CODENAME).'</a>';
+				if ((!isset($expandDocsIds) ||!is_array($expandDocsIds)) || (isset($expandDocsIds) && is_array($expandDocsIds) && !in_array($search->getMatchValue($result, 'docid'), $expandDocsIds))) {
+					$content .= ' - <a href="'.$_SERVER['SCRIPT_NAME'].'?q='.(isset($_REQUEST['q']) ? urlencode($_REQUEST['q']) : '').'&amp;expandDocs='.(isset($_REQUEST['expandDocs']) ? urlencode($_REQUEST['expandDocs']).','.$search->getMatchValue($result, 'docid') : $search->getMatchValue($result, 'docid')).'" title="'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_RELOAD_USING_THIS_DOC, false, MOD_ASE_CODENAME).'">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_MORERELEVANT, false, MOD_ASE_CODENAME).'</a>';
 				} else {
 				 	$content .= ' - <span class="alert">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_MORERELEVANT, false, MOD_ASE_CODENAME).'</span>';
 				}
@@ -207,7 +212,7 @@ if (is_object($search)) {
 			//no more than 25 pages (500 first results max)
 			while((($toPage-1)*$resultsNumber) <= $search->getMatchesNumbers() && $toPage <= 25) {
 				if ($toPage != $pageNB) {
-					$content .= '<a href="'.$_SERVER['SCRIPT_NAME'].'?q='.urlencode($_REQUEST['q']).'&amp;page='.$toPage.'&amp;expandDocs='.urlencode($_REQUEST['expandDocs']).'">'.$toPage.'</a>&nbsp;&nbsp; ';
+					$content .= '<a href="'.$_SERVER['SCRIPT_NAME'].'?q='.(isset($_REQUEST['q']) ? urlencode($_REQUEST['q']) : '').'&amp;page='.$toPage.'&amp;expandDocs='.(isset($_REQUEST['expandDocs']) ? urlencode($_REQUEST['expandDocs']) : '').'">'.$toPage.'</a>&nbsp;&nbsp; ';
 				} else {
 					$content .= '<strong>'.$toPage.'</strong>&nbsp;&nbsp;&nbsp;';
 				}
@@ -221,7 +226,7 @@ if (is_object($search)) {
 		if (sizeof($expandSet)) {
 			$content .='<hr /><div class="center"><strong>'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_EXPAND, false, MOD_ASE_CODENAME).' </strong>';
 			foreach ($expandSet as $term) {
-				$content .='<a href="'.$_SERVER['SCRIPT_NAME'].'?q='.urlencode($_REQUEST['q']).'+'.urlencode($term).'&amp;expandDocs='.urlencode($_REQUEST['expandDocs']).'">'.$term.'</a>&nbsp; ';
+				$content .='<a href="'.$_SERVER['SCRIPT_NAME'].'?q='.(isset($_REQUEST['q']) ? urlencode($_REQUEST['q']) : '').'+'.urlencode($term).'&amp;expandDocs='.(isset($_REQUEST['expandDocs']) ? urlencode($_REQUEST['expandDocs']) : '').'">'.$term.'</a>&nbsp; ';
 			}
 			$content .='</div>';
 		}
@@ -230,7 +235,7 @@ if (is_object($search)) {
 		<div class="right">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_RESULTCOUNT, array((($pageNB - 1) * $resultsNumber + 1), $max, $search->getMatchesNumbers('~')), MOD_ASE_CODENAME).' ('.round($time,3).'s)</div>
 		<br />
 		<form name="searchbottom" action="'.$_SERVER['SCRIPT_NAME'].'" method="get">
-		<input type="text" style="width:60%;" name="q" value="'.htmlspecialchars($_REQUEST['q']).'" />&nbsp;<input type="submit" value="'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_SEARCH, false, MOD_ASE_CODENAME).'" />
+		<input type="text" style="width:60%;" name="q" value="'.(isset($_REQUEST['q']) ? htmlspecialchars($_REQUEST['q']) : '').'" />&nbsp;<input type="submit" value="'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_SEARCH, false, MOD_ASE_CODENAME).'" />
 		&nbsp;&nbsp;&nbsp;<a href="#help" onclick="document.getElementById(\'aseHelp\').style.display=\'block\';">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_HELP, false, MOD_ASE_CODENAME).'</a>
 		</form><br />';
 		
@@ -277,7 +282,7 @@ The following prefixes allow you to restrict your search on document\'s characte
 -->
 
 <br /><br />';
-if (defined('SYSTEM_DEBUG') && SYSTEM_DEBUG && is_object($search) && !$error && is_object($cms_user) && $cms_user->getUserId()==1) {
+if (defined('SYSTEM_DEBUG') && SYSTEM_DEBUG && isset($search) && is_object($search) && !$error && is_object($cms_user) && $cms_user->getUserId()==1) {
 	$resultstime = getmicrotime() - $startresultstime;
 	$content .='<hr />Displaying results in '.round($resultstime,3).'s.<br />';
 	$content .='<strong>Query : </strong>'.$search->getQueryDesc();

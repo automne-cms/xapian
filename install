@@ -5,6 +5,7 @@
 >	/automne/classes/modules/ase/VERSION
 >	/automne/classes/modules/ase/document.php
 >	/automne/classes/modules/ase/xapianDB.php
+>	/automne/classes/modules/ase/xapian.php
 >	/automne/classes/modules/ase/xapianIndexer.php
 >	/automne/classes/modules/ase/xapianSearch.php
 >	/automne/classes/modules/ase/filters/catalog.php
