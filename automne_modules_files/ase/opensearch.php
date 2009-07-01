@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: opensearch.php,v 1.1.1.1 2007/09/04 15:01:29 sebastien Exp $
+// $Id: opensearch.php,v 1.2 2009/07/01 15:36:55 sebastien Exp $
 
 /**
   * PHP page : generate  OpenSearch description document
@@ -56,7 +56,7 @@ if (!$error) {
 			'</OpenSearchDescription>';
 			
 			//send RSS content
-			if (!$_REQUEST['previz']) {
+			if (!isset($_REQUEST['previz']) || !$_REQUEST['previz']) {
 				header('Content-type: text/xml; charset=ISO-8859-1');
 				echo $content;
 			} else {

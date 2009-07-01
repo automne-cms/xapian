@@ -1,3 +1,6 @@
+v0.34
+[BUG] : Opensearch did not work properly
+
 v0.33
 [REFACTOR] : Refactor module to be used in Automne 4. Since this version, this module is no longer compatible with Automne 3
 
