@@ -2,7 +2,7 @@
 /**
   * Install or update ASE module
   * @author Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>
-  * @version $Id: ase_install.php,v 1.5 2009/07/07 09:10:51 sebastien Exp $
+  * @version $Id: ase_install.php,v 1.6 2009/07/07 09:14:06 sebastien Exp $
   */
 
 require_once($_SERVER["DOCUMENT_ROOT"]."/cms_rc_admin.php");
@@ -37,8 +37,6 @@ if (!$installed) {
 	}
 } else {
 	echo "ASE installation : Already installed : Launch update ...<br />";
-	
-	
 	//load destination module parameters
 	$module = CMS_modulesCatalog::getByCodename('ase');
 	$moduleParameters = $module->getParameters(false,true);
