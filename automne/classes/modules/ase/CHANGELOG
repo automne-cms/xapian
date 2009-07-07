@@ -1,3 +1,6 @@
+v0.37
+[REFACTOR] : remove stopwords from expand set
+
 v0.36
 [REFACTOR] : ase_install file use old parser
 

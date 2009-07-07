@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xapianSearch.php,v 1.6 2009/06/08 14:22:14 sebastien Exp $
+// $Id: xapianSearch.php,v 1.7 2009/07/07 12:19:23 sebastien Exp $
 
 /**
   * Class CMS_XapianQuery
@@ -348,11 +348,13 @@ class CMS_XapianQuery extends CMS_grandFather {
 			$expandTerms = array();
 			//instanciate stemmer
 			$stemmer = new XapianStem($this->_language);
+			//get stopper
+			$stopper = $this->_getStopper();
 			//pr($this->_queryTerms);
 			while (!$eSetI->equals($expands->end()) && sizeof($expandTerms) < $this->_expandSetNumber) {
 			    $term = $eSetI->get_termname();
-				//only words (starting with W) should compose expand set and it should not already in query
-				if (substr($term,0,1) !== 'Z' && substr($term,0,2) !== '__' && strlen($term) > 3 && !in_array('Z'.$stemmer->apply($term), $this->_queryTerms) && !in_array($term, $this->_queryTerms)) {
+				//only words (starting with W) should compose expand set and it should not already in query nor in stopwords
+				if (substr($term,0,1) !== 'Z' && substr($term,0,2) !== '__' && strlen($term) > 3 && !in_array('Z'.$stemmer->apply($term), $this->_queryTerms) && !in_array($term, $this->_queryTerms) && !$stopper->apply($term)) {
 					$expandTerms[$stemmer->apply($term)] = utf8_decode($term);
 				}
 				//iterate eSet
