@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: polymod.php,v 1.6 2009/06/08 14:22:14 sebastien Exp $
+// $Id: polymod.php,v 1.7 2009/07/07 09:05:02 sebastien Exp $
 
 /**
   * Class CMS_polymod_ase
@@ -397,12 +397,23 @@ class CMS_polymod_ase extends CMS_ase_interface {
 				return '';
 			break;
 			case 'pubDate' :
-				if ($this->_results[$matchInfo['uid']]->getObjectResourceStatus() == 1) {
-					$pubDate = $this->_results[$matchInfo['uid']]->getPublicationDateStart();
-					if (!$parameters['format']) {
-						return $pubDate->getTimestamp();
-					} else {
-						return date($parameters['format'], $pubDate->getTimestamp());
+				if (method_exists($this->_results[$matchInfo['uid']], 'getPublicationDate')) {
+					$pubDate = $this->_results[$matchInfo['uid']]->getPublicationDate();
+					if ($pubDate && is_object($pubDate)) {
+						if (!$parameters['format']) {
+							return $pubDate->getTimestamp();
+						} else {
+							return date($parameters['format'], $pubDate->getTimestamp());
+						}
+					}
+				} else {
+					if ($this->_results[$matchInfo['uid']]->getObjectResourceStatus() == 1) {
+						$pubDate = $this->_results[$matchInfo['uid']]->getPublicationDateStart();
+						if (!$parameters['format']) {
+							return $pubDate->getTimestamp();
+						} else {
+							return date($parameters['format'], $pubDate->getTimestamp());
+						}
 					}
 				}
 			break;
