@@ -2,7 +2,7 @@
 /**
   * Install or update ASE module
   * @author Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>
-  * @version $Id: ase_install.php,v 1.4 2007/09/06 16:36:15 sebastien Exp $
+  * @version $Id: ase_install.php,v 1.5 2009/07/07 09:10:51 sebastien Exp $
   */
 
 require_once($_SERVER["DOCUMENT_ROOT"]."/cms_rc_admin.php");
@@ -38,25 +38,26 @@ if (!$installed) {
 } else {
 	echo "ASE installation : Already installed : Launch update ...<br />";
 	
-	//merge module parameters file
+	
+	//load destination module parameters
 	$module = CMS_modulesCatalog::getByCodename('ase');
 	$moduleParameters = $module->getParameters(false,true);
 	
 	//load the XML data of the source the files
 	$sourceXML = new CMS_file(PATH_TMP_FS.PATH_PACKAGES_WR.'/modules/ase_rc.xml');
-	$parser = new CMS_XMLParser(XMLPARSER_DATA_TYPE_CDATA, $sourceXML->readContent("string"));
-	$parser->addWantedTag("param", false);
-	$parser->setDebug(false);
-	$parser->setLog(false);
-	$parser->parse();
+	$domdocument = new CMS_DOMDocument();
+	try {
+		$domdocument->loadXML($sourceXML->readContent("string"));
+	} catch (DOMException $e) {}
+	$paramsTags = $domdocument->getElementsByTagName('param');
 	$sourceParameters = array();
-	foreach ($parser->getTags() as $aTag) {
-		$attributes = $aTag->getAttributes();
-		$sourceParameters[$attributes["name"]] = array($aTag->getInnerContent(),$attributes["type"]);
+	foreach ($paramsTags as $aTag) {
+		$name = ($aTag->hasAttribute('name')) ? $aTag->getAttribute('name') : '';
+		$type = ($aTag->hasAttribute('type')) ? $aTag->getAttribute('type') : '';
+		$sourceParameters[$name] = array(CMS_DOMDocument::DOMElementToString($aTag, true),$type);
 	}
 	//merge the two tables of parameters
 	$resultParameters = array_merge($sourceParameters,$moduleParameters);
-	
 	//set new parameters to the module
 	if ($module->setAndWriteParameters($resultParameters)) {
 		echo 'Modules parameters successfully merged<br />';
