@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: polymod.php,v 1.7 2009/07/07 09:05:02 sebastien Exp $
+// $Id: polymod.php,v 1.8 2009/07/20 13:48:27 sebastien Exp $
 
 /**
   * Class CMS_polymod_ase
@@ -127,7 +127,7 @@ class CMS_polymod_ase extends CMS_ase_interface {
 					$type = 'mix';
 				}
 				//then add file
-				$document->addFile($file['file'], $file['extension'], WEBROOT);
+				$document->addFile($file['file'], $file['extension'], CMS_file::WEBROOT);
 			}
 		} else {
 			$type = 'txt';
