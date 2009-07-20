@@ -1,3 +1,6 @@
+v0.38
+[REFACTOR] : add a class "button" on input type submit used in module row
+
 v0.37
 [REFACTOR] : remove stopwords from expand set
 

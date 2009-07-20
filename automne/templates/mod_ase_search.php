@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: mod_ase_search.php,v 1.15 2009/07/13 10:24:33 sebastien Exp $
+// $Id: mod_ase_search.php,v 1.16 2009/07/20 12:47:22 sebastien Exp $
 
 /**
   * Template CMS_ase_search
@@ -158,7 +158,7 @@ if (isset($_REQUEST['q']) && trim($_REQUEST['q'])) {
 $content = '
 <div id="aseSearch">
 <form name="search" action="'.$_SERVER['SCRIPT_NAME'].'" method="get">
-<input type="text" style="width:60%;" name="q" value="'.(isset($_REQUEST['q']) ? htmlspecialchars($_REQUEST['q']) : '').'" />&nbsp;<input type="submit" value="'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_SEARCH, false, MOD_ASE_CODENAME).'" />
+<input type="text" style="width:60%;" name="q" value="'.(isset($_REQUEST['q']) ? htmlspecialchars($_REQUEST['q']) : '').'" />&nbsp;<input type="submit" class="button" value="'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_SEARCH, false, MOD_ASE_CODENAME).'" />
 &nbsp;&nbsp;&nbsp;<a href="#help" onclick="document.getElementById(\'aseHelp\').style.display=\'block\';">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_HELP, false, MOD_ASE_CODENAME).'</a>
 </form>';
 
@@ -235,7 +235,7 @@ if (isset($search) && is_object($search)) {
 		<div class="right">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_RESULTCOUNT, array((($pageNB - 1) * $resultsNumber + 1), $max, $search->getMatchesNumbers('~')), MOD_ASE_CODENAME).' ('.round($time,3).'s)</div>
 		<br />
 		<form name="searchbottom" action="'.$_SERVER['SCRIPT_NAME'].'" method="get">
-		<input type="text" style="width:60%;" name="q" value="'.(isset($_REQUEST['q']) ? htmlspecialchars($_REQUEST['q']) : '').'" />&nbsp;<input type="submit" value="'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_SEARCH, false, MOD_ASE_CODENAME).'" />
+		<input type="text" style="width:60%;" name="q" value="'.(isset($_REQUEST['q']) ? htmlspecialchars($_REQUEST['q']) : '').'" />&nbsp;<input type="submit" class="button" value="'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_SEARCH, false, MOD_ASE_CODENAME).'" />
 		&nbsp;&nbsp;&nbsp;<a href="#help" onclick="document.getElementById(\'aseHelp\').style.display=\'block\';">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_HELP, false, MOD_ASE_CODENAME).'</a>
 		</form><br />';
 		
