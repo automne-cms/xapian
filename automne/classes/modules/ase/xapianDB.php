@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xapianDB.php,v 1.9 2009/06/08 14:22:14 sebastien Exp $
+// $Id: xapianDB.php,v 1.10 2009/07/22 14:53:57 sebastien Exp $
 
 /**
   * Class CMS_XapianDB
@@ -189,7 +189,11 @@ class CMS_XapianDB extends CMS_grandFather {
 			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get DB DSN');
 			return false;
 		}
-		$this->_db = Xapian::flint_open($this->_getDSN());//new XapianDatabase($this->_getDSN());
+		try {
+			$this->_db = Xapian::flint_open($this->_getDSN());
+		} catch (Exception $e) {
+			$this->raiseError('Can not open database : '.$e->getMessage());
+		}
 		if (!$this->_db) {
 			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get database ...');
 			return false;
@@ -216,7 +220,11 @@ class CMS_XapianDB extends CMS_grandFather {
 				clearstatcache();
 			}
 		}
-		$this->_db = Xapian::flint_open($this->_getDSN(), Xapian::DB_CREATE_OR_OPEN);
+		try {
+			$this->_db = Xapian::flint_open($this->_getDSN(), Xapian::DB_CREATE_OR_OPEN);
+		} catch (Exception $e) {
+			$this->raiseError('Can not open database : '.$e->getMessage());
+		}
 		if (!$this->_db) {
 			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get writable database ...');
 			return false;
