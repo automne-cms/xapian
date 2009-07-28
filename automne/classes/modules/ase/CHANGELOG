@@ -1,3 +1,6 @@
+v0.41
+[BUG] : file aseFrontEnd.php cause a session restart
+
 v0.40
 [BUG] : Exception not caught when Xapian try to open a wrong database version
 

@@ -18,17 +18,11 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: aseFrontEnd.php,v 1.4 2009/06/08 14:22:13 sebastien Exp $
+// $Id: aseFrontEnd.php,v 1.5 2009/07/28 15:36:51 sebastien Exp $
 
 /**
   * Main Include File of the Frontend Package : ASE
   * Includes all of the package files.
   */
-session_name('AutomneSession');
-@session_start();
-//Delete polymod session if already exists
-if (isset($_SESSION['polyModule']) && sizeof($_SESSION['polyModule'])) {
-	unset($_SESSION['polyModule']);
-}
 require_once($_SERVER["DOCUMENT_ROOT"]."/cms_rc_frontend.php");
 ?>
