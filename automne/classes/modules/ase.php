@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: ase.php,v 1.14 2009/06/08 15:21:01 sebastien Exp $
+// $Id: ase.php,v 1.15 2009/08/12 14:31:20 sebastien Exp $
 
 /**
   * Class CMS_module_ase
@@ -115,7 +115,7 @@ if ($xapianExists) {
 		{
 			$return = array();
 			switch ($treatmentMode) {
-				case MODULE_TREATMENT_PAGECONTENT_TAGS :
+				case MODULE_TREATMENT_PAGEHEADER_TAGS :
 					$return = array (
 						"atm-meta-tags" => array("selfClosed" => true, "parameters" => array()),
 					);
@@ -164,7 +164,7 @@ if ($xapianExists) {
 					$this->moduleUsage($treatmentParameters["page"]->getID(), MOD_ASE_CODENAME, true);
 					return $cs->getClientspaceData(MOD_ASE_CODENAME, $treatmentParameters["language"], $treatmentParameters["page"], $visualizationMode);
 				break;
-				case MODULE_TREATMENT_PAGECONTENT_TAGS:
+				case MODULE_TREATMENT_PAGEHEADER_TAGS:
 					if (!is_a($treatedObject,"CMS_page")) {
 						$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : $treatedObject must be a CMS_page object');
 						return false;

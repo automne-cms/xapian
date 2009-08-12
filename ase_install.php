@@ -2,7 +2,7 @@
 /**
   * Install or update ASE module
   * @author Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>
-  * @version $Id: ase_install.php,v 1.6 2009/07/07 09:14:06 sebastien Exp $
+  * @version $Id: ase_install.php,v 1.7 2009/08/12 14:31:24 sebastien Exp $
   */
 
 require_once($_SERVER["DOCUMENT_ROOT"]."/cms_rc_admin.php");
@@ -24,10 +24,12 @@ if (!$installed) {
 		if (CMS_file::copyTo(PATH_TMP_FS.PATH_PACKAGES_WR.'/modules/ase_rc.xml',PATH_PACKAGES_FS.'/modules/ase_rc.xml')
 			&& CMS_file::copyTo(PATH_TMP_FS.PATH_TEMPLATES_ROWS_WR.'/mod_ase.xml',PATH_TEMPLATES_ROWS_FS.'/mod_ase.xml')
 			&& CMS_file::copyTo(PATH_TMP_FS.'/css/modules/ase.css',PATH_REALROOT_FS.'/css/modules/ase.css')
+			&& CMS_file::copyTo(PATH_TMP_FS.PATH_TEMPLATES_WR.'/mod_ase_search.php',PATH_TEMPLATES_FS.'/mod_ase_search.php')
 			) {
 			CMS_file::chmodFile(FILES_CHMOD, PATH_PACKAGES_FS.'/modules/ase_rc.xml');
 			CMS_file::chmodFile(FILES_CHMOD, PATH_TEMPLATES_ROWS_FS.'/mod_ase.xml');
 			CMS_file::chmodFile(FILES_CHMOD, PATH_REALROOT_FS.'/css/modules/ase.css');
+			CMS_file::chmodFile(FILES_CHMOD, PATH_TEMPLATES_FS.'/mod_ase_search.php');
 			echo "ASE installation : Installation done.<br /><br />";
 		} else {
 			echo "ASE installation : INSTALLATION ERROR ! Can not copy parameters file ...<br />";

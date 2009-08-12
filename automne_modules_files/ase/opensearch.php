@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: opensearch.php,v 1.2 2009/07/01 15:36:55 sebastien Exp $
+// $Id: opensearch.php,v 1.3 2009/08/12 14:31:55 sebastien Exp $
 
 /**
   * PHP page : generate  OpenSearch description document
@@ -32,7 +32,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/automne/classes/aseFrontEnd.php");
 
 //Get parameters
 $error = 0;
-if (!(substr($_REQUEST['search'],0,1) == '/' || sensitiveIO::isPositiveInteger($_REQUEST['search'])) || !sensitiveIO::isPositiveInteger($_REQUEST['website'])) {
+if (!isset($_REQUEST['search']) || !isset($_REQUEST['website']) || !(substr($_REQUEST['search'],0,1) == '/' || sensitiveIO::isPositiveInteger($_REQUEST['search'])) || !sensitiveIO::isPositiveInteger($_REQUEST['website'])) {
 	$error = 1;
 }
 

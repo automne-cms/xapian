@@ -1,3 +1,6 @@
+v0.42
+[REFACTOR] : change atm-meta-tags treatment to use MODULE_TREATMENT_PAGEHEADER_TAGS instead of MODULE_TREATMENT_PAGECONTENT_TAGS (needed since Automne 4.0.0rc3)
+
 v0.41
 [BUG] : file aseFrontEnd.php cause a session restart
 
