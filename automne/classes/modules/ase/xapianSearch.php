@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xapianSearch.php,v 1.7 2009/07/07 12:19:23 sebastien Exp $
+// $Id: xapianSearch.php,v 1.8 2009/11/12 15:48:14 sebastien Exp $
 
 /**
   * Class CMS_XapianQuery
@@ -146,6 +146,21 @@ class CMS_XapianQuery extends CMS_grandFather {
 	}
 	
 	function query(&$page, &$resultsNumber) {
+		//check for rejected user agent (ie : robots must not be able of doing search)
+		if (isset($_SERVER['HTTP_USER_AGENT']) && $_SERVER['HTTP_USER_AGENT']) {
+			$module = CMS_modulesCatalog::getByCodename(MOD_ASE_CODENAME);
+			$userAgentRejected = $module->getParameters('USER_AGENT_REJECTED');
+			if ($userAgentRejected) {
+				$userAgents = explode(';', $userAgentRejected);
+				if (is_array($userAgents)) {
+					foreach($userAgents as $userAgent) {
+						if (strpos(strtolower($_SERVER['HTTP_USER_AGENT']), strtolower($userAgent)) !== false) {
+							return false;
+						}
+					}
+				}
+			}
+		}
 		if (((int) $page) < 1) {
 			$page = 1;
 		}
@@ -346,8 +361,8 @@ class CMS_XapianQuery extends CMS_grandFather {
 			$expands = $this->_enquire->get_eset(($this->_expandSetNumber*3),$this->_rSet,0);
 			$eSetI = $expands->begin();
 			$expandTerms = array();
-			//instanciate stemmer
-			$stemmer = new XapianStem($this->_language);
+			//get stemmer
+			$stemmer = $this->_getStemmer();
 			//get stopper
 			$stopper = $this->_getStopper();
 			//pr($this->_queryTerms);
@@ -453,18 +468,18 @@ class CMS_XapianQuery extends CMS_grandFather {
 		return $filtersQuery;
 	}
 	
-	function &_getStopper() {
+	function _getStopper() {
 		static $stopper;
 		if (!isset($stopper)) {
+			//instanciate stoppper and add stopwords list
+			$stopper = new XapianSimpleStopper();
 			//get stop words for document language
 			$stoplist = new CMS_file(PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME.'/stopwords/'.$this->_language.'.txt');
 			if (!$stoplist->exists()) {
 				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no stopwords list founded for language : '.$this->_language);
-				return false;
+				return $stopper;
 			}
 			$stopwords = $stoplist->readContent('array');
-			//instanciate stoppper and add stopwords list
-			$stopper = new XapianSimpleStopper();
 			foreach ($stopwords as $stopword) {
 				$stopper->add($stopword);
 			}
@@ -472,9 +487,13 @@ class CMS_XapianQuery extends CMS_grandFather {
 		return $stopper;
 	}
 	
-    function _getStemmer() {
-		//return stemmer
-		return new XapianStem($this->_language);
+	function _getStemmer() {
+		$languageCode = strtolower($this->_language);
+		$languagesMap = CMS_ase_document::languagesMap();
+		if (isset($languagesMap[$languageCode]) && in_array($languagesMap[$languageCode], explode(' ', XapianStem::get_available_languages()))) {
+			return new XapianStem($languagesMap[$languageCode]);
+		}
+		return new XapianStem('none');
 	}
 	
 	/**

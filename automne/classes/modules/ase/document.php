@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: document.php,v 1.6 2009/06/08 14:22:14 sebastien Exp $
+// $Id: document.php,v 1.7 2009/11/12 15:48:14 sebastien Exp $
 
 /**
   * Class CMS_ase_document
@@ -418,16 +418,16 @@ class CMS_ase_document extends CMS_grandFather
 		return $this->_plainTextContent;
 	}
 	
-	function &getStopper() {
+	function getStopper() {
+		//instanciate stoppper and add stopwords list
+		$stopper = new XapianSimpleStopper();
 		//get stop words for document language
 		$stoplist = new CMS_file(PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME.'/stopwords/'.strtolower($this->getValue('language')).'.txt');
 		if (!$stoplist->exists()) {
 			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no stopwords list founded for language : '.$this->getValue('language'));
-			return false;
+			return $stopper;
 		}
 		$stopwords = $stoplist->readContent('array');
-		//instanciate stoppper and add stopwords list
-		$stopper = new XapianSimpleStopper();
 		foreach ($stopwords as $stopword) {
 			$stopper->add(utf8_encode($stopword));
 		}
@@ -435,7 +435,194 @@ class CMS_ase_document extends CMS_grandFather
 	}
 	
 	function getStemmer() {
-		return new XapianStem(strtolower($this->getValue('language')));
+		$languageCode = strtolower($this->getValue('language'));
+		$languagesMap = $this->languagesMap();
+		if (isset($languagesMap[$languageCode]) && in_array($languagesMap[$languageCode], explode(' ', XapianStem::get_available_languages()))) {
+			return new XapianStem($languagesMap[$languageCode]);
+		}
+		return new XapianStem('none');
+	}
+	
+	function languagesMap() {
+		return array_map('strtolower', array_flip(array(
+			'Abkhazian'			=> 'ab',
+			'Avestan'			=> 'ae',
+			'Afrikaans'			=> 'af',
+			'Akan'				=> 'ak',
+			'Amharic'			=> 'am',
+			'Aragonese'			=> 'an',
+			'Arabic'			=> 'ar',
+			'Assamese'			=> 'as',
+			'Avaric'			=> 'av',
+			'Aymara'			=> 'ay',
+			'Azerbaijani'		=> 'az',
+			'Bashkir'			=> 'ba',
+			'Belarusian'		=> 'be',
+			'Bulgarian'			=> 'bg',
+			'Bihari'			=> 'bh',
+			'Bislama'			=> 'bi',
+			'Bambara'			=> 'bm',
+			'Bengali'			=> 'bn',
+			'Tibetan'			=> 'bo',
+			'Breton'			=> 'br',
+			'Bosnian'			=> 'bs',
+			'Catalan'			=> 'ca',
+			'Chechen'			=> 'ce',
+			'Chamorro'			=> 'ch',
+			'Corsican'			=> 'co',
+			'Cree'				=> 'cr',
+			'Czech'				=> 'cs',
+			'Church Slavic'		=> 'cu',
+			'Chuvash'			=> 'cv',
+			'Welsh'				=> 'cy',
+			'Danish'			=> 'da',
+			'German'			=> 'de',
+			'Divehi'			=> 'dv',
+			'Dzongkha'			=> 'dz',
+			'Ewe'				=> 'ee',
+			'Modern Greek'		=> 'el',
+			'English'			=> 'en',
+			'Esperanto'			=> 'eo',
+			'Spanish'			=> 'es',
+			'Estonian'			=> 'et',
+			'Basque'			=> 'eu',
+			'Persian'			=> 'fa',
+			'Fulah'				=> 'ff',
+			'Finnish'			=> 'fi',
+			'Fijian'			=> 'fj',
+			'Faroese'			=> 'fo',
+			'French'			=> 'fr',
+			'Western Frisian'	=> 'fy',
+			'Irish'				=> 'ga',
+			'Gaelic'			=> 'gd',
+			'Galician'			=> 'gl',
+			'Gujarati'			=> 'gu',
+			'Manx'				=> 'gv',
+			'Hausa'				=> 'ha',
+			'Modern Hebrew'		=> 'he',
+			'Hindi'				=> 'hi',
+			'Hiri Motu'			=> 'ho',
+			'Croatian'			=> 'hr',
+			'Haitian'			=> 'ht',
+			'Hungarian'			=> 'hu',
+			'Armenian'			=> 'hy',
+			'Herero'			=> 'hz',
+			'Interlingua'		=> 'ia',
+			'Indonesian'		=> 'id',
+			'Interlingue'		=> 'ie',
+			'Igbo'				=> 'ig',
+			'Sichuan Yi'		=> 'ii',
+			'Inupiaq'			=> 'ik',
+			'Ido'				=> 'io',
+			'Icelandic'			=> 'is',
+			'Italian'			=> 'it',
+			'Inuktitut'			=> 'iu',
+			'Japanese'			=> 'ja',
+			'Javanese'			=> 'jv',
+			'Georgian'			=> 'ka',
+			'Kongo'				=> 'kg',
+			'Kikuyu'			=> 'ki',
+			'Kwanyama'			=> 'kj',
+			'Kazakh'			=> 'kk',
+			'Kalaallisut'		=> 'kl',
+			'Central Khmer'		=> 'km',
+			'Kannada'			=> 'kn',
+			'Korean'			=> 'ko',
+			'Kanuri'			=> 'kr',
+			'Kashmiri'			=> 'ks',
+			'Kurdish'			=> 'ku',
+			'Komi'				=> 'kv',
+			'Cornish'			=> 'kw',
+			'Kirghiz'			=> 'ky',
+			'Latin'				=> 'la',
+			'Luxembourgish'		=> 'lb',
+			'Ganda'				=> 'lg',
+			'Limburgish'		=> 'li',
+			'Lingala'			=> 'ln',
+			'Lao'				=> 'lo',
+			'Lithuanian'		=> 'lt',
+			'Luba-Katanga'		=> 'lu',
+			'Latvian'			=> 'lv',
+			'Malagasy'			=> 'mg',
+			'Marshallese'		=> 'mh',
+			'Macedonian'		=> 'mk',
+			'Malayalam'			=> 'ml',
+			'Mongolian'			=> 'mn',
+			'Marathi'			=> 'mr',
+			'Malay'				=> 'ms',
+			'Maltese'			=> 'mt',
+			'Burmese'			=> 'my',
+			'Nauru'				=> 'na',
+			'North Ndebele'		=> 'nd',
+			'Nepali'			=> 'ne',
+			'Ndonga'			=> 'ng',
+			'Dutch'				=> 'nl',
+			'Norwegian Nynorsk'	=> 'nn',
+			'Norwegian'			=> 'no',
+			'South Ndebele'		=> 'nr',
+			'Navajo'			=> 'nv',
+			'Chichewa'			=> 'ny',
+			'Ojibwa'			=> 'oj',
+			'Oromo'				=> 'om',
+			'Oriya'				=> 'or',
+			'Ossetian'			=> 'os',
+			'Panjabi'			=> 'pa',
+			'Polish'			=> 'pl',
+			'Pashto'			=> 'ps',
+			'Portuguese'		=> 'pt',
+			'Quechua'			=> 'qu',
+			'Romansh'			=> 'rm',
+			'Rundi'				=> 'rn',
+			'Romanian'			=> 'ro',
+			'Russian'			=> 'ru',
+			'Kinyarwanda'		=> 'rw',
+			'Sanskrit'			=> 'sa',
+			'Sardinian'			=> 'sc',
+			'Sindhi'			=> 'sd',
+			'Northern Sami'		=> 'se',
+			'Sango'				=> 'sg',
+			'Sinhala'			=> 'si',
+			'Slovak'			=> 'sk',
+			'Slovene'			=> 'sl',
+			'Samoan'			=> 'sm',
+			'Shona'				=> 'sn',
+			'Somali'			=> 'so',
+			'Albanian'			=> 'sq',
+			'Serbian'			=> 'sr',
+			'Swati'				=> 'ss',
+			'Southern Sotho'	=> 'st',
+			'Sundanese'			=> 'su',
+			'Swedish'			=> 'sv',
+			'Swahili'			=> 'sw',
+			'Tamil'				=> 'ta',
+			'Telugu'			=> 'te',
+			'Tajik'				=> 'tg',
+			'Thai'				=> 'th',
+			'Tigrinya'			=> 'ti',
+			'Turkmen'			=> 'tk',
+			'Tagalog'			=> 'tl',
+			'Tswana'			=> 'tn',
+			'Turkish'			=> 'tr',
+			'Tsonga'			=> 'ts',
+			'Tatar'				=> 'tt',
+			'Twi'				=> 'tw',
+			'Tahitian'			=> 'ty',
+			'Uighur'			=> 'ug',
+			'Ukrainian'			=> 'uk',
+			'Urdu'				=> 'ur',
+			'Uzbek'				=> 'uz',
+			'Venda'				=> 've',
+			'Vietnamese'		=> 'vi',
+			'Volapük'			=> 'vo',
+			'Walloon'			=> 'wa',
+			'Wolof'				=> 'wo',
+			'Xhosa'				=> 'xh',
+			'Yiddish'			=> 'yi',
+			'Yoruba'			=> 'yo',
+			'Zhuang'			=> 'za',
+			'Chinese'			=> 'zh',
+			'Zulu'				=> 'zu'
+		)));
 	}
 	
 	/**

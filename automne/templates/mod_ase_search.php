@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: mod_ase_search.php,v 1.16 2009/07/20 12:47:22 sebastien Exp $
+// $Id: mod_ase_search.php,v 1.17 2009/11/12 15:48:14 sebastien Exp $
 
 /**
   * Template CMS_ase_search
@@ -171,7 +171,7 @@ if (isset($search) && is_object($search)) {
 		<div class="right">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_RESULTCOUNT, array((($pageNB - 1) * $resultsNumber + 1), $max, $search->getMatchesNumbers('~'), ), MOD_ASE_CODENAME).' ('.round($time,3).'s)</div>';
 		//Spell correction
 		if ($search->getCorrectedQueryString()) {
-			$content .='<div class="left"><strong class="alert">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_DIDYOUMEAN, false, MOD_ASE_CODENAME).' </strong><a href="'.$_SERVER['SCRIPT_NAME'].'?q='.urlencode($search->getCorrectedQueryString()).'">'.$search->getCorrectedQueryString().'</a></div>';
+			$content .='<div class="left"><strong class="alert">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_DIDYOUMEAN, false, MOD_ASE_CODENAME).' </strong><a rel="nofollow" href="'.$_SERVER['SCRIPT_NAME'].'?q='.urlencode($search->getCorrectedQueryString()).'">'.$search->getCorrectedQueryString().'</a></div>';
 		}
 		$content .='<h2>'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_RESULTS, false, MOD_ASE_CODENAME).'</h2>';
 		
@@ -192,7 +192,7 @@ if (isset($search) && is_object($search)) {
 				 - '.$search->getMatchValue($result, 'percent').'%<br />
 				 '.$cms_language->getMessage(MESSAGE_ASE_RESULTS_PUBLISHED, false, MOD_ASE_CODENAME).' '.$search->getMatchValue($result, 'pubDate', array('format' => $cms_language->getDateFormat()));
 				if ((!isset($expandDocsIds) ||!is_array($expandDocsIds)) || (isset($expandDocsIds) && is_array($expandDocsIds) && !in_array($search->getMatchValue($result, 'docid'), $expandDocsIds))) {
-					$content .= ' - <a href="'.$_SERVER['SCRIPT_NAME'].'?q='.(isset($_REQUEST['q']) ? urlencode($_REQUEST['q']) : '').'&amp;expandDocs='.(isset($_REQUEST['expandDocs']) ? urlencode($_REQUEST['expandDocs']).','.$search->getMatchValue($result, 'docid') : $search->getMatchValue($result, 'docid')).'" title="'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_RELOAD_USING_THIS_DOC, false, MOD_ASE_CODENAME).'">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_MORERELEVANT, false, MOD_ASE_CODENAME).'</a>';
+					$content .= ' - <a rel="nofollow" href="'.$_SERVER['SCRIPT_NAME'].'?q='.(isset($_REQUEST['q']) ? urlencode($_REQUEST['q']) : '').'&amp;expandDocs='.(isset($_REQUEST['expandDocs']) ? urlencode($_REQUEST['expandDocs']).','.$search->getMatchValue($result, 'docid') : $search->getMatchValue($result, 'docid')).'" title="'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_RELOAD_USING_THIS_DOC, false, MOD_ASE_CODENAME).'">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_MORERELEVANT, false, MOD_ASE_CODENAME).'</a>';
 				} else {
 				 	$content .= ' - <span class="alert">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_MORERELEVANT, false, MOD_ASE_CODENAME).'</span>';
 				}
@@ -202,7 +202,7 @@ if (isset($search) && is_object($search)) {
 		}
 		//Spell correction
 		if ($search->getCorrectedQueryString()) {
-			$content .='<div class="left"><strong class="alert">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_DIDYOUMEAN, false, MOD_ASE_CODENAME).' </strong><a href="'.$_SERVER['SCRIPT_NAME'].'?q='.urlencode($search->getCorrectedQueryString()).'">'.$search->getCorrectedQueryString().'</a></div>';
+			$content .='<div class="left"><strong class="alert">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_DIDYOUMEAN, false, MOD_ASE_CODENAME).' </strong><a rel="nofollow" href="'.$_SERVER['SCRIPT_NAME'].'?q='.urlencode($search->getCorrectedQueryString()).'">'.$search->getCorrectedQueryString().'</a></div>';
 		}
 		//pages
 		if ($resultsNumber < $search->getMatchesNumbers()) {
@@ -212,7 +212,7 @@ if (isset($search) && is_object($search)) {
 			//no more than 25 pages (500 first results max)
 			while((($toPage-1)*$resultsNumber) <= $search->getMatchesNumbers() && $toPage <= 25) {
 				if ($toPage != $pageNB) {
-					$content .= '<a href="'.$_SERVER['SCRIPT_NAME'].'?q='.(isset($_REQUEST['q']) ? urlencode($_REQUEST['q']) : '').'&amp;page='.$toPage.'&amp;expandDocs='.(isset($_REQUEST['expandDocs']) ? urlencode($_REQUEST['expandDocs']) : '').'">'.$toPage.'</a>&nbsp;&nbsp; ';
+					$content .= '<a rel="nofollow" href="'.$_SERVER['SCRIPT_NAME'].'?q='.(isset($_REQUEST['q']) ? urlencode($_REQUEST['q']) : '').'&amp;page='.$toPage.'&amp;expandDocs='.(isset($_REQUEST['expandDocs']) ? urlencode($_REQUEST['expandDocs']) : '').'">'.$toPage.'</a>&nbsp;&nbsp; ';
 				} else {
 					$content .= '<strong>'.$toPage.'</strong>&nbsp;&nbsp;&nbsp;';
 				}
@@ -226,7 +226,7 @@ if (isset($search) && is_object($search)) {
 		if (sizeof($expandSet)) {
 			$content .='<hr /><div class="center"><strong>'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_EXPAND, false, MOD_ASE_CODENAME).' </strong>';
 			foreach ($expandSet as $term) {
-				$content .='<a href="'.$_SERVER['SCRIPT_NAME'].'?q='.(isset($_REQUEST['q']) ? urlencode($_REQUEST['q']) : '').'+'.urlencode($term).'&amp;expandDocs='.(isset($_REQUEST['expandDocs']) ? urlencode($_REQUEST['expandDocs']) : '').'">'.$term.'</a>&nbsp; ';
+				$content .='<a rel="nofollow" href="'.$_SERVER['SCRIPT_NAME'].'?q='.(isset($_REQUEST['q']) ? urlencode($_REQUEST['q']) : '').'+'.urlencode($term).'&amp;expandDocs='.(isset($_REQUEST['expandDocs']) ? urlencode($_REQUEST['expandDocs']) : '').'">'.$term.'</a>&nbsp; ';
 			}
 			$content .='</div>';
 		}
@@ -243,7 +243,7 @@ if (isset($search) && is_object($search)) {
 		if (!$error) {
 			//Spell correction
 			if ($search->getCorrectedQueryString()) {
-				$content .='<div class="left"><strong class="alert">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_DIDYOUMEAN, false, MOD_ASE_CODENAME).' </strong><a href="'.$_SERVER['SCRIPT_NAME'].'?q='.urlencode($search->getCorrectedQueryString()).'">'.$search->getCorrectedQueryString().'</a></div>';
+				$content .='<div class="left"><strong class="alert">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_DIDYOUMEAN, false, MOD_ASE_CODENAME).' </strong><a rel="nofollow" href="'.$_SERVER['SCRIPT_NAME'].'?q='.urlencode($search->getCorrectedQueryString()).'">'.$search->getCorrectedQueryString().'</a></div>';
 			}
 			$content .= '<div class="noresults">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_NORESULTS, false, MOD_ASE_CODENAME).'</div>';
 		} else {

@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: polymod.php,v 1.8 2009/07/20 13:48:27 sebastien Exp $
+// $Id: polymod.php,v 1.9 2009/11/12 15:48:14 sebastien Exp $
 
 /**
   * Class CMS_polymod_ase
@@ -367,7 +367,7 @@ class CMS_polymod_ase extends CMS_ase_interface {
 			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : uid must be a positive integer : '.$matchInfo['uid']);
 			return false;
 		}
-		if (!is_object($this->_results[$matchInfo['uid']])) {
+		if (!isset($matchInfo['uid']) || !isset($this->_results[$matchInfo['uid']]) || !is_object($this->_results[$matchInfo['uid']])) {
 			return;
 		}
 		//page content
