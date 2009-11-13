@@ -18,6 +18,7 @@
 >	/automne/classes/modules/ase/filters/sxw.php
 >	/automne/classes/modules/ase/filters/xls.php
 >	/automne/classes/modules/ase/filters/docx.php
+>	/automne/classes/modules/ase/filters/xlsx.php
 >	/automne/classes/modules/ase/interfaces/catalog.php
 >	/automne/classes/modules/ase/interfaces/common.php
 >	/automne/classes/modules/ase/interfaces/polymod.php
@@ -25,13 +26,16 @@
 >	/automne/classes/modules/ase.php
 >	/automne_bin/sxwtoplain.sh	x
 >	/automne_bin/docxtoplain.sh	x
+>	/automne_bin/xlsxtoplain.sh	x
 >	/automne_modules_files/ase/opensearch.php
+>	/automne_modules_files/ase/charenrc
 >	/automne_modules_files/ase/databases/.htaccess
 >	/automne_modules_files/ase/stopwords/.htaccess
 >	/automne_modules_files/ase/stopwords/de.txt
 >	/automne_modules_files/ase/stopwords/en.txt
 >	/automne_modules_files/ase/stopwords/es.txt
 >	/automne_modules_files/ase/stopwords/fr.txt
+>	/automne_modules_files/ase/stopwords/ja.txt
 >	/sql/mod_ase.sql
 >	/sql/mod_ase_I18NM_messages.sql
 #execute ASE installation/update DB script

@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xapianIndexer.php,v 1.9 2009/06/08 14:22:14 sebastien Exp $
+// $Id: xapianIndexer.php,v 1.10 2009/11/13 17:31:14 sebastien Exp $
 
 /**
   * Class CMS_XapianIndexer
@@ -31,16 +31,16 @@
   * @author Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>
   */
 
-//Xapian Document values
-define('XAPIAN_VALUENO_TIMESTAMP', 0);
-define('XAPIAN_VALUENO_MODULE', 1);
-define('XAPIAN_VALUENO_LANGUAGE', 2);
-define('XAPIAN_VALUENO_TITLE', 3);
-define('XAPIAN_VALUENO_UID', 4);
-define('XAPIAN_VALUENO_XID', 5);
-define('XAPIAN_VALUENO_TYPE', 6);
-
 class CMS_XapianIndexer extends CMS_grandFather {
+	//Xapian Document values
+	const XAPIAN_VALUENO_TIMESTAMP = 0;
+	const XAPIAN_VALUENO_MODULE = 1;
+	const XAPIAN_VALUENO_LANGUAGE = 2;
+	const XAPIAN_VALUENO_TITLE = 3;
+	const XAPIAN_VALUENO_UID = 4;
+	const XAPIAN_VALUENO_XID = 5;
+	const XAPIAN_VALUENO_TYPE = 6;
+	
 	/**
 	 * Postings in currently indexed document
 	 * @access	protected
@@ -111,26 +111,26 @@ class CMS_XapianIndexer extends CMS_grandFather {
 			return false;
 		}
 		//document datas (only first 500 caracters, more is useless), remove * # and trailing spaces also
-		$this->_xapianDocument->set_data(strtr(trim(str_replace(array('*','#'), '',substr($this->_document->getTextContent(),0,500))),"_’", " '"));
+		$this->_xapianDocument->set_data(strtr(trim(str_replace(array('*','#'), '',io::substr($this->_document->getTextContent(),0,500))),"_’", " '"));
 		
 		/* 
 		 * document values
 		 */
 		
 		//time
-		$this->_xapianDocument->add_value(XAPIAN_VALUENO_TIMESTAMP, time());
+		$this->_xapianDocument->add_value(self::XAPIAN_VALUENO_TIMESTAMP, time());
 		//module
-		$this->_xapianDocument->add_value(XAPIAN_VALUENO_MODULE, $this->_document->getValue('module'));
+		$this->_xapianDocument->add_value(self::XAPIAN_VALUENO_MODULE, $this->_document->getValue('module'));
 		//UID
-		$this->_xapianDocument->add_value(XAPIAN_VALUENO_UID, $this->_document->getValue('uid'));
+		$this->_xapianDocument->add_value(self::XAPIAN_VALUENO_UID, $this->_document->getValue('uid'));
 		//language
-		$this->_xapianDocument->add_value(XAPIAN_VALUENO_LANGUAGE, $this->_document->getValue('language'));
+		$this->_xapianDocument->add_value(self::XAPIAN_VALUENO_LANGUAGE, $this->_document->getValue('language'));
 		//title
-		$this->_xapianDocument->add_value(XAPIAN_VALUENO_TITLE, $this->_document->getValue('title'));
+		$this->_xapianDocument->add_value(self::XAPIAN_VALUENO_TITLE, $this->_document->getValue('title'));
 		//XID
-		$this->_xapianDocument->add_value(XAPIAN_VALUENO_XID, $xid);
+		$this->_xapianDocument->add_value(self::XAPIAN_VALUENO_XID, $xid);
 		//Type
-		$this->_xapianDocument->add_value(XAPIAN_VALUENO_TYPE, $this->_document->getValue('type'));
+		$this->_xapianDocument->add_value(self::XAPIAN_VALUENO_TYPE, $this->_document->getValue('type'));
 		/* 
 		 * document posting and attributes
 		 */
@@ -176,9 +176,55 @@ class CMS_XapianIndexer extends CMS_grandFather {
 	}
 	
 	function _prepareTextToIndex($text) {
+		//eventually tokenize japanese text
+		if ($this->_document->getValue('language') == 'ja' || $this->_document->getValue('language') == 'jp') {
+			if ($return = $this->tokenizeJapanese($text)) {
+				$text = $return;
+			}
+		}
 		$text = strtr($text,"_’'", 
 							"   ");
-		return utf8_encode($text);
+		//convert text to utf-8 if needed
+		if (!io::isUTF8($text)) {
+			return utf8_encode($text);
+		} else {
+			return $text;
+		}
+		
+	}
+	
+	/**
+	  * Tokenize Japanese text to be used by Xapian
+	  * This method use ChaSen binary (which must be available on the server)
+	  * This does not handle mixed languages pretty well so avoid mixing japanese with other than pure ascii characters
+	  *
+	  * @param string $text : the japanese text to tokenize
+	  * @return string $text : the japanese text tokenized
+	  * @access public
+	  */
+	function tokenizeJapanese($text) {
+		$error = '';
+		if (io::substr(CMS_patch::executeCommand('which chasen 2>&1',$error),0,1) == '/' && !$error) {
+			$text = preg_replace('/[\w\d\b .&,;:_()"*\'-]{2,}/s', "[$0]", $text);
+			//get tmp path
+			$tmpFile = new CMS_file(PATH_TMP_FS.'/chasen_'.md5(mt_rand().microtime()).'.tmp');
+			$tmpFile->setContent($text);
+			$tmpFile->writeTopersistence();
+			$conversionCommand = 'chasen -F "%m " -r '.PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME.'/chasenrc -i w '.$tmpFile->getName();
+			$return = CMS_patch::executeCommand($conversionCommand, $error);
+			$tmpFile->delete();
+			if ($error) {
+				CMS_gtandFather::raiseError('Conversion command "'.$conversionCommand.'" output with errors : '.print_r($error,true).'. Return is : '.print_r($return,true));
+				return false;
+			} else {
+				$text = $return;
+			}
+			$text = strtr($text, '[]', '  ');
+		} else {
+			CMS_gtandFather::raiseError('Cannot find chasen to properly tokenize japanese text ...');
+			return false;
+		}
+		return $text;
 	}
 	
 	/**
@@ -196,10 +242,10 @@ class CMS_XapianIndexer extends CMS_grandFather {
 		foreach ($attributes as $attributeName => $attributeValues) {
 			if (is_array($attributeValues)) {
 				foreach ($attributeValues as $attributeValue) {
-					$this->_addPosting('__'.strtoupper($attributeName).'__:'.$attributeValue);
+					$this->_addPosting('__'.io::strtoupper($attributeName).'__:'.$attributeValue);
 				}
 			} elseif($attributeValues) {
-				$this->_addPosting('__'.strtoupper($attributeName).'__:'.$attributeValues);
+				$this->_addPosting('__'.io::strtoupper($attributeName).'__:'.$attributeValues);
 			} else {
 				return false;
 			}

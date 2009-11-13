@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: mod_ase_search.php,v 1.17 2009/11/12 15:48:14 sebastien Exp $
+// $Id: mod_ase_search.php,v 1.18 2009/11/13 17:31:14 sebastien Exp $
 
 /**
   * Template CMS_ase_search
@@ -31,8 +31,14 @@
 
 //use this language if $_REQUEST['language'] or filter "language:" are not specified.
 //This is used also for texts language
-$defaultSearchLanguage = $mod_ase["language"];
-
+if (isset($mod_ase["language"]) && $mod_ase["language"]) {
+	$defaultSearchLanguage = $mod_ase["language"];
+} else {
+	$page = CMS_tree::getPageById('{{pageID}}');
+	if ($page) {
+		$defaultSearchLanguage = $page->getLanguage(true);
+	}
+}
 //force loading module ase
 if (!class_exists('CMS_module_ase')) {
 	die('Cannot find ase module ...');
@@ -92,12 +98,18 @@ if (isset($_REQUEST['q']) && trim($_REQUEST['q'])) {
 	
 	//Create search query
 	$searchQuery = isset($_REQUEST['q']) ? trim($_REQUEST['q']) : '';
-	if (isset($_REQUEST['language'])) {
+	//set search language
+	if (io::strpos($searchQuery, 'language:') !== false) { //from user input
+		$searchLanguage = strtolower(io::substr($searchQuery, (io::strpos($searchQuery, 'language:') + 9), 2));
+	} elseif (isset($_REQUEST['language']) && $_REQUEST['language']) { //from user request
 		$searchQuery .= ' language:'.$_REQUEST['language'];
 		$searchLanguage = $_REQUEST['language'];
-	} else {
+	} else { //from default language
+		$searchQuery .= ' language:'.$defaultSearchLanguage;
 		$searchLanguage = $defaultSearchLanguage;
 	}
+	
+	//filter on filetype
 	if (isset($_REQUEST['filetype'])) {
 		$filetypes = explode(',',$_REQUEST['filetype']);
 		$searchQuery .= ' AND (filetype:'.implode(' OR filetype:',$filetypes).')';

@@ -17,7 +17,7 @@
 ## | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 ## +----------------------------------------------------------------------+
 ##
-## $Id: docxtoplain.sh,v 1.2 2009/11/13 17:31:14 sebastien Exp $
+## $Id: xlsxtoplain.sh,v 1.1 2009/11/13 17:31:14 sebastien Exp $
 
 ##
 ## Convert Microsoft Word 2007 documents (docx format) into plain text
@@ -28,19 +28,19 @@
 ## +----------------------------------------------------------------------+
 
 ## Temporary path
-temppath=/tmp/docxtoplain
+temppath=/tmp/xlsxtoplain
 
 ## ------------------------------------------------------------------------
 
 if [ ! -d $temppath ] ; then
 	mkdir $temppath
 fi
-if [ -f $temppath/word/document.xml ] ; then
-	rm $temppath/word/document.xml
+if [ -f $temppath/xl/sharedStrings.xml ] ; then
+	rm $temppath/xl/sharedStrings.xml
 fi
 if [ -f $1 ] ; then
-	unzip $1 word/document.xml -d $temppath/ > /dev/null 2>&1
-	if [ -f $temppath/word/document.xml ] ; then
-		cat $temppath/word/document.xml | sed -e "s/<[^>]*>/ /g"
+	unzip $1 xl/sharedStrings.xml -d $temppath/ > /dev/null 2>&1
+	if [ -f $temppath/xl/sharedStrings.xml ] ; then
+		cat $temppath/xl/sharedStrings.xml | sed -e "s/<[^>]*>/ /g"
 	fi
 fi

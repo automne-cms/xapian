@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: standard.php,v 1.5 2009/06/08 14:22:14 sebastien Exp $
+// $Id: standard.php,v 1.6 2009/11/13 17:31:14 sebastien Exp $
 
 /**
   * Class CMS_standard_ase
@@ -49,7 +49,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 			} else {
 				return $cms_language->getMessage(MESSAGE_STANDARD_UID_PAGE_TITLE).' : Page error ('.$uid.')';
 			}
-		} elseif (substr($uid,0,4) == 'file') {
+		} elseif (io::substr($uid,0,4) == 'file') {
 			$fileID = (int) array_pop(explode('_',$uid));
 			if (!$fileID) {
 				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no file ID found for uid : '.$uid);
@@ -125,7 +125,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 			return true;
 		} else
 		//this UID is a file in a page
-		if (substr($document->getValue('uid'),0,4) == 'file') {
+		if (io::substr($document->getValue('uid'),0,4) == 'file') {
 			$fileID = (int) array_pop(explode('_',$document->getValue('uid')));
 			if (!$fileID) {
 				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no file ID found for uid : '.$document->getValue('uid'));
@@ -157,7 +157,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 			//add document filename
 			$filename = explode('_',$fileDatas["file"]);
 			unset($filename[0]);
-			$originalFilename = substr(implode('_',$filename),32);
+			$originalFilename = io::substr(implode('_',$filename),32);
 			//set original filename as content
 			$document->addPlainTextContent($originalFilename);
 			//set document type
@@ -553,7 +553,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 			}
 		} else
 		//this UID is a file in a page
-		if (substr($matchInfo['uid'],0,4) == 'file') {
+		if (io::substr($matchInfo['uid'],0,4) == 'file') {
 			static $filesDatas;
 			//get file ID
 			$fileID = (int) array_pop(explode('_',$matchInfo['uid']));
@@ -594,7 +594,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 						//add document filename
 						$filename = explode('_',$filesDatas[$matchInfo['uid']]["file"]);
 						unset($filename[0]);
-						$title = substr(implode('_',$filename),32);
+						$title = io::substr(implode('_',$filename),32);
 					}
 					return '<a href="'.PATH_MODULES_FILES_WR.'/'.MOD_STANDARD_CODENAME.'/public/'.$filesDatas[$matchInfo['uid']]['file'].'" title="'.htmlspecialchars($title).'">'.$this->strChop($title, 120).'</a> '.$iconHTML;
 				break;
@@ -635,7 +635,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 						//add document filename
 						$filename = explode('_',$filesDatas[$matchInfo['uid']]["file"]);
 						unset($filename[0]);
-						$title = substr(implode('_',$filename),32);
+						$title = io::substr(implode('_',$filename),32);
 					}
 					return $title;
 				break;
@@ -698,7 +698,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 			return array('pageID', 'pageTitle', 'linkTitle', 'url', 'description', 'keywords', 'pubDate');
 		} else
 		//this UID is a file in a page
-		if (substr($matchInfo['uid'],0,4) == 'file') {
+		if (io::substr($matchInfo['uid'],0,4) == 'file') {
 			$fileID = (int) array_pop(explode('_',$matchInfo['uid']));
 			if (!$fileID) {
 				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no file ID found for uid : '.$matchInfo['uid']);

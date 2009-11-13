@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xapianSearch.php,v 1.8 2009/11/12 15:48:14 sebastien Exp $
+// $Id: xapianSearch.php,v 1.9 2009/11/13 17:31:14 sebastien Exp $
 
 /**
   * Class CMS_XapianQuery
@@ -84,16 +84,21 @@ class CMS_XapianQuery extends CMS_grandFather {
 	
 	function CMS_XapianQuery($query, $modules = array(), $language, $returnUIDOnly = false) {
 		//sanitize query string
+		if ($language == 'ja' || $language == 'jp') {
+			if ($return = CMS_XapianIndexer::tokenizeJapanese($query)) {
+				$query = $return;
+			}
+		}
 		$query = strtr($query,"_’'", 
 							  "   ");
-		$this->_query = utf8_encode($query);
+		$this->_query = strtolower(APPLICATION_DEFAULT_ENCODING) != 'utf-8' ? utf8_decode($query) : $query;
 		if (is_array($modules) && sizeof($modules)) {
 			$this->_modules = $modules;
 		} else {
 			//search on all active modules
 			$this->_modules = array_keys(CMS_ase_interface_catalog::getActiveModules());
 		}
-		$this->_language = strtolower($language);
+		$this->_language = io::strtolower($language);
 		$this->_uidOnly = ($returnUIDOnly) ? true : false;
 		//set enumerators
 		$this->_enumerators = XAPIAN_QUERY_FLAG_BOOLEAN
@@ -119,7 +124,7 @@ class CMS_XapianQuery extends CMS_grandFather {
 			return false;
 		}
 		if (in_array($module, $this->_modules)) {
-			$this->_modulesInterfaces[strtolower($module)] = $interface;
+			$this->_modulesInterfaces[io::strtolower($module)] = $interface;
 		}
 		return true;
 	}
@@ -154,7 +159,7 @@ class CMS_XapianQuery extends CMS_grandFather {
 				$userAgents = explode(';', $userAgentRejected);
 				if (is_array($userAgents)) {
 					foreach($userAgents as $userAgent) {
-						if (strpos(strtolower($_SERVER['HTTP_USER_AGENT']), strtolower($userAgent)) !== false) {
+						if (io::strpos(io::strtolower($_SERVER['HTTP_USER_AGENT']), io::strtolower($userAgent)) !== false) {
 							return false;
 						}
 					}
@@ -194,13 +199,13 @@ class CMS_XapianQuery extends CMS_grandFather {
 				$db->addDatabase(new CMS_XapianDB($module));
 			}
 			//interfaces
-			if (!isset($this->_modulesInterfaces[strtolower($module)]) || !is_object($this->_modulesInterfaces[strtolower($module)])) {
+			if (!isset($this->_modulesInterfaces[io::strtolower($module)]) || !is_object($this->_modulesInterfaces[io::strtolower($module)])) {
 				//load module interface
 				if (!($moduleInterface = CMS_ase_interface_catalog::getModuleInterface($module))) {
 					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no interface for module '.$module);
 					return false;
 				}
-				$this->_modulesInterfaces[strtolower($module)] = $moduleInterface;
+				$this->_modulesInterfaces[io::strtolower($module)] = $moduleInterface;
 			}
 			$count++;
 		}
@@ -222,13 +227,13 @@ class CMS_XapianQuery extends CMS_grandFather {
 			$queryParser->add_prefix('title', 				'__TITLE__:');
 		}
 		//pre-check query to stop words in phrase query (not properly done by parse_query method ... maybe it is a bug ?)
-		/*if (strpos($this->_query, '"') !== false) {
+		/*if (io::strpos($this->_query, '"') !== false) {
 			$this->_query = $this->_filterStopWords($this->_query);
 		}*/
 		//set user query and enumerators then parse query
 		$query = @$queryParser->parse_query($this->_query,$this->_enumerators);
 		//get corrected query string if any
-		$this->_correctedQueryString = utf8_decode($queryParser->get_corrected_query_string());
+		$this->_correctedQueryString = strtolower(APPLICATION_DEFAULT_ENCODING) != 'utf-8' ? utf8_decode($queryParser->get_corrected_query_string()) : $queryParser->get_corrected_query_string();
 		if (!is_object($query) || !$query->get_length()) {
 			return false;
 		}
@@ -314,26 +319,26 @@ class CMS_XapianQuery extends CMS_grandFather {
 					return $match[$value];
 				break;
 				case 'title':
-					return $match['doc']->get_value(XAPIAN_VALUENO_TITLE);
+					return $match['doc']->get_value(CMS_XapianIndexer::XAPIAN_VALUENO_TITLE);
 				break;
 				case 'language':
-					return $match['doc']->get_value(XAPIAN_VALUENO_LANGUAGE);
+					return $match['doc']->get_value(CMS_XapianIndexer::XAPIAN_VALUENO_LANGUAGE);
 				break;
 				case 'indexationDate':
 					if (!$parameters['format']) {
-						return $match['doc']->get_value(XAPIAN_VALUENO_TIMESTAMP);
+						return $match['doc']->get_value(CMS_XapianIndexer::XAPIAN_VALUENO_TIMESTAMP);
 					} else {
-						return date($parameters['format'], $match['doc']->get_value(XAPIAN_VALUENO_TIMESTAMP));
+						return date($parameters['format'], $match['doc']->get_value(CMS_XapianIndexer::XAPIAN_VALUENO_TIMESTAMP));
 					}
 				break;
 				case 'indexedDatas':
 					return $match['doc']->get_data();
 				break;
 				case 'type':
-					return $match['doc']->get_value(XAPIAN_VALUENO_TYPE);
+					return $match['doc']->get_value(CMS_XapianIndexer::XAPIAN_VALUENO_TYPE);
 				break;
 				case 'dateStart':
-					return $match['doc']->get_value(XAPIAN_VALUENO_TYPE);
+					return $match['doc']->get_value(CMS_XapianIndexer::XAPIAN_VALUENO_TYPE);
 				break;
 			}
 			return '';
@@ -369,8 +374,8 @@ class CMS_XapianQuery extends CMS_grandFather {
 			while (!$eSetI->equals($expands->end()) && sizeof($expandTerms) < $this->_expandSetNumber) {
 			    $term = $eSetI->get_termname();
 				//only words (starting with W) should compose expand set and it should not already in query nor in stopwords
-				if (substr($term,0,1) !== 'Z' && substr($term,0,2) !== '__' && strlen($term) > 3 && !in_array('Z'.$stemmer->apply($term), $this->_queryTerms) && !in_array($term, $this->_queryTerms) && !$stopper->apply($term)) {
-					$expandTerms[$stemmer->apply($term)] = utf8_decode($term);
+				if (io::substr($term,0,1) !== 'Z' && io::substr($term,0,2) !== '__' && io::strlen($term) > 3 && !in_array('Z'.$stemmer->apply($term), $this->_queryTerms) && !in_array($term, $this->_queryTerms) && !$stopper->apply($term)) {
+					$expandTerms[$stemmer->apply($term)] = strtolower(APPLICATION_DEFAULT_ENCODING) != 'utf-8' ? utf8_decode($term) : $term;
 				}
 				//iterate eSet
 				$eSetI->next();
@@ -400,9 +405,9 @@ class CMS_XapianQuery extends CMS_grandFather {
 			if (!$this->_uidOnly) {
 				$matchInfos = array(
 					'docid'		=> $mSetI->get_docid(),
-					'xid'		=> $doc->get_value(XAPIAN_VALUENO_XID),
-					'uid'		=> $doc->get_value(XAPIAN_VALUENO_UID),
-					'module'	=> $doc->get_value(XAPIAN_VALUENO_MODULE),
+					'xid'		=> $doc->get_value(CMS_XapianIndexer::XAPIAN_VALUENO_XID),
+					'uid'		=> $doc->get_value(CMS_XapianIndexer::XAPIAN_VALUENO_UID),
+					'module'	=> $doc->get_value(CMS_XapianIndexer::XAPIAN_VALUENO_MODULE),
 					'position'	=> $count,
 					'percent'	=> $mSetI->get_percent(),
 					'relevance'	=> $mSetI->get_weight(),
@@ -415,7 +420,7 @@ class CMS_XapianQuery extends CMS_grandFather {
 					$this->_rSet->add_document($mSetI->get_docid());
 				}
 			} else {
-				$this->_matchesInfos[$doc->get_value(XAPIAN_VALUENO_XID)] = $doc->get_value(XAPIAN_VALUENO_UID);
+				$this->_matchesInfos[$doc->get_value(CMS_XapianIndexer::XAPIAN_VALUENO_XID)] = $doc->get_value(CMS_XapianIndexer::XAPIAN_VALUENO_UID);
 			}
 			//iterate mSet
 			$mSetI->next();
@@ -439,7 +444,7 @@ class CMS_XapianQuery extends CMS_grandFather {
 			foreach ($moduleFilters as $status => $filters) {
 				$typequery = null;
 				foreach ($filters as $type => $typeFilters) {
-					$type = strtoupper($type);
+					$type = io::strtoupper($type);
 					$query = null;
 					foreach ($typeFilters as $value) {
 						$query = (is_object($query)) ? new XapianQuery(XAPIAN_QUERY_OP_OR, $query, new XapianQuery('__'.$type.'__:'.$value)) : new XapianQuery('__'.$type.'__:'.$value);
@@ -453,7 +458,7 @@ class CMS_XapianQuery extends CMS_grandFather {
 				}
 			}
 			if (is_array($moduleFilters) && sizeof($moduleFilters)) {
-				$moduleQuery = new XapianQuery('__MODULE__:'.strtolower($module));
+				$moduleQuery = new XapianQuery('__MODULE__:'.io::strtolower($module));
 				//if inquery, add it
 				if ($inquery) {
 					$moduleQuery = new XapianQuery(XAPIAN_QUERY_OP_AND, $moduleQuery, $inquery);
@@ -488,7 +493,7 @@ class CMS_XapianQuery extends CMS_grandFather {
 	}
 	
 	function _getStemmer() {
-		$languageCode = strtolower($this->_language);
+		$languageCode = io::strtolower($this->_language);
 		$languagesMap = CMS_ase_document::languagesMap();
 		if (isset($languagesMap[$languageCode]) && in_array($languagesMap[$languageCode], explode(' ', XapianStem::get_available_languages()))) {
 			return new XapianStem($languagesMap[$languageCode]);
@@ -512,7 +517,7 @@ class CMS_XapianQuery extends CMS_grandFather {
 		$words = preg_split('/[\s[:punct:]]+/S', $words[0], 0, PREG_SPLIT_NO_EMPTY);
 		$stopper = $this->_getStopper();
 		foreach ($words as $key => $word) {
-			if (strlen($word) <= $this->_minIndexableWordLength || $stopper->apply($word)) {
+			if (io::strlen($word) <= $this->_minIndexableWordLength || $stopper->apply($word)) {
 				unset($words[$key]);
 			}
 		}

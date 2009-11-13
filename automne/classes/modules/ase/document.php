@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: document.php,v 1.7 2009/11/12 15:48:14 sebastien Exp $
+// $Id: document.php,v 1.8 2009/11/13 17:31:14 sebastien Exp $
 
 /**
   * Class CMS_ase_document
@@ -142,8 +142,8 @@ class CMS_ase_document extends CMS_grandFather
 					$this->_document['type'] 	= $datas['type_mased'];
 				}
 			} else {
-				$this->_document['uid'] 	= strtolower($parameters['uid']);
-				$this->_document['module'] 	= strtolower($parameters['module']);
+				$this->_document['uid'] 	= io::strtolower($parameters['uid']);
+				$this->_document['module'] 	= io::strtolower($parameters['module']);
 			}
 		}
 		
@@ -219,7 +219,7 @@ class CMS_ase_document extends CMS_grandFather
 			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : unknown valueName to set :'.$valueName);
 			return false;
 		}
-		$this->_document[$valueName] = strtolower($value);
+		$this->_document[$valueName] = io::strtolower($value);
 		return true;
 	}
 	
@@ -331,7 +331,7 @@ class CMS_ase_document extends CMS_grandFather
 					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get filter for file document type : '.$filepath['type']);
 					return false;
 				}
-				pr($filepath['file']);
+				//pr($filepath['file']);
 				$filters[] = new $filterName($filepath['file'], DATA_TYPE_FILE);
 			}
 		}
@@ -346,8 +346,17 @@ class CMS_ase_document extends CMS_grandFather
 			}
 			//then get filtered Content
 			$textfile = new CMS_file($plainTextPath);
-			//try to detect utf-8 strings
-			$content = $this->_detectUTF8($textfile->getContent()) ? utf8_decode($textfile->getContent()) : $textfile->getContent();
+			//detect and convert strings charset into website charset
+			$content = $textfile->getContent();
+			if (io::isUTF8($content)) {
+				if (io::strtolower(APPLICATION_DEFAULT_ENCODING) != 'utf-8') {
+					$content = utf8_decode($content);
+				}
+			} else {
+				if (io::strtolower(APPLICATION_DEFAULT_ENCODING) == 'utf-8') {
+					$content = utf8_encode($content);
+				}
+			}
 			//add content to plain/text content
 			$this->addPlainTextContent($content);
 			//destroy filter object (required to destroy tmp filter files)
@@ -359,37 +368,18 @@ class CMS_ase_document extends CMS_grandFather
 	}
 	
 	/**
-	  * Try to detect UTF-8 content
-	  *
-	  * @author chris AT w3style.co DOT uk
-	  * @return boolean true/false
-	  * @access private
-	  */
-	function _detectUTF8($string) {
-		return preg_match('%(?:
-		[\xC2-\xDF][\x80-\xBF]        		# non-overlong 2-byte
-		|\xE0[\xA0-\xBF][\x80-\xBF]			# excluding overlongs
-		|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}	# straight 3-byte
-		|\xED[\x80-\x9F][\x80-\xBF]			# excluding surrogates
-		|\xF0[\x90-\xBF][\x80-\xBF]{2}		# planes 1-3
-		|[\xF1-\xF3][\x80-\xBF]{3}			# planes 4-15
-		|\xF4[\x80-\x8F][\x80-\xBF]{2}		# plane 16
-		)+%xs', $string);
-	}
-	
-	/**
 	  * Add content to document plain text content
 	  *
 	  * @return boolean true/false
 	  * @access private
 	  */
 	function addPlainTextContent($content) {
-		if (strlen($this->_plainTextContent) >= $this->_maxplaintextlength) {
+		if (io::strlen($this->_plainTextContent) >= $this->_maxplaintextlength) {
 			return false;
 		}
 		$this->_plainTextContent .= $content.' ';
-		if (strlen($this->_plainTextContent) > $this->_maxplaintextlength) {
-			$this->_plainTextContent = substr($this->_plainTextContent, 0, $this->_maxplaintextlength);
+		if (io::strlen($this->_plainTextContent) > $this->_maxplaintextlength) {
+			$this->_plainTextContent = io::substr($this->_plainTextContent, 0, $this->_maxplaintextlength);
 		}
 		return true;
 	}
@@ -422,20 +412,24 @@ class CMS_ase_document extends CMS_grandFather
 		//instanciate stoppper and add stopwords list
 		$stopper = new XapianSimpleStopper();
 		//get stop words for document language
-		$stoplist = new CMS_file(PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME.'/stopwords/'.strtolower($this->getValue('language')).'.txt');
+		$stoplist = new CMS_file(PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME.'/stopwords/'.io::strtolower($this->getValue('language')).'.txt');
 		if (!$stoplist->exists()) {
 			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no stopwords list founded for language : '.$this->getValue('language'));
 			return $stopper;
 		}
 		$stopwords = $stoplist->readContent('array');
 		foreach ($stopwords as $stopword) {
-			$stopper->add(utf8_encode($stopword));
+			if (!io::isUTF8($stopword)) {
+				$stopper->add(utf8_encode($stopword));
+			} else {
+				$stopper->add($stopword);
+			}
 		}
 		return $stopper;
 	}
 	
 	function getStemmer() {
-		$languageCode = strtolower($this->getValue('language'));
+		$languageCode = io::strtolower($this->getValue('language'));
 		$languagesMap = $this->languagesMap();
 		if (isset($languagesMap[$languageCode]) && in_array($languagesMap[$languageCode], explode(' ', XapianStem::get_available_languages()))) {
 			return new XapianStem($languagesMap[$languageCode]);

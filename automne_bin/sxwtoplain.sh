@@ -17,7 +17,7 @@
 ## | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 ## +----------------------------------------------------------------------+
 ##
-## $Id: sxwtoplain.sh,v 1.2 2008/05/13 16:13:50 jeremie Exp $
+## $Id: sxwtoplain.sh,v 1.3 2009/11/13 17:31:14 sebastien Exp $
 
 ##
 ## Convert Open Office documents (open document format) into plain text
@@ -41,6 +41,6 @@ fi
 if [ -f $1 ] ; then
 	unzip $1 content.xml -d $temppath/ > /dev/null 2>&1
 	if [ -f $temppath/content.xml ] ; then
-		cat $temppath/content.xml | iconv -c -f UTF-8 -t ISO-8859-1 | sed -e "s/<[^>]*>/ /g"
+		cat $temppath/content.xml | sed -e "s/<[^>]*>/ /g"
 	fi
 fi

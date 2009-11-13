@@ -1,7 +1,7 @@
 v0.42
 [REFACTOR] : change atm-meta-tags treatment to use MODULE_TREATMENT_PAGEHEADER_TAGS instead of MODULE_TREATMENT_PAGECONTENT_TAGS (needed since Automne 4.0.0rc3)
 [REFACTOR] : add UTF-8 support
-[FEATURE] : add Japanese Support (need ChaSen : http://chasen-legacy.sourceforge.jp/ or Debian package chasen)
+[FEATURE] : add Japanese Support (need ChaSen : http://chasen-legacy.sourceforge.jp/ or Debian package chasen). English doc here : http://chasen.aist-nara.ac.jp/chasen/doc/chasen-2.2.1.pdf
 [FEATURE] : add XLSX file support
 
 v0.41
