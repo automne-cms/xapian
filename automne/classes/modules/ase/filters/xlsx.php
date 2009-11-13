@@ -17,10 +17,10 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: sxw.php,v 1.3 2009/11/13 17:31:13 sebastien Exp $
+// $Id: xlsx.php,v 1.1 2009/11/13 17:31:13 sebastien Exp $
 
 /**
-  * Class CMS_filter_sxw
+  * Class CMS_filter_xlsx
   *
   * Represent a filter for Open Office and Open Document formats.
   *
@@ -32,9 +32,9 @@
 /**
   * ASE Messages
   */
-define('MESSAGE_SXW_FILTER_LABEL', 9);
+define('MESSAGE_XLSX_FILTER_LABEL', 44);
 
-class CMS_filter_sxw extends CMS_filter_common
+class CMS_filter_xlsx extends CMS_filter_common
 {
 	/**
 	  * Filter label
@@ -42,7 +42,7 @@ class CMS_filter_sxw extends CMS_filter_common
 	  * @var constant
 	  * @access private
 	  */
-	var $_label = MESSAGE_SXW_FILTER_LABEL;
+	var $_label = MESSAGE_XLSX_FILTER_LABEL;
 	
 	/**
 	  * Supported documents extension (must be in lowercase)
@@ -50,7 +50,7 @@ class CMS_filter_sxw extends CMS_filter_common
 	  * @var array
 	  * @access private
 	  */
-	var $_supportedExtensions = array('sxw','odt');
+	var $_supportedExtensions = array('xlsx');
 	
 	/**
 	  * All binaries needed to the filter
@@ -68,11 +68,11 @@ class CMS_filter_sxw extends CMS_filter_common
 	  */
 	function _createConversionCommand() {
 		//check for shell script executable status
-		if (!CMS_file::fileIsExecutable(PATH_REALROOT_FS.'/automne_bin/sxwtoplain.sh') && !CMS_file::makeExecutable(PATH_REALROOT_FS.'/automne_bin/sxwtoplain.sh')) {
-			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : shell script sxwtoplain.sh is not executable ... ');
+		if (!CMS_file::fileIsExecutable(PATH_REALROOT_FS.'/automne_bin/xlsxtoplain.sh') && !CMS_file::makeExecutable(PATH_REALROOT_FS.'/automne_bin/xlsxtoplain.sh')) {
+			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : shell script xlsxtoplain.sh is not executable ... ');
 			return false;
 		}
-		return  PATH_REALROOT_FS.'/automne_bin/sxwtoplain.sh '.$this->_sourceDocument.' > '.$this->_convertedDocument;
+		return  PATH_REALROOT_FS.'/automne_bin/xlsxtoplain.sh '.$this->_sourceDocument.' > '.$this->_convertedDocument;
 	}
 	
 	/**
@@ -86,7 +86,7 @@ class CMS_filter_sxw extends CMS_filter_common
 			return false;
 		}
 		//check for shell script executable status
-		if (!CMS_file::fileIsExecutable(PATH_REALROOT_FS.'/automne_bin/sxwtoplain.sh') && !CMS_file::makeExecutable(PATH_REALROOT_FS.'/automne_bin/sxwtoplain.sh')) {
+		if (!CMS_file::fileIsExecutable(PATH_REALROOT_FS.'/automne_bin/xlsxtoplain.sh') && !CMS_file::makeExecutable(PATH_REALROOT_FS.'/automne_bin/xlsxtoplain.sh')) {
 			return false;
 		}
 		return true;
@@ -95,7 +95,7 @@ class CMS_filter_sxw extends CMS_filter_common
 	function _cleanConverted() {
 		//transcode document content
 		if (!file_put_contents($this->_convertedDocument, iconv("UTF-8", (strtolower(APPLICATION_DEFAULT_ENCODING) != 'utf-8' ? 'ISO-8859-1' : 'UTF-8')."//IGNORE", file_get_contents($this->_convertedDocument)))) {
-			$this->_raiseError(get_class($this).' : '.__FUNCTION__.' : can\'t convert DOCX document ... ');
+			$this->_raiseError(get_class($this).' : '.__FUNCTION__.' : can\'t convert XLSX document ... ');
 			return false;
 		}
 	}

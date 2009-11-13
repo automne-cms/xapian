@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: html.php,v 1.2 2009/06/08 14:22:13 sebastien Exp $
+// $Id: html.php,v 1.3 2009/11/13 17:31:13 sebastien Exp $
 
 /**
   * Class CMS_filter_html
@@ -53,21 +53,40 @@ class CMS_filter_html extends CMS_filter_common
 	var $_supportedExtensions = array('htm','html','xhtml');
 	
 	/**
-	  * All binaries needed to the filter
-	  * 
-	  * @var array
-	  * @access private
-	  */
-	var $_binaries = array('html2text');
-	
-	/**
-	  * Create conversion command line
+	  * Convert initial file into plain/text
 	  *
-	  * @return string : the conversion command
+	  * @return boolean true on success, false otherwise
 	  * @access private
 	  */
-	function _createConversionCommand() {
-		return  $this->_binaries[0].' -o '.$this->_convertedDocument.' -nobs '.$this->_sourceDocument;
+	function _convert() {
+		if ($this->hasError()) {
+			$this->_raiseError(get_class($this).' : '.__FUNCTION__.' : can\'t convert document, object has an error ...');
+			return false;
+		}
+		//get tmp path
+		$tmpPath = CMS_file::getTmpPath();
+		if (!$tmpPath) {
+			$this->_raiseError(get_class($this).' : '.__FUNCTION__.' : can\'t get temporary path to write in ...');
+			return false;
+		}
+		//generate random filename
+		$filename = sensitiveIO::sanitizeAsciiString('filter_'.APPLICATION_LABEL.'_'.microtime());
+		while(is_file($tmpPath.'/'.$filename)) {
+			$filename = sensitiveIO::sanitizeAsciiString('filter_'.APPLICATION_LABEL.'_'.microtime());
+		}
+		$this->_convertedDocument = $tmpPath.'/'.$filename;
+		if (!touch($this->_convertedDocument)) {
+			$this->_raiseError(get_class($this).' : '.__FUNCTION__.' : can\'t create temporary document : '.$this->_convertedDocument);
+			return false;
+		}
+		//convert document
+		if (!file_put_contents($this->_convertedDocument, html_entity_decode(strip_tags(file_get_contents($this->_sourceDocument)), ENT_COMPAT, (strtolower(APPLICATION_DEFAULT_ENCODING) != 'utf-8' ? 'ISO-8859-1' : 'UTF-8')))) {
+			$this->_raiseError(get_class($this).' : '.__FUNCTION__.' : can\'t convert HTML document ... ');
+			return false;
+		}
+		//run some cleaning task on converted document command
+		$this->_cleanConverted();
+		return true;
 	}
 }
 ?>

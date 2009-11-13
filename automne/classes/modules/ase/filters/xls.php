@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xls.php,v 1.2 2009/06/08 14:22:14 sebastien Exp $
+// $Id: xls.php,v 1.3 2009/11/13 17:31:13 sebastien Exp $
 
 /**
   * Class CMS_filter_xls
@@ -59,5 +59,15 @@ class CMS_filter_xls extends CMS_filter_common
 	  * @access private
 	  */
 	var $_binaries = array('xls2csv');
+	
+	/**
+	  * Create conversion command line
+	  *
+	  * @return string : the conversion command
+	  * @access private
+	  */
+	function _createConversionCommand() {
+		return  $this->_binaries[0].' -s cp1252'.".".' '.$this->_sourceDocument.' > '.$this->_convertedDocument;
+	}
 }
 ?>

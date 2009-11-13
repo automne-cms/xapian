@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: catalog.php,v 1.2 2009/06/08 14:22:13 sebastien Exp $
+// $Id: catalog.php,v 1.3 2009/11/13 17:31:13 sebastien Exp $
 
 /**
   * static Class CMS_filter_catalog
@@ -62,8 +62,8 @@ class CMS_filter_catalog
 		);
 		$packages_dir = dir(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/filters/');
 		while (false !== ($file = $packages_dir->read())) {
-			if (substr($file, - 4) == ".php" && !in_array($file, $excludedFiles) && class_exists('CMS_filter_'.substr($file, 0, -4))) {
-				$filtersCatalog[] = 'CMS_filter_'.substr($file, 0, -4);
+			if (io::substr($file, - 4) == ".php" && !in_array($file, $excludedFiles) && class_exists('CMS_filter_'.io::substr($file, 0, -4))) {
+				$filtersCatalog[] = 'CMS_filter_'.io::substr($file, 0, -4);
 			}
 		}
 		return $filtersCatalog;

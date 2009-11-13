@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: index.php,v 1.3 2007/09/20 09:30:11 sebastien Exp $
+// $Id: index.php,v 1.4 2009/11/13 17:31:14 sebastien Exp $
 
 /**
   * PHP page : module polymod admin
@@ -33,6 +33,8 @@ require_once(PATH_ADMIN_SPECIAL_SESSION_CHECK_FS);
 define("MESSAGE_PAGE_TITLE_MODULE", 248);
 define("MESSAGE_PAGE_STATUS", 160);
 define("MESSAGE_PAGE_MODULES", 999);
+define("MESSAGE_PAGE_NO", 1083);
+define("MESSAGE_PAGE_YES", 1082);
 
 //Message from ase module
 define("MESSAGE_PAGE_TITLE", 2);
@@ -49,6 +51,7 @@ define("MESSAGE_PAGE_DB_DOCUMENTS", 20);
 define("MESSAGE_PAGE_ACTION_REINDEX", 21);
 define("MESSAGE_PAGE_ACTION_REINDEXCONFIRM", 22);
 define("MESSAGE_PAGE_XAPIAN_MINVERSION", 26);
+define("MESSAGE_PAGE_XAPIAN_JAPANESE_SUPPORT", 45);
 
 //CHECKS user has module clearance
 if (!$cms_user->hasModuleClearance(MOD_ASE_CODENAME, CLEARANCE_MODULE_EDIT)) {
@@ -118,7 +121,14 @@ if (!($xapianVersion = $cms_module->getXapianVersion())) {
 		}
 		$content .= '</td></tr>';
 	}
+	$error = '';
 	$content .= '</table><br />';
+	if (io::substr(CMS_patch::executeCommand('which chasen 2>&1', $error),0,1) == '/' && !$error) {
+		$content .= '<dialog-title type="admin_h3">'.$cms_language->getMessage(MESSAGE_PAGE_XAPIAN_JAPANESE_SUPPORT, false, MOD_ASE_CODENAME).' : '.$cms_language->getMessage(MESSAGE_PAGE_YES).'</dialog-title>';
+	} else {
+		$content .= '<dialog-title type="admin_h3">'.$cms_language->getMessage(MESSAGE_PAGE_XAPIAN_JAPANESE_SUPPORT, false, MOD_ASE_CODENAME).' : '.$cms_language->getMessage(MESSAGE_PAGE_NO).'</dialog-title>';
+	}
+	$content .= '<br />';
 	$content .= '<dialog-title type="admin_h2">'.$cms_language->getMessage(MESSAGE_PAGE_MODULES).' :</dialog-title>';
 	//get all active modules
 	$modules = CMS_ase_interface_catalog::getActiveModules();

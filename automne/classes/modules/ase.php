@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: ase.php,v 1.15 2009/08/12 14:31:20 sebastien Exp $
+// $Id: ase.php,v 1.16 2009/11/13 17:31:13 sebastien Exp $
 
 /**
   * Class CMS_module_ase
@@ -47,26 +47,6 @@ if (!extension_loaded("xapian")) {
 	$xapianExists = true;
 }
 
-/**
-  * ASE requirements
-  */
-require_once(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/xapian.php');
-require_once(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/document.php');
-require_once(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/xapianIndexer.php');
-require_once(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/xapianSearch.php');
-require_once(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/xapianDB.php');
-
-//Filters objects
-require_once(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/filters/common.php');
-//Automatic filters includes
-$filters_dir = dir(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/filters/');
-while (false !== ($file = $filters_dir->read())) {
-	if (substr($file, strlen($file) - 3) == "php") {
-		require_once(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/filters/'.$file);
-	}
-}
-require_once(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/interfaces/catalog.php');
-
 //if Xapian exists, load module
 if ($xapianExists) {
 	//Message from ase module
@@ -87,6 +67,45 @@ if ($xapianExists) {
 	
 	class CMS_module_ase extends CMS_moduleValidation
 	{
+		/**
+		  * Module autoload handler
+		  *
+		  * @param string $classname the classname required for loading
+		  * @return string : the file to use for required classname
+		  * @access public
+		  */
+		function load($classname) {
+			static $classes;
+			if (!isset($classes)) {
+				$classes = array(
+					/**
+					 * Module main classes
+					 */
+					'xapian' 					=> PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/xapian.php',
+					'cms_ase_document' 			=> PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/document.php',
+					'cms_xapiandb' 				=> PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/xapianDB.php',
+					'cms_xapianindexer' 		=> PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/xapianIndexer.php',
+					'cms_xapianquery' 			=> PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/xapianSearch.php',
+					'cms_filter_common' 		=> PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/filters/common.php',
+					'cms_filter_catalog' 		=> PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/filters/catalog.php',
+					'cms_ase_interface_catalog' => PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/interfaces/catalog.php',
+					'cms_ase_interface' 		=> PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/interfaces/common.php',
+				);
+			}
+			$file = '';
+			if (isset($classes[io::strtolower($classname)])) {
+				$file = $classes[io::strtolower($classname)];
+			} elseif (io::substr(io::strtolower($classname), 0, 11) == 'cms_filter_') {
+				$type = io::substr(io::strtolower($classname), 11);
+				if (file_exists(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/filters/'.$type.'.php')) {
+					$file = PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/filters/'.$type.'.php';
+				}
+			} else if (io::substr(io::strtolower($classname), 0, 6) == 'xapian') {
+				$file = PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/xapian.php';
+			}
+			return $file;
+		}
+		
 		/**
 		  * Get Xapian librairie version
 		  *

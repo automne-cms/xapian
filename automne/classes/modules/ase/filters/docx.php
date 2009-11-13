@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: docx.php,v 1.1 2008/05/13 16:14:29 jeremie Exp $
+// $Id: docx.php,v 1.2 2009/11/13 17:31:13 sebastien Exp $
 
 /**
   * Class CMS_filter_docx
@@ -90,6 +90,14 @@ class CMS_filter_docx extends CMS_filter_common
 			return false;
 		}
 		return true;
+	}
+	
+	function _cleanConverted() {
+		//transcode document content
+		if (!file_put_contents($this->_convertedDocument, iconv("UTF-8", (strtolower(APPLICATION_DEFAULT_ENCODING) != 'utf-8' ? 'ISO-8859-1' : 'UTF-8')."//IGNORE", file_get_contents($this->_convertedDocument)))) {
+			$this->_raiseError(get_class($this).' : '.__FUNCTION__.' : can\'t convert DOCX document ... ');
+			return false;
+		}
 	}
 }
 ?>

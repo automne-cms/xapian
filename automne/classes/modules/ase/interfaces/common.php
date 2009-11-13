@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: common.php,v 1.2 2007/09/20 09:30:12 sebastien Exp $
+// $Id: common.php,v 1.3 2009/11/13 17:31:13 sebastien Exp $
 
 /**
   * Class CMS_ase_interface
@@ -156,8 +156,8 @@ class CMS_ase_interface extends CMS_grandFather {
 	        $append = ($center === true) ? ' ... ' : ' ...';
 	    }
 	    // Get some measurements
-	    $len_string = strlen($string);
-	    $len_append = strlen($append);
+	    $len_string = io::strlen($string);
+	    $len_append = io::strlen($append);
 	    // If the string is longer than the maximum length, we need to chop it
 	    if ($len_string > $length) {
 	        // Check if we want to chop it in half
@@ -166,13 +166,13 @@ class CMS_ase_interface extends CMS_grandFather {
 	            $len_start = $length / 2;
 	            $len_end = $len_start - $len_append;
 	            // Get each segment
-	            $seg_start = substr($string, 0, $len_start);
-	            $seg_end = substr($string, $len_string - $len_end, $len_end);
+	            $seg_start = io::substr($string, 0, $len_start);
+	            $seg_end = io::substr($string, $len_string - $len_end, $len_end);
 	            // Stick them together
 	            $string = $seg_start . $append . $seg_end;
 	        } else {
 	            // Otherwise, just chop the end off
-	            $string = substr($string, 0, $length - $len_append) . $append;
+	            $string = io::substr($string, 0, $length - $len_append) . $append;
 	        }
 	    }
 	    return $string;

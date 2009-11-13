@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: polymod.php,v 1.9 2009/11/12 15:48:14 sebastien Exp $
+// $Id: polymod.php,v 1.10 2009/11/13 17:31:13 sebastien Exp $
 
 /**
   * Class CMS_polymod_ase
@@ -154,7 +154,7 @@ class CMS_polymod_ase extends CMS_ase_interface {
 				if (sensitiveIO::isPositiveInteger($fieldType)) {
 					//this field is a poly_object so recurse on his values
 					$this->_getFieldsContent($itemField, $content, $files);
-				} elseif (strpos($fieldType,"multi|") !== false) {
+				} elseif (io::strpos($fieldType,"multi|") !== false) {
 					//this field is a multi_poly_object so recurse on all poly_objects it contain
 					$params = $itemField->getParamsValues();
 					if ($itemField->getValue('count')) {
@@ -172,7 +172,7 @@ class CMS_polymod_ase extends CMS_ase_interface {
 					$content .= ' '.$itemField->getHTMLDescription();
 					//if this field is a file, check for file
 					if ($fieldType == 'CMS_object_file') {
-						if ($itemField->getValue('filename') && in_array(strtolower($itemField->getValue('fileExtension')), $supportedFilesTypes)) {
+						if ($itemField->getValue('filename') && in_array(io::strtolower($itemField->getValue('fileExtension')), $supportedFilesTypes)) {
 							$files[] = array('file' => $itemField->getValue('filePath').'/'.$itemField->getValue('filename'), 'extension' => $itemField->getValue('fileExtension'));
 						}
 					}
@@ -434,7 +434,7 @@ class CMS_polymod_ase extends CMS_ase_interface {
 						$data = trim(ob_get_contents());
 						ob_end_clean();
 						//check if $data has a website url
-						if (substr($data,0,7) != 'http://') {
+						if (io::substr($data,0,7) != 'http://') {
 							$data = CMS_websitesCatalog::getMainURL() . $data;
 						}
 						return $data;

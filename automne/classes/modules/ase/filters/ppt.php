@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: ppt.php,v 1.2 2009/06/08 14:22:13 sebastien Exp $
+// $Id: ppt.php,v 1.3 2009/11/13 17:31:13 sebastien Exp $
 
 /**
   * Class CMS_filter_ppt
@@ -58,7 +58,7 @@ class CMS_filter_ppt extends CMS_filter_common
 	  * @var array
 	  * @access private
 	  */
-	var $_binaries = array('ppthtml', 'iconv', 'html2text');
+	var $_binaries = array('ppthtml');
 	
 	/**
 	  * Create conversion command line
@@ -67,7 +67,20 @@ class CMS_filter_ppt extends CMS_filter_common
 	  * @access private
 	  */
 	function _createConversionCommand() {
-		return  $this->_binaries[0].' '.$this->_sourceDocument.' | '.$this->_binaries[1].' -c -f UTF-8 -t ISO-8859-1 | '.$this->_binaries[2].' -nobs > '.$this->_convertedDocument;
+		return  'cd '.dirname($this->_sourceDocument).';'.$this->_binaries[0].' '.basename($this->_sourceDocument).' > '.$this->_convertedDocument;
+	}
+	
+	function _cleanConverted() {
+		//transcode document content
+		if (!file_put_contents($this->_convertedDocument, iconv("UTF-8", (strtolower(APPLICATION_DEFAULT_ENCODING) != 'utf-8' ? 'ISO-8859-1' : 'UTF-8')."//IGNORE", file_get_contents($this->_convertedDocument)))) {
+			$this->_raiseError(get_class($this).' : '.__FUNCTION__.' : can\'t convert DOCX document ... ');
+			return false;
+		}
+		//convert HTML to plain text
+		if (!file_put_contents($this->_convertedDocument, html_entity_decode(strip_tags(file_get_contents($this->_convertedDocument)), ENT_COMPAT, (strtolower(APPLICATION_DEFAULT_ENCODING) != 'utf-8' ? 'ISO-8859-1' : 'UTF-8')))) {
+			$this->_raiseError(get_class($this).' : '.__FUNCTION__.' : can\'t convert HTML document ... ');
+			return false;
+		}
 	}
 }
 ?>

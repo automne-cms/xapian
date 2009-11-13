@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: catalog.php,v 1.6 2009/06/08 14:22:14 sebastien Exp $
+// $Id: catalog.php,v 1.7 2009/11/13 17:31:13 sebastien Exp $
 
 /**
   * Class CMS_ase_interface_catalog
@@ -33,7 +33,7 @@ class CMS_ase_interface_catalog extends CMS_grandFather {
 	    $packages_dir = dir(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/interfaces/');
 	    $aExceptions = array("catalog.php", "common.php");
         while (false !== ($file = $packages_dir->read())) {
-	        if (substr($file, strlen($file) - 3) == "php" && !in_array($file, $aExceptions)) {
+	        if (io::substr($file, io::strlen($file) - 3) == "php" && !in_array($file, $aExceptions)) {
 		        require_once(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/interfaces/'.$file);		       
 	        }
         }
@@ -75,7 +75,7 @@ class CMS_ase_interface_catalog extends CMS_grandFather {
 	    $packages_dir = dir(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/interfaces/');
 	    $aExceptions = array("catalog.php", "common.php");
         while (false !== ($file = $packages_dir->read())) {
-	        if (substr($file, strlen($file) - 3) == "php" && !in_array($file, $aExceptions)) {
+	        if (io::substr($file, io::strlen($file) - 3) == "php" && !in_array($file, $aExceptions)) {
 		        require_once(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/interfaces/'.$file);		       
 	        }
         }
@@ -142,7 +142,7 @@ class CMS_ase_interface_catalog extends CMS_grandFather {
 		}
 		if (sizeof($parameters['deleteInfos'])) {
 			foreach ($parameters['deleteInfos'] as $name => $value) {
-				$return = (!$db->deleteDocuments('__'.strtoupper($name).'__:'.$value)) ? false : $return;
+				$return = (!$db->deleteDocuments('__'.io::strtoupper($name).'__:'.$value)) ? false : $return;
 			}
 		} else {
 			$return = (!$db->deleteDocuments('__XID__:'.$parameters['module'].$parameters['uid'])) ? false : $return;

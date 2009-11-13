@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: pdf.php,v 1.2 2009/06/08 14:22:13 sebastien Exp $
+// $Id: pdf.php,v 1.3 2009/11/13 17:31:13 sebastien Exp $
 
 /**
   * Class CMS_filter_pdf
@@ -34,8 +34,7 @@
   */
 define('MESSAGE_PDF_FILTER_LABEL', 8);
 
-class CMS_filter_pdf extends CMS_filter_common
-{
+class CMS_filter_pdf extends CMS_filter_common {
 	/**
 	  * Filter label
 	  * 

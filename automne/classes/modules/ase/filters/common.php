@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: common.php,v 1.3 2009/06/08 14:22:13 sebastien Exp $
+// $Id: common.php,v 1.4 2009/11/13 17:31:13 sebastien Exp $
 
 /**
   * Class CMS_filter_common
@@ -126,28 +126,15 @@ class CMS_filter_common extends CMS_grandFather
 			}
 			$this->_sourceDocument = $file->getName();
 		} else {
-			//get tmp path
-			$tmpPath = CMS_file::getTmpPath();
-			if (!$tmpPath) {
-				$this->_raiseError(get_class($this).' : '.__FUNCTION__.' : can\'t get temporary path to write in ...');
+			//create tmp file
+			$tmpFile = new CMS_file(PATH_TMP_FS.'/filter_'.md5(mt_rand().microtime()).'.tmp');
+			$tmpFile->setContent($source);
+			$tmpFile->writeTopersistence();
+			if (!$tmpFile->exists()) {
+				$this->raiseError('can\'t create temporary document : '.$tmpFile->getName());
 				return;
 			}
-			//generate random filename
-			$filename = sensitiveIO::sanitizeAsciiString('filter_'.APPLICATION_LABEL.'_'.microtime());
-			while(is_file($tmpPath.'/'.$filename)) {
-				$filename = sensitiveIO::sanitizeAsciiString('filter_'.APPLICATION_LABEL.'_'.microtime());
-			}
-			$this->_sourceDocument = $tmpPath.'/'.$filename;
-			if (!touch($this->_sourceDocument)) {
-				$this->_raiseError(get_class($this).' : '.__FUNCTION__.' : can\'t create temporary document : '.$this->_sourceDocument);
-				return;
-			}
-			//save source content into temporary file
-			$file = new CMS_file($this->_sourceDocument, CMS_file::FILE_SYSTEM, CMS_file::TYPE_FILE);
-			if (!$file->setContent($source) || !$file->writeToPersistence()) {
-				$this->_raiseError(get_class($this).' : '.__FUNCTION__.' : can\'t set temporary document content : '.$this->_sourceDocument);
-				return;
-			}
+			$this->_sourceDocument = $tmpFile->getName();
 			$this->_isTmpFile = true;
 		}
 	}
@@ -165,7 +152,7 @@ class CMS_filter_common extends CMS_grandFather
 			$supported = true;
 			foreach ($this->_binaries as $binary) {
 				$binary = escapeshellcmd(trim($binary));
-				$supported = (substr(CMS_patch::executeCommand('which '.$binary.' 2>&1',$error),0,1) == '/' && !$error) ? $supported : false;
+				$supported = (io::substr(CMS_patch::executeCommand('which '.$binary.' 2>&1',$error),0,1) == '/' && !$error) ? $supported : false;
 			}
 			$active[$classname] = $supported;
 		}
@@ -217,7 +204,7 @@ class CMS_filter_common extends CMS_grandFather
 	
 	/**
 	  * Destroy all conversion temporary files
-	  * This destructor absolutuley needs to be run after filter useage to clean temp directory
+	  * This destructor absolutely needs to be run after filter useage to clean temp directory
 	  *
 	  * @return boolean true on success, false otherwise
 	  * @access public
@@ -244,20 +231,9 @@ class CMS_filter_common extends CMS_grandFather
 			$this->_raiseError(get_class($this).' : '.__FUNCTION__.' : can\'t convert document, object has an error ...');
 			return false;
 		}
-		//get tmp path
-		$tmpPath = CMS_file::getTmpPath();
-		if (!$tmpPath) {
-			$this->_raiseError(get_class($this).' : '.__FUNCTION__.' : can\'t get temporary path to write in ...');
-			return false;
-		}
-		//generate random filename
-		$filename = sensitiveIO::sanitizeAsciiString('filter_'.APPLICATION_LABEL.'_'.microtime());
-		while(is_file($tmpPath.'/'.$filename)) {
-			$filename = sensitiveIO::sanitizeAsciiString('filter_'.APPLICATION_LABEL.'_'.microtime());
-		}
-		$this->_convertedDocument = $tmpPath.'/'.$filename;
+		$this->_convertedDocument = PATH_TMP_FS.'/filter_'.md5(mt_rand().microtime()).'.tmp';
 		if (!touch($this->_convertedDocument)) {
-			$this->_raiseError(get_class($this).' : '.__FUNCTION__.' : can\'t create temporary document : '.$this->_convertedDocument);
+			$this->raiseError('can\'t create temporary document : '.$this->_convertedDocument);
 			return false;
 		}
 		//create conversion command
@@ -265,7 +241,6 @@ class CMS_filter_common extends CMS_grandFather
 			$this->_raiseError(get_class($this).' : '.__FUNCTION__.' : can\'t create conversion command ... ');
 			return false;
 		}
-		
 		//run conversion command line
 		$error = '';
 		$return = CMS_patch::executeCommand($conversionCommand,$error);
@@ -273,7 +248,6 @@ class CMS_filter_common extends CMS_grandFather
 			$this->_raiseError(get_class($this).' : '.__FUNCTION__.' : conversion command "'.$conversionCommand.'" output with errors : '.print_r($error,true).'. Return is : '.print_r($return,true));
 			return false;
 		}
-		
 		//run some cleaning task on converted document command
 		$this->_cleanConverted();
 		return true;

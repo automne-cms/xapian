@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: doc.php,v 1.2 2009/06/08 14:22:13 sebastien Exp $
+// $Id: doc.php,v 1.3 2009/11/13 17:31:13 sebastien Exp $
 
 /**
   * Class CMS_filter_doc
@@ -59,5 +59,15 @@ class CMS_filter_doc extends CMS_filter_common
 	  * @access private
 	  */
 	var $_binaries = array('catdoc');
+	
+	/**
+	  * Create conversion command line
+	  *
+	  * @return string : the conversion command
+	  * @access private
+	  */
+	function _createConversionCommand() {
+		return  $this->_binaries[0].' -8 -d UTF-8 '.$this->_sourceDocument.' > '.$this->_convertedDocument;
+	}
 }
 ?>
