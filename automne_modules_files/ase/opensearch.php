@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: opensearch.php,v 1.3 2009/08/12 14:31:55 sebastien Exp $
+// $Id: opensearch.php,v 1.4 2009/11/17 12:33:26 sebastien Exp $
 
 /**
   * PHP page : generate  OpenSearch description document
@@ -47,7 +47,7 @@ if (!$error) {
 			}
 			
 			$content = 
-			'<?xml version="1.0" encoding="ISO-8859-1"?>'."\n".
+			'<?xml version="1.0" encoding="'.APPLICATION_DEFAULT_ENCODING.'"?>'."\n".
 			'<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">'."\n".
 			'	<ShortName>'.$title.'</ShortName>'."\n".
 			'	<Description>Search on '.$title.' website.</Description>'."\n".
@@ -57,7 +57,7 @@ if (!$error) {
 			
 			//send RSS content
 			if (!isset($_REQUEST['previz']) || !$_REQUEST['previz']) {
-				header('Content-type: text/xml; charset=ISO-8859-1');
+				header('Content-type: text/xml; charset='.APPLICATION_DEFAULT_ENCODING);
 				echo $content;
 			} else {
 				echo '<pre>'.htmlspecialchars($content).'</pre>';

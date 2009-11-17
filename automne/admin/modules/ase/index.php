@@ -1,42 +1,42 @@
 <?php
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 // +----------------------------------------------------------------------+
-// | Automne (TM)                                                         |
+// | Automne (TM)														  |
 // +----------------------------------------------------------------------+
-// | Copyright (c) 2000-2007 WS Interactive                               |
+// | Copyright (c) 2000-2009 WS Interactive								  |
 // +----------------------------------------------------------------------+
-// | This source file is subject to version 2.0 of the GPL license.       |
-// | The license text is bundled with this package in the file            |
-// | LICENSE-GPL, and is available at through the world-wide-web at       |
-// | http://www.gnu.org/copyleft/gpl.html.                                |
+// | Automne is subject to version 2.0 or above of the GPL license.		  |
+// | The license text is bundled with this package in the file			  |
+// | LICENSE-GPL, and is available through the world-wide-web at		  |
+// | http://www.gnu.org/copyleft/gpl.html.								  |
 // +----------------------------------------------------------------------+
-// | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
+// | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>	  |
 // +----------------------------------------------------------------------+
 //
-// $Id: index.php,v 1.4 2009/11/13 17:31:14 sebastien Exp $
+// $Id: index.php,v 1.5 2009/11/17 12:33:26 sebastien Exp $
 
 /**
-  * PHP page : module polymod admin
-  * Presents one module resource
-  *
+  * PHP page : Load polymod items search window.
+  * Used accross an Ajax request.
+  * 
   * @package CMS
-  * @subpackage polymod
+  * @subpackage admin
   * @author Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>
   */
 
 require_once($_SERVER["DOCUMENT_ROOT"]."/cms_rc_admin.php");
-require_once(PATH_ADMIN_SPECIAL_SESSION_CHECK_FS);
 
 /**
   * Messages from standard module 
   */
+define("MESSAGE_ERROR_MODULE_RIGHTS",570);
 define("MESSAGE_PAGE_TITLE_MODULE", 248);
 define("MESSAGE_PAGE_STATUS", 160);
-define("MESSAGE_PAGE_MODULES", 999);
 define("MESSAGE_PAGE_NO", 1083);
 define("MESSAGE_PAGE_YES", 1082);
 
 //Message from ase module
+define("MESSAGE_PAGE_INDEXED_MODULES", 47);
 define("MESSAGE_PAGE_TITLE", 2);
 define("MESSAGE_PAGE_ERROR_XAPIAN_NOT_FOUND", 3);
 define("MESSAGE_PAGE_XAPIAN_VERSION", 4);
@@ -52,110 +52,157 @@ define("MESSAGE_PAGE_ACTION_REINDEX", 21);
 define("MESSAGE_PAGE_ACTION_REINDEXCONFIRM", 22);
 define("MESSAGE_PAGE_XAPIAN_MINVERSION", 26);
 define("MESSAGE_PAGE_XAPIAN_JAPANESE_SUPPORT", 45);
+define("MESSAGE_PAGE_MISSING_BINARY", 46);
+define("MESSAGE_PAGE_REFRESH_INDEX", 52);
+define("MESSAGE_PAGE_REINDEX_DESC", 53);
 
+//load interface instance
+$view = CMS_view::getInstance();
+//set default display mode for this page
+$view->setDisplayMode(CMS_view::SHOW_RAW);
+//This file is an admin file. Interface must be secure
+$view->setSecure();
+
+$winId = sensitiveIO::request('winId');
+$fatherId = sensitiveIO::request('fatherId');
+$objectId = sensitiveIO::request('objectId');
+
+if (!$winId) {
+	CMS_grandFather::raiseError('Unknown window Id ...');
+	$view->show();
+}
+//load module
+$module = CMS_modulesCatalog::getByCodename(MOD_ASE_CODENAME);
+
+if (!$module) {
+	CMS_grandFather::raiseError('Unknown module : '.MOD_ASE_CODENAME);
+	$view->show();
+}
 //CHECKS user has module clearance
 if (!$cms_user->hasModuleClearance(MOD_ASE_CODENAME, CLEARANCE_MODULE_EDIT)) {
-	header("Location: ".PATH_ADMIN_SPECIAL_ENTRY_WR."?cms_message_id=".MESSAGE_PAGE_CLEARANCE_ERROR."&".session_name()."=".session_name());
-	exit;
+	CMS_grandFather::raiseError('User has no rights on module : '.MOD_ASE_CODENAME);
+	$view->setActionMessage($cms_language->getmessage(MESSAGE_ERROR_MODULE_RIGHTS, array($module->getLabel($cms_language))));
+	$view->show();
 }
 
-//instanciate module
-$cms_module = CMS_modulesCatalog::getByCodename(MOD_ASE_CODENAME);
-
-// +----------------------------------------------------------------------+
-// | Actions                                                              |
-// +----------------------------------------------------------------------+
-switch ($_REQUEST['cms_action']) {
-	case 'reindex':
-		if ($cms_user->hasAdminClearance(CLEARANCE_ADMINISTRATION_EDITVALIDATEALL)) {
-			$db = new CMS_XapianDB($_REQUEST['module']);
-			if ($db->reindex()) {
-				$cms_message = $cms_language->getMessage(MESSAGE_ACTION_OPERATION_DONE);
-			}
-		}
-	break;
-}
-
-// +----------------------------------------------------------------------+
-// | Render                                                               |
-// +----------------------------------------------------------------------+
-
-$dialog = new CMS_dialog();
 $content = '';
-$dialog->setTitle($cms_language->getMessage(MESSAGE_PAGE_TITLE_MODULE, array($cms_module->getLabel($cms_language)))." :: ".$cms_language->getMessage(MESSAGE_PAGE_TITLE, false, MOD_ASE_CODENAME));
-
-if ($cms_message) {
-	$dialog->setActionMessage($cms_message);
-}
-//show version number
-if (file_exists(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/VERSION')) {
-	$content .= '<div style="position:absolute;top:2px;right:2px;font-size:8px;">v'.file_get_contents(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/VERSION').'</div>';
-}
-$content .= '<dialog-title type="admin_h2">'.$cms_language->getMessage(MESSAGE_PAGE_STATUS).' :</dialog-title><br />';
-if (!($xapianVersion = $cms_module->getXapianVersion())) {
-	$content .= '<span class="admin_text_alert">'.$cms_language->getMessage(MESSAGE_PAGE_ERROR_XAPIAN_NOT_FOUND, array(APPLICATION_MAINTAINER_EMAIL), MOD_ASE_CODENAME).'</span>';
+if (!($xapianVersion = $module->getXapianVersion())) {
+	$content .= '<span class="atm-text-alert">'.$cms_language->getMessage(MESSAGE_PAGE_ERROR_XAPIAN_NOT_FOUND, array(APPLICATION_MAINTAINER_EMAIL), MOD_ASE_CODENAME).'</span>';
 } else {
-	//show version n°
-	if (version_compare($xapianVersion, MOD_ASE_XAPIAN_MIN_VERSION , '>=' )) {
-		$content .= '<dialog-title type="admin_h3">'.$cms_language->getMessage(MESSAGE_PAGE_XAPIAN_VERSION, array('<span style="color:green;">'.$xapianVersion.'</span>'), MOD_ASE_CODENAME).'</dialog-title>';
-	} else {
-		$content .= '<dialog-title type="admin_h3">'.$cms_language->getMessage(MESSAGE_PAGE_XAPIAN_VERSION, array('<span style="color:red;font-weight:bold;">'.$xapianVersion.'</span>'), MOD_ASE_CODENAME).' - '.$cms_language->getMessage(MESSAGE_PAGE_XAPIAN_MINVERSION, array(MOD_ASE_XAPIAN_MIN_VERSION), MOD_ASE_CODENAME).'</dialog-title>';
-	}
-	//get active filters
-	$content .= '<br /><dialog-title type="admin_h3">'.$cms_language->getMessage(MESSAGE_PAGE_ACTIVE_FILTERS, false, MOD_ASE_CODENAME).'</dialog-title>
-	<table border="0" cellpadding="2" cellspacing="2">
-		<tr>
-			<th class="admin">'.$cms_language->getMessage(MESSAGE_PAGE_FILTER_LABEL,false,MOD_ASE_CODENAME).'</th>
-			<th class="admin">'.$cms_language->getMessage(MESSAGE_PAGE_FILTER_EXTENSIONS,false,MOD_ASE_CODENAME).'</th>
-		</tr>';
-	$filters = CMS_filter_catalog::getFilters();
-	$count = 0;
-	foreach ($filters as $filter) {
-		$count++;
-		$td_class = ($count % 2 == 0) ? "admin_lightgreybg" : "admin_darkgreybg";
-		$content .= '<tr><td class="'.$td_class.'">'.$filter->getLabel($cms_language).'</td><td class="'.$td_class.'">';
-		if ($filter->isActive()) {
-			$content .= implode(', ',$filter->getSupportedExtensions());
-		} else {
-			$content .= $cms_language->getMessage(MESSAGE_PAGE_INACTIVE_FILTER,false,MOD_ASE_CODENAME);
-		}
-		$content .= '</td></tr>';
-	}
-	$error = '';
-	$content .= '</table><br />';
-	if (io::substr(CMS_patch::executeCommand('which chasen 2>&1', $error),0,1) == '/' && !$error) {
-		$content .= '<dialog-title type="admin_h3">'.$cms_language->getMessage(MESSAGE_PAGE_XAPIAN_JAPANESE_SUPPORT, false, MOD_ASE_CODENAME).' : '.$cms_language->getMessage(MESSAGE_PAGE_YES).'</dialog-title>';
-	} else {
-		$content .= '<dialog-title type="admin_h3">'.$cms_language->getMessage(MESSAGE_PAGE_XAPIAN_JAPANESE_SUPPORT, false, MOD_ASE_CODENAME).' : '.$cms_language->getMessage(MESSAGE_PAGE_NO).'</dialog-title>';
-	}
-	$content .= '<br />';
-	$content .= '<dialog-title type="admin_h2">'.$cms_language->getMessage(MESSAGE_PAGE_MODULES).' :</dialog-title>';
+	$content .= '<h1>'.$cms_language->getMessage(MESSAGE_PAGE_INDEXED_MODULES, false, MOD_ASE_CODENAME).' :</h1>';
 	//get all active modules
 	$modules = CMS_ase_interface_catalog::getActiveModules();
+	$content .= '<table id="atm-reindex">
+	<tr class="atm-odd">
+		<th>&nbsp;</th>
+		<th>'.$cms_language->getMessage(MESSAGE_PAGE_DB_SIZE, false, MOD_ASE_CODENAME).'</th>
+		<th>'.$cms_language->getMessage(MESSAGE_PAGE_DB_DOCUMENTS, false, MOD_ASE_CODENAME).'</th>';
+	//reindex module
+	if ($cms_user->hasAdminClearance(CLEARANCE_ADMINISTRATION_EDITVALIDATEALL)) {
+		$content .= '<th>&nbsp;</th><th>&nbsp;</th>';
+	}
+	$content .= '</tr>';
+	$count = 0;
 	foreach ($modules as $module) {
-		$content .= '<br /><dialog-title type="admin_h3">'.$module->getLabel($cms_language).' : '.(CMS_ase_interface_catalog::moduleHasInterface($module->getCodename()) ? '<strong>'.$cms_language->getMessage(MESSAGE_PAGE_ACTIVE, false, MOD_ASE_CODENAME).'</strong>' : $cms_language->getMessage(MESSAGE_PAGE_INACTIVE, false, MOD_ASE_CODENAME)).'</dialog-title>';
+		$count++;
+		$tr_class = ($count % 2 == 0) ? ' class="atm-odd"' : '';
 		$db = new CMS_XapianDB($module->getCodename());
-		$content .= '<table cellspacing="5" cellpadding="5">
-		<tr>
-			<td class="admin">
-			- '.$cms_language->getMessage(MESSAGE_PAGE_DB_SIZE, false, MOD_ASE_CODENAME).' : '.$db->getDBSize().'<br />
-			- '.$cms_language->getMessage(MESSAGE_PAGE_DB_DOCUMENTS, false, MOD_ASE_CODENAME).' : '.$db->getDocCount().'
-			</td>';
+		$content .= '
+		<tr'.$tr_class.' class="">
+			<th>'.$module->getLabel($cms_language).(!CMS_ase_interface_catalog::moduleHasInterface($module->getCodename()) ? ' : <strong>'.$cms_language->getMessage(MESSAGE_PAGE_INACTIVE, false, MOD_ASE_CODENAME).'</strong>' : '').'</th>
+			<td class="atm-index-'.$module->getCodename().'-dbsize">'.$db->getDBSize().'o</td><td class="atm-index-'.$module->getCodename().'-doccount">'.$db->getDocCount().'</td>';
 			//reindex module
 			if ($cms_user->hasAdminClearance(CLEARANCE_ADMINISTRATION_EDITVALIDATEALL)) {
-				$content .= '
-				<form action="'.$_SERVER["SCRIPT_NAME"].'" method="post" onSubmit="return confirm(\''.addslashes($cms_language->getMessage(MESSAGE_PAGE_ACTION_REINDEXCONFIRM, array(htmlspecialchars($module->getLabel($cms_language))), MOD_ASE_CODENAME)) . '\')">
-					<input type="hidden" name="module" value="'.$module->getCodename().'" />
-					<input type="hidden" name="cms_action" value="reindex" />
-					<td><input type="submit" class="admin_input_submit" value="'.$cms_language->getMessage(MESSAGE_PAGE_ACTION_REINDEX, false, MOD_ASE_CODENAME).'" /></td>
-				</form>
-				';
+				$content .= '<td class="x-toolbar-cell atm-update-button" atm:module="'.$module->getCodename().'"></td><td class="x-toolbar-cell atm-reindex-button" atm:module="'.$module->getCodename().'"></td>';
 			}
-		$content .= '
-			</tr>
-		</table>';
+		$content .= '</tr>';
 	}
+	$content .='</table>';
 }
-$dialog->setContent($content);
-$dialog->show();
+
+$content = sensitiveIO::sanitizeJSString($content);
+
+$controlerURL = PATH_ADMIN_MODULES_WR.'/'.MOD_ASE_CODENAME.'/controler.php';
+
+$jscontent = <<<END
+	var moduleObjectWindow = Ext.getCmp('{$winId}');
+	
+	var indexPanel = new Ext.Panel({
+		autoScroll:			true,
+		region:				'center',
+		border:				false,
+		bodyStyle: 			'padding:5px',
+		cls:				'atm-help-panel',
+		html:				'{$content}',
+		listeners:			{'afterrender':function(){
+			Ext.select('.atm-reindex-button', true, 'atm-reindex').each(function(el) {
+				var button = new Ext.Toolbar.Button({
+					renderTo:		el,
+					text:			'{$cms_language->getJSMessage(MESSAGE_PAGE_ACTION_REINDEX, false, MOD_ASE_CODENAME)}',
+					tooltip:		'{$cms_language->getJSMessage(MESSAGE_PAGE_REINDEX_DESC, false, MOD_ASE_CODENAME)}',
+					handler:		function(button) {
+						Automne.message.popup({
+							msg: 				'{$cms_language->getJSMessage(MESSAGE_PAGE_ACTION_REINDEXCONFIRM, false, MOD_ASE_CODENAME)}',
+							buttons: 			Ext.MessageBox.OKCANCEL,
+							animEl: 			button.getEl(),
+							closable: 			false,
+							icon: 				Ext.MessageBox.WARNING,
+							fn: 				function (button) {
+								if (button == 'ok') {
+									Automne.server.call({
+										url:				'{$controlerURL}',
+										params: 			{
+											action:				'reindex',
+											module:				this.getAttributeNS('atm', 'module')
+										},
+										fcnCallback: 		function(response, options, content) {
+											if (content.success) {
+												Ext.select('.atm-index-' + options.params.module + '-doccount', true, 'atm-reindex').first().update(content.doccount);
+												Ext.select('.atm-index-' + options.params.module + '-dbsize', true, 'atm-reindex').first().update(content.dbsize);
+											}
+										},
+										callBackScope:		this
+									});
+								}
+							},
+							scope:			this
+						});
+					},
+					scope:			el
+				});
+			});
+			Ext.select('.atm-update-button', true, 'atm-reindex').each(function(el) {
+				var button = new Ext.Toolbar.Button({
+					renderTo:		el,
+					height:			21,
+					tooltip:		'{$cms_language->getJSMessage(MESSAGE_PAGE_REFRESH_INDEX, false, MOD_ASE_CODENAME)}',
+					iconCls:		'x-tbar-loading',
+					handler:		function(button) {
+						Automne.server.call({
+							url:				'{$controlerURL}',
+							params: 			{
+								action:				'update',
+								module:				this.getAttributeNS('atm', 'module')
+							},
+							fcnCallback: 		function(response, options, content) {
+								if (content.success) {
+									Ext.select('.atm-index-' + options.params.module + '-doccount', true, 'atm-reindex').first().update(content.doccount);
+									Ext.select('.atm-index-' + options.params.module + '-dbsize', true, 'atm-reindex').first().update(content.dbsize);
+								}
+							},
+							callBackScope:		this
+						});
+					},
+					scope:			el
+				});
+			});
+		}, scope:this}
+	});
+	moduleObjectWindow.add(indexPanel);
+	
+	//redo windows layout
+	moduleObjectWindow.doLayout();
+END;
+$view->addJavascript($jscontent);
+$view->show();
 ?>

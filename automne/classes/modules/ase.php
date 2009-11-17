@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: ase.php,v 1.16 2009/11/13 17:31:13 sebastien Exp $
+// $Id: ase.php,v 1.17 2009/11/17 12:33:26 sebastien Exp $
 
 /**
   * Class CMS_module_ase
@@ -49,12 +49,6 @@ if (!extension_loaded("xapian")) {
 
 //if Xapian exists, load module
 if ($xapianExists) {
-	//Message from ase module
-	define("MESSAGE_TASK_QUERY_MODULE", 23);
-	define("MESSAGE_TASK_INDEX_MODULE_DOCUMENT", 24);
-	define("MESSAGE_TASK_DELETE_MODULE_DOCUMENT", 25);
-	define("MESSAGE_MOD_ASE_ROWS_EXPLANATION", 42);
-	
 	//Interfaces objects
 	require_once(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/interfaces/common.php');
 	//Automatic interfaces includes
@@ -67,6 +61,16 @@ if ($xapianExists) {
 	
 	class CMS_module_ase extends CMS_moduleValidation
 	{
+		const MESSAGE_TASK_QUERY_MODULE = 23;
+		const MESSAGE_TASK_INDEX_MODULE_DOCUMENT = 24;
+		const MESSAGE_TASK_DELETE_MODULE_DOCUMENT = 25;
+		const MESSAGE_MOD_ASE_ROWS_EXPLANATION = 42;
+		const MESSAGE_MOD_ASE_INDEXED_MODULES = 47;
+		const MESSAGE_MOD_ASE_INDEXED_MODULES_DESC = 48;
+		const MESSAGE_MOD_ASE_CONFIG = 49;
+		const MESSAGE_MOD_ASE_ENGINE_CONFIG = 50;
+		const MESSAGE_MOD_ASE_ENGINE_CONFIG_DESC = 51;
+		
 		/**
 		  * Module autoload handler
 		  *
@@ -333,7 +337,7 @@ if ($xapianExists) {
 					return $modulesCode;
 				break;
 				case MODULE_TREATMENT_ROWS_EDITION_LABELS :
-					$modulesCode[MOD_ASE_CODENAME] = $treatmentParameters["language"]->getMessage(MESSAGE_MOD_ASE_ROWS_EXPLANATION, false, MOD_ASE_CODENAME);
+					$modulesCode[MOD_ASE_CODENAME] = $treatmentParameters["language"]->getMessage(self::MESSAGE_MOD_ASE_ROWS_EXPLANATION, false, MOD_ASE_CODENAME);
 					return $modulesCode;
 				break;
 			}
@@ -415,11 +419,11 @@ if ($xapianExists) {
 				return false;
 			}
 			if ($parameters['task'] == 'queryModule') {
-				return $cms_language->getMessage(MESSAGE_TASK_QUERY_MODULE, array($moduleInterface->getTitle($parameters['uid'])), MOD_ASE_CODENAME);
+				return $cms_language->getMessage(self::MESSAGE_TASK_QUERY_MODULE, array($moduleInterface->getTitle($parameters['uid'])), MOD_ASE_CODENAME);
 			} elseif ($parameters['task'] == 'reindex') {
-				return $cms_language->getMessage(MESSAGE_TASK_INDEX_MODULE_DOCUMENT, array($moduleInterface->getTitle($parameters['uid'])), MOD_ASE_CODENAME);
+				return $cms_language->getMessage(self::MESSAGE_TASK_INDEX_MODULE_DOCUMENT, array($moduleInterface->getTitle($parameters['uid'])), MOD_ASE_CODENAME);
 			} elseif ($parameters['task'] == 'delete') {
-				return $cms_language->getMessage(MESSAGE_TASK_DELETE_MODULE_DOCUMENT, array($moduleInterface->getTitle($parameters['uid'])), MOD_ASE_CODENAME);
+				return $cms_language->getMessage(self::MESSAGE_TASK_DELETE_MODULE_DOCUMENT, array($moduleInterface->getTitle($parameters['uid'])), MOD_ASE_CODENAME);
 			} else {
 				return parent::scriptInfo($parameters);
 			}
@@ -433,6 +437,43 @@ if ($xapianExists) {
 		  */
 		function isActive() {
 			return true;
+		}
+		
+		/**
+		  * Return a list of objects infos to be displayed in module index according to user privileges
+		  *
+		  * @return string : HTML scripts infos
+		  * @access public
+		  */
+		function getObjectsInfos($user) {
+			$objectsInfos = array();
+			$cms_language = $user->getLanguage();
+			
+			/*$objectsInfos[] = array(
+				'label'			=> 'Statistiques',
+				'adminLabel'	=> 'Statistiques de recherche',
+				'description'	=> 'Consulter les statistiques des recherches effectuées',
+				'objectId'		=> 'stats',
+				'url'			=> PATH_ADMIN_MODULES_WR.'/'.MOD_ASE_CODENAME.'/stats.php',
+				'class'			=> 'atm-logs',
+			);*/
+			$objectsInfos[] = array(
+				'label'			=> $cms_language->getMessage(self::MESSAGE_MOD_ASE_INDEXED_MODULES, false, MOD_ASE_CODENAME),
+				'adminLabel'	=> $cms_language->getMessage(self::MESSAGE_MOD_ASE_INDEXED_MODULES, false, MOD_ASE_CODENAME),
+				'description'	=> $cms_language->getMessage(self::MESSAGE_MOD_ASE_INDEXED_MODULES_DESC, false, MOD_ASE_CODENAME),
+				'objectId'		=> 'modules',
+				'url'			=> PATH_ADMIN_MODULES_WR.'/'.MOD_ASE_CODENAME.'/index.php',
+				'class'			=> 'atm-modules',
+			);
+			$objectsInfos[] = array(
+				'label'			=> $cms_language->getMessage(self::MESSAGE_MOD_ASE_CONFIG, false, MOD_ASE_CODENAME),
+				'adminLabel'	=> $cms_language->getMessage(self::MESSAGE_MOD_ASE_ENGINE_CONFIG, false, MOD_ASE_CODENAME),
+				'description'	=> $cms_language->getMessage(self::MESSAGE_MOD_ASE_ENGINE_CONFIG_DESC, false, MOD_ASE_CODENAME),
+				'objectId'		=> 'config',
+				'url'			=> PATH_ADMIN_MODULES_WR.'/'.MOD_ASE_CODENAME.'/config.php',
+				'class'			=> 'atm-server',
+			);
+			return $objectsInfos;
 		}
 	}
 } else {

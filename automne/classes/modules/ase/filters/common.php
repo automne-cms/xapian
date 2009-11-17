@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: common.php,v 1.4 2009/11/13 17:31:13 sebastien Exp $
+// $Id: common.php,v 1.5 2009/11/17 12:33:26 sebastien Exp $
 
 /**
   * Class CMS_filter_common
@@ -152,11 +152,35 @@ class CMS_filter_common extends CMS_grandFather
 			$supported = true;
 			foreach ($this->_binaries as $binary) {
 				$binary = escapeshellcmd(trim($binary));
+				$error = '';
 				$supported = (io::substr(CMS_patch::executeCommand('which '.$binary.' 2>&1',$error),0,1) == '/' && !$error) ? $supported : false;
 			}
 			$active[$classname] = $supported;
 		}
 		return $active[$classname];
+	}
+	
+	/**
+	  * Get missing binaries for inactive filter
+	  *
+	  * @return array : the missing binaries names for filter
+	  * @access public
+	  */
+	function getMissingBinaries() {
+		static $missing;
+		$classname = strtolower(get_class($this));
+		if (!isset($missing[$classname])) {
+			$binaries = array();
+			foreach ($this->_binaries as $binary) {
+				$binary = escapeshellcmd(trim($binary));
+				$error = '';
+				if (io::substr(CMS_patch::executeCommand('which '.$binary.' 2>&1',$error),0,1) != '/' || $error) {
+					$binaries[] = $binary;
+				}
+			}
+			$missing[$classname] = $binaries;
+		}
+		return $missing[$classname];
 	}
 	
 	/**

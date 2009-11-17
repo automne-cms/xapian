@@ -2,7 +2,7 @@
 ## Contains declaration for module installation : 
 ## All messages (mandatory) : inject 2/2
 ##
-## @version $Id: mod_ase_I18NM_messages.sql,v 1.11 2009/11/13 17:31:14 sebastien Exp $
+## @version $Id: mod_ase_I18NM_messages.sql,v 1.12 2009/11/17 12:33:26 sebastien Exp $
 
 DELETE FROM I18NM_messages WHERE module='ase';
 
@@ -21,13 +21,13 @@ INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (1
 INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (13, 'ase', NOW(), 'Filtre inconnu', 'Unknown filter');
 INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (14, 'ase', NOW(), 'Filtre', 'Filter');
 INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (15, 'ase', NOW(), 'Extensions supportées', 'Supported extensions');
-INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (16, 'ase', NOW(), 'Inactif (binaires requis non trouvés)', 'Inactive (required binaries not found)');
-INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (17, 'ase', NOW(), 'Actif', 'Active');
+INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (16, 'ase', NOW(), 'Inactif', 'Inactive');
+INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (17, 'ase', NOW(), 'Indexation active', 'Active Indexing');
 INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (18, 'ase', NOW(), 'Inactif', 'Inactive');
 INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (19, 'ase', NOW(), 'Taille de l''index', 'Index size');
 INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (20, 'ase', NOW(), 'Nombre de documents indexés', 'Number of indexed documents');
 INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (21, 'ase', NOW(), 'Réindexer', 'Reindex');
-INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (22, 'ase', NOW(), 'Confirmez-vous la réindexation complète du contenu du module ''%s'' ?', 'Do you confirm content reindexation for module ''%s''?');
+INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (22, 'ase', NOW(), 'Confirmez-vous la réindexation complète du contenu du module ?<br /><br />Attention, durant la réindexation le moteur ne fournira plus de résultats pertinents pour le module.', 'Do you confirm content reindexation for module?<br /><br />Attention, during the reindexing the engine will not provide relevant results for the module.');
 INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (23, 'ase', NOW(), 'Moteur de recherche : Interrogation de l''element ''%s''', 'Search engine : Query element ''%s''');
 INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (24, 'ase', NOW(), 'Moteur de recherche : Indexation de l''element ''%s''', 'Search engine : Indexing element ''%s''');
 INSERT INTO `I18NM_messages` (`id`, `module`, `timestamp`, `fr`, `en`) VALUES (25, 'ase', NOW(), 'Moteur de recherche : Suppression de l''element ''%s''', 'Search engine : Delete element ''%s''');
@@ -185,3 +185,16 @@ INSERT INTO I18NM_messages (id, module, timestamp, fr, en) VALUES (42, 'ase', NO
 INSERT INTO I18NM_messages (id, module, timestamp, fr, en) VALUES (43, 'ase', NOW(), 'Microsoft Word 2007', 'Microsoft Word 2007');
 INSERT INTO I18NM_messages (id, module, timestamp, fr, en) VALUES (44, 'ase', NOW(), 'Microsoft Excel 2007', 'Microsoft Excel 2007');
 INSERT INTO I18NM_messages (id, module, timestamp, fr, en) VALUES (45, 'ase', NOW(), 'Support des textes Japonais', 'Japanese text support');
+INSERT INTO I18NM_messages (id, module, timestamp, fr, en) VALUES (46, 'ase', NOW(), 'Binaire manquant', 'Missing binary');
+INSERT INTO I18NM_messages (id, module, timestamp, fr, en) VALUES (47, 'ase', NOW(), 'Modules indexés', 'Indexed modules');
+INSERT INTO I18NM_messages (id, module, timestamp, fr, en) VALUES (48, 'ase', NOW(), 'Consulter les modules indexés et réindexer un module', 'Consult modules indexed and reindex module');
+INSERT INTO I18NM_messages (id, module, timestamp, fr, en) VALUES (49, 'ase', NOW(), 'Configuration', 'Configuration');
+INSERT INTO I18NM_messages (id, module, timestamp, fr, en) VALUES (50, 'ase', NOW(), 'Configuration du moteur', 'Engine Configuration');
+INSERT INTO I18NM_messages (id, module, timestamp, fr, en) VALUES (51, 'ase', NOW(), 'Consulter l\'état de fonctionnement du moteur et les filtres de documents actifs', 'Consult the operating condition of engine filters and active documents');
+INSERT INTO I18NM_messages (id, module, timestamp, fr, en) VALUES (52, 'ase', NOW(), 'Rafraichir les informations sur l\'index', 'Refresh index informations');
+INSERT INTO I18NM_messages (id, module, timestamp, fr, en) VALUES (53, 'ase', NOW(), 'Réindexer le module : En cas de problème sur les résultats de recherche (incomplets ou erronés), il peut être nécessaire de réindexer le contenu d\'un module pour mettre à jour toutes les informations du moteur de recherche.', 'Reindex the module: In case of problems on the search results (incomplete or incorrect), it may be necessary to re-index the contents of a module update all informations of the search engine.');
+INSERT INTO I18NM_messages (id, module, timestamp, fr, en) VALUES (54, 'ase', NOW(), 'Pages de recherches employées pour Open Search :', 'Pages used for Open Search:');
+INSERT INTO I18NM_messages (id, module, timestamp, fr, en) VALUES (55, 'ase', NOW(), 'Pages racines des arborescences exclues de l\'indexation :', 'Pages roots of trees excluded from indexing:');
+
+
+
