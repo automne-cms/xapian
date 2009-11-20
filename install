@@ -28,7 +28,7 @@
 >	/automne_bin/docxtoplain.sh	x
 >	/automne_bin/xlsxtoplain.sh	x
 >	/automne_modules_files/ase/opensearch.php
->	/automne_modules_files/ase/charenrc
+>	/automne_modules_files/ase/chasenrc
 >	/automne_modules_files/ase/databases/.htaccess
 >	/automne_modules_files/ase/stopwords/.htaccess
 >	/automne_modules_files/ase/stopwords/de.txt
