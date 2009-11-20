@@ -1,5 +1,7 @@
 # files to create / update
 >	/automne/admin/modules/ase/index.php
+>	/automne/admin/modules/ase/config.php
+>	/automne/admin/modules/ase/controler.php
 >	/automne/classes/aseFrontEnd.php
 >	/automne/classes/modules/ase/CHANGELOG
 >	/automne/classes/modules/ase/VERSION
