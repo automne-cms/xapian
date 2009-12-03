@@ -2,7 +2,7 @@
 ## Contains declaration for module installation : 
 ## All table creation (mandatory) : inject 1/2
 ##
-## @version $Id: mod_ase.sql,v 1.4 2007/10/12 16:25:34 sebastien Exp $
+## @version $Id: mod_ase.sql,v 1.5 2009/12/03 08:27:37 sebastien Exp $
 
 # --------------------------------------------------------
 
@@ -21,7 +21,7 @@ CREATE TABLE `mod_ase_document` (
   PRIMARY KEY  (`id_mased`),
   UNIQUE KEY `mod-uid` (`uid_mased`,`module_mased`),
   KEY `xid_mased` (`xid_mased`)
-) TYPE=MyISAM;
+) TYPE=MyISAM DEFAULT CHARSET=utf8;
 
 #
 # Contenu de la table `modules`

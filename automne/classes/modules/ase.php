@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: ase.php,v 1.17 2009/11/17 12:33:26 sebastien Exp $
+// $Id: ase.php,v 1.18 2009/12/03 08:27:37 sebastien Exp $
 
 /**
   * Class CMS_module_ase
@@ -268,7 +268,7 @@ if ($xapianExists) {
 				case MODULE_TREATMENT_BEFORE_VALIDATION_TREATMENT :
 					//if validation is accepted and in case of ressource deletion/archive
 					if ($treatmentParameters['result'] == VALIDATION_OPTION_ACCEPT
-						 && (!$treatedObject->getStatus() || ($treatedObject->getProposedLocation() == RESOURCE_LOCATION_DELETED || $treatedObject->getProposedLocation() == RESOURCE_LOCATION_ARCHIVED))) {
+						 && ((!$treatedObject->getStatus() && isset($treatmentParameters['action']) && $treatmentParameters['action'] == 'delete') || ($treatedObject->getStatus() && ($treatedObject->getProposedLocation() == RESOURCE_LOCATION_DELETED || $treatedObject->getProposedLocation() == RESOURCE_LOCATION_ARCHIVED)))) {
 						//check for module interface existence
 						if (CMS_ase_interface_catalog::moduleHasInterface($treatmentParameters['module'])) {
 							//get Interface
@@ -302,7 +302,7 @@ if ($xapianExists) {
 					}
 					//if validation is accepted and in case of ressource publication
 					if ($treatmentParameters['result'] == VALIDATION_OPTION_ACCEPT
-						 && (!$treatedObject->getStatus() || ($treatedObject->getLocation() != RESOURCE_LOCATION_DELETED && $treatedObject->getLocation() != RESOURCE_LOCATION_ARCHIVED))) {
+						 && ((!$treatedObject->getStatus() && isset($treatmentParameters['action']) && $treatmentParameters['action'] == 'update') || ($treatedObject->getStatus() && $treatedObject->getLocation() != RESOURCE_LOCATION_DELETED && $treatedObject->getLocation() != RESOURCE_LOCATION_ARCHIVED))) {
 						//check for module interface existence
 						if (CMS_ase_interface_catalog::moduleHasInterface($treatmentParameters['module'])) {
 							//get Interface
@@ -381,16 +381,16 @@ if ($xapianExists) {
 				return true;
 			} elseif ($parameters['task'] == 'reindex') {
 				if (!CMS_ase_interface_catalog::reindexModuleDocument($parameters)) {
-					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : cannot index document ... add task to queue list again');
+					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : cannot index document. Module : '.$parameters['module'].', uid : '.$parameters['uid']);
 					//add script to indexation
-					CMS_scriptsManager::addScript(MOD_ASE_CODENAME, $parameters);
+					//CMS_scriptsManager::addScript(MOD_ASE_CODENAME, $parameters);
 				}
 				return true;
 			} elseif ($parameters['task'] == 'delete') {
 				if (!CMS_ase_interface_catalog::deleteModuleDocument($parameters)) {
-					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : cannot delete document ... add task to queue list again');
+					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : cannot delete document. Module : '.$parameters['module'].', uid : '.$parameters['uid']);
 					//add script to indexation
-					CMS_scriptsManager::addScript(MOD_ASE_CODENAME, $parameters);
+					//CMS_scriptsManager::addScript(MOD_ASE_CODENAME, $parameters);
 				}
 				return true;
 			} else {
