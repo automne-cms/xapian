@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: polymod.php,v 1.11 2009/12/07 09:19:45 sebastien Exp $
+// $Id: polymod.php,v 1.12 2009/12/07 09:27:53 sebastien Exp $
 
 /**
   * Class CMS_polymod_ase
@@ -173,7 +173,7 @@ class CMS_polymod_ase extends CMS_ase_interface {
 					//if this field is a file, check for file
 					if ($fieldType == 'CMS_object_file') {
 						if ($itemField->getValue('filename') && in_array(io::strtolower($itemField->getValue('fileExtension')), $supportedFilesTypes)) {
-							$files[] = array('file' => $itemField->getValue('filePath').'/'.$itemField->getValue('filename'), 'extension' => $itemField->getValue('fileExtension'));
+							$files[] = array('file' => parse_url($itemField->getValue('filePath'), PHP_URL_PATH).'/'.$itemField->getValue('filename'), 'extension' => $itemField->getValue('fileExtension'));
 						}
 					}
 				}
