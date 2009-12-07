@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: polymod.php,v 1.10 2009/11/13 17:31:13 sebastien Exp $
+// $Id: polymod.php,v 1.11 2009/12/07 09:19:45 sebastien Exp $
 
 /**
   * Class CMS_polymod_ase
@@ -362,6 +362,7 @@ class CMS_polymod_ase extends CMS_ase_interface {
 	  * @access public
 	  */
 	function getMatchValue(&$matchInfo, $value, $parameters = array()) {
+		global $cms_user, $cms_language;
 		//this UID is an object
 		if (!sensitiveIO::isPositiveInteger($matchInfo['uid'])) {
 			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : uid must be a positive integer : '.$matchInfo['uid']);

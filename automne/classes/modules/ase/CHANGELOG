@@ -1,3 +1,6 @@
+v0.44
+[BUG] : with polyobject if APPLICATION_ENFORCES_ACCESS_CONTROL is active, then object compiled URL is not properly set
+
 v0.43
 [BUG] : with polyobject without ressource : not properly deleted
 [BUG] : with indexed objects with errors : infinite index loop
