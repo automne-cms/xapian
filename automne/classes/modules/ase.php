@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: ase.php,v 1.18 2009/12/03 08:27:37 sebastien Exp $
+// $Id: ase.php,v 1.19 2009/12/17 14:52:19 sebastien Exp $
 
 /**
   * Class CMS_module_ase
@@ -375,22 +375,16 @@ if ($xapianExists) {
 							CMS_scriptsManager::addScript(MOD_ASE_CODENAME, $indexInfo);
 						}
 					}
-					//then launch scripts execution
-					//CMS_scriptsManager::startScript();
 				}
 				return true;
 			} elseif ($parameters['task'] == 'reindex') {
 				if (!CMS_ase_interface_catalog::reindexModuleDocument($parameters)) {
 					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : cannot index document. Module : '.$parameters['module'].', uid : '.$parameters['uid']);
-					//add script to indexation
-					//CMS_scriptsManager::addScript(MOD_ASE_CODENAME, $parameters);
 				}
 				return true;
 			} elseif ($parameters['task'] == 'delete') {
 				if (!CMS_ase_interface_catalog::deleteModuleDocument($parameters)) {
 					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : cannot delete document. Module : '.$parameters['module'].', uid : '.$parameters['uid']);
-					//add script to indexation
-					//CMS_scriptsManager::addScript(MOD_ASE_CODENAME, $parameters);
 				}
 				return true;
 			} else {
@@ -448,15 +442,6 @@ if ($xapianExists) {
 		function getObjectsInfos($user) {
 			$objectsInfos = array();
 			$cms_language = $user->getLanguage();
-			
-			/*$objectsInfos[] = array(
-				'label'			=> 'Statistiques',
-				'adminLabel'	=> 'Statistiques de recherche',
-				'description'	=> 'Consulter les statistiques des recherches effectuées',
-				'objectId'		=> 'stats',
-				'url'			=> PATH_ADMIN_MODULES_WR.'/'.MOD_ASE_CODENAME.'/stats.php',
-				'class'			=> 'atm-logs',
-			);*/
 			$objectsInfos[] = array(
 				'label'			=> $cms_language->getMessage(self::MESSAGE_MOD_ASE_INDEXED_MODULES, false, MOD_ASE_CODENAME),
 				'adminLabel'	=> $cms_language->getMessage(self::MESSAGE_MOD_ASE_INDEXED_MODULES, false, MOD_ASE_CODENAME),

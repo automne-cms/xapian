@@ -1,3 +1,6 @@
+v0.45
+[BUG] : with some content having encoded entities
+
 v0.44
 [BUG] : with polyobject if APPLICATION_ENFORCES_ACCESS_CONTROL is active, then object compiled URL is not properly set
 

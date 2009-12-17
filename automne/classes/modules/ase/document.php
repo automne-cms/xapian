@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: document.php,v 1.8 2009/11/13 17:31:14 sebastien Exp $
+// $Id: document.php,v 1.9 2009/12/17 14:52:20 sebastien Exp $
 
 /**
   * Class CMS_ase_document
@@ -377,6 +377,9 @@ class CMS_ase_document extends CMS_grandFather
 		if (io::strlen($this->_plainTextContent) >= $this->_maxplaintextlength) {
 			return false;
 		}
+		//strip tags and decode entities
+		$content = strip_tags(io::decodeEntities($content));
+		//add content
 		$this->_plainTextContent .= $content.' ';
 		if (io::strlen($this->_plainTextContent) > $this->_maxplaintextlength) {
 			$this->_plainTextContent = io::substr($this->_plainTextContent, 0, $this->_maxplaintextlength);
