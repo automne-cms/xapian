@@ -1,3 +1,6 @@
+v0.46
+[BUG] : with HTML tags script and style which are encoded
+
 v0.45
 [BUG] : with some content having encoded entities
 

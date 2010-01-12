@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: common.php,v 1.5 2009/11/17 12:33:26 sebastien Exp $
+// $Id: common.php,v 1.6 2010/01/12 09:14:37 sebastien Exp $
 
 /**
   * Class CMS_filter_common
@@ -304,6 +304,22 @@ class CMS_filter_common extends CMS_grandFather
 	function _cleanConverted() {
 		//by default do nothing
 		return true;
+	}
+	
+	/**
+	  * This method will remove tags (strip_tags) but also, HTML comments and script and style tags content
+	  *
+	  * @param HTML string $text : the html to convert in plain text
+	  * @return plain text
+	  * @access public
+	  * @static
+	  */
+	function stripTags($text) {
+		$search = array('@<script[^>]*?>.*?</script>@si',  // Strip out javascript
+               '@<style[^>]*?>.*?</style>@siU',    // Strip style tags properly
+               '@<![\s\S]*?--[ \t\n\r]*>@'         // Strip multi-line comments including CDATA
+		);
+		return strip_tags(preg_replace($search, '', $text)); 
 	}
 }
 ?>

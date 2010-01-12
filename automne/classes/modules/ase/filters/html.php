@@ -17,7 +17,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: html.php,v 1.3 2009/11/13 17:31:13 sebastien Exp $
+// $Id: html.php,v 1.4 2010/01/12 09:14:37 sebastien Exp $
 
 /**
   * Class CMS_filter_html
@@ -80,7 +80,7 @@ class CMS_filter_html extends CMS_filter_common
 			return false;
 		}
 		//convert document
-		if (!file_put_contents($this->_convertedDocument, html_entity_decode(strip_tags(file_get_contents($this->_sourceDocument)), ENT_COMPAT, (strtolower(APPLICATION_DEFAULT_ENCODING) != 'utf-8' ? 'ISO-8859-1' : 'UTF-8')))) {
+		if (!file_put_contents($this->_convertedDocument, html_entity_decode($this->stripTags(file_get_contents($this->_sourceDocument)), ENT_COMPAT, (strtolower(APPLICATION_DEFAULT_ENCODING) != 'utf-8' ? 'ISO-8859-1' : 'UTF-8')))) {
 			$this->_raiseError(get_class($this).' : '.__FUNCTION__.' : can\'t convert HTML document ... ');
 			return false;
 		}

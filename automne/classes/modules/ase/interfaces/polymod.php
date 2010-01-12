@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: polymod.php,v 1.12 2009/12/07 09:27:53 sebastien Exp $
+// $Id: polymod.php,v 1.13 2010/01/12 09:14:37 sebastien Exp $
 
 /**
   * Class CMS_polymod_ase
@@ -114,7 +114,7 @@ class CMS_polymod_ase extends CMS_ase_interface {
 		$files = array();
 		$this->_getFieldsContent($item, $content, $files);
 		//remove all HTML from content
-		$content = strip_tags($content);
+		$content = CMS_filter_common::stripTags($content);
 		//then set it as plain text content for document
 		$document->addPlainTextContent($content);
 		//add files
