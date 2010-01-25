@@ -1,3 +1,6 @@
+v0.47
+[REFACTOR] : Adapt messages for Automne 4.0.0 format
+
 v0.46
 [BUG] : with HTML tags script and style which are encoded
 

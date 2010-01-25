@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xapianDB.php,v 1.11 2009/11/13 17:31:14 sebastien Exp $
+// $Id: xapianDB.php,v 1.12 2010/01/25 16:32:22 sebastien Exp $
 
 /**
   * Class CMS_XapianDB
@@ -91,7 +91,11 @@ class CMS_XapianDB extends CMS_grandFather {
 	}
 	
 	function getDocCount() {
-		return $this->_db->get_doccount();
+		if (is_object($this->_db)) {
+			return $this->_db->get_doccount();
+		} else {
+			return 0;
+		}
 	}
 	
 	function isWritable() {

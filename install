@@ -39,7 +39,9 @@
 >	/automne_modules_files/ase/stopwords/fr.txt
 >	/automne_modules_files/ase/stopwords/ja.txt
 >	/sql/mod_ase.sql
->	/sql/mod_ase_I18NM_messages.sql
+>	/sql/messages/fr/ase.sql
+>	/sql/messages/en/ase.sql
 #execute ASE installation/update DB script
-x	/sql/mod_ase_I18NM_messages.sql
+x	/sql/messages/fr/ase.sql
+x	/sql/messages/en/ase.sql
 x	/ase_install.php
