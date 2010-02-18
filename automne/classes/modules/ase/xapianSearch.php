@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xapianSearch.php,v 1.9 2009/11/13 17:31:14 sebastien Exp $
+// $Id: xapianSearch.php,v 1.10 2010/02/18 16:54:00 sebastien Exp $
 
 /**
   * Class CMS_XapianQuery
@@ -307,6 +307,12 @@ class CMS_XapianQuery extends CMS_grandFather {
 	}
 	
 	function getMatchValue(&$match, $value, $parameters = array()) {
+		static $matchValues;
+		$cachekey = md5(serialize(func_get_args()));
+		if (isset($matchValues[$cachekey])) {
+			return $matchValues[$cachekey];
+		}
+		$matchValues[$cachekey] = '';
 		if (!isset($this->_availableMatchInfos) || !is_array($this->_availableMatchInfos) || (is_array($this->_availableMatchInfos) && in_array($value, $this->_availableMatchInfos))) {
 			switch ($value) {
 				case 'docid':
@@ -316,35 +322,35 @@ class CMS_XapianQuery extends CMS_grandFather {
 				case 'percent':
 				case 'relevance':
 				case 'position':
-					return $match[$value];
+					$matchValues[$cachekey] = $match[$value];
 				break;
 				case 'title':
-					return $match['doc']->get_value(CMS_XapianIndexer::XAPIAN_VALUENO_TITLE);
+					$matchValues[$cachekey] = $match['doc']->get_value(CMS_XapianIndexer::XAPIAN_VALUENO_TITLE);
 				break;
 				case 'language':
-					return $match['doc']->get_value(CMS_XapianIndexer::XAPIAN_VALUENO_LANGUAGE);
+					$matchValues[$cachekey] = $match['doc']->get_value(CMS_XapianIndexer::XAPIAN_VALUENO_LANGUAGE);
 				break;
 				case 'indexationDate':
 					if (!$parameters['format']) {
-						return $match['doc']->get_value(CMS_XapianIndexer::XAPIAN_VALUENO_TIMESTAMP);
+						$matchValues[$cachekey] = $match['doc']->get_value(CMS_XapianIndexer::XAPIAN_VALUENO_TIMESTAMP);
 					} else {
-						return date($parameters['format'], $match['doc']->get_value(CMS_XapianIndexer::XAPIAN_VALUENO_TIMESTAMP));
+						$matchValues[$cachekey] = date($parameters['format'], $match['doc']->get_value(CMS_XapianIndexer::XAPIAN_VALUENO_TIMESTAMP));
 					}
 				break;
 				case 'indexedDatas':
-					return $match['doc']->get_data();
+					$matchValues[$cachekey] = $match['doc']->get_data();
 				break;
 				case 'type':
-					return $match['doc']->get_value(CMS_XapianIndexer::XAPIAN_VALUENO_TYPE);
+					$matchValues[$cachekey] = $match['doc']->get_value(CMS_XapianIndexer::XAPIAN_VALUENO_TYPE);
 				break;
 				case 'dateStart':
-					return $match['doc']->get_value(CMS_XapianIndexer::XAPIAN_VALUENO_TYPE);
+					$matchValues[$cachekey] = $match['doc']->get_value(CMS_XapianIndexer::XAPIAN_VALUENO_TYPE);
 				break;
 			}
-			return '';
 		} else {
-			return $this->_modulesInterfaces[$match['module']]->getMatchValue($match, $value, $parameters);
+			$matchValues[$cachekey] = $this->_modulesInterfaces[$match['module']]->getMatchValue($match, $value, $parameters);
 		}
+		return $matchValues[$cachekey];
 	}
 	
 	function getAvailableMatchValues($match) {
@@ -449,7 +455,7 @@ class CMS_XapianQuery extends CMS_grandFather {
 					foreach ($typeFilters as $value) {
 						$query = (is_object($query)) ? new XapianQuery(XAPIAN_QUERY_OP_OR, $query, new XapianQuery('__'.$type.'__:'.$value)) : new XapianQuery('__'.$type.'__:'.$value);
 					}
-					$typequery = (is_object($typequery)) ? new XapianQuery(XAPIAN_QUERY_OP_OR, $query, $typequery) : $query;
+					$typequery = (is_object($typequery)) ? new XapianQuery(XAPIAN_QUERY_OP_AND, $query, $typequery) : $query;
 				}
 				if (is_object($typequery) && $status == 'in') {
 					$inquery = $typequery;
