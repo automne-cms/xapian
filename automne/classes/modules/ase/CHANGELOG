@@ -1,3 +1,8 @@
+v0.48
+[BUG] : Interfaces filters uses "OR" operator instead of "AND"
+[REFACTOR] : Add website ID in configuration panel
+[REFACTOR] : Add some cache on search results display
+
 v0.47
 [REFACTOR] : Adapt messages for Automne 4.0.0 format
 
