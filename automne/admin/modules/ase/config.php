@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>	  |
 // +----------------------------------------------------------------------+
 //
-// $Id: config.php,v 1.1 2009/11/17 12:33:26 sebastien Exp $
+// $Id: config.php,v 1.2 2010/02/18 16:54:16 sebastien Exp $
 
 /**
   * PHP page : Load polymod items search window.
@@ -190,7 +190,7 @@ if (!($xapianVersion = $module->getXapianVersion())) {
 		foreach ($websites as $website) {
 			$count++;
 			$tr_class = ($count % 2 == 0) ? ' class="atm-odd"' : '';
-			$content .= '<tr'.$tr_class.'><td>'.$website->getLabel().'</td>';
+			$content .= '<tr'.$tr_class.'><td>'.$website->getLabel().' <small>(id: '.$website->getID().')</small></td>';
 			if (isset($searchs[$website->getID()]) && $searchs[$website->getID()]) {
 				if (sensitiveIO::isPositiveInteger($searchs[$website->getID()])) {
 					$page = CMS_tree::getPageById($searchs[$website->getID()]);
