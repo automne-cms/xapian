@@ -1,3 +1,6 @@
+v0.49
+[BUG] : With ISO websites, if query contain a non ascii caracter
+
 v0.48
 [BUG] : Interfaces filters uses "OR" operator instead of "AND"
 [REFACTOR] : Add website ID in configuration panel
