@@ -1,3 +1,6 @@
+v0.50
+[BUG] : Xapian DB files does not have correct rights.
+
 v0.49
 [BUG] : With ISO websites, if query contain a non ascii caracter
 

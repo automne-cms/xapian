@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: xapianDB.php,v 1.12 2010/01/25 16:32:22 sebastien Exp $
+// $Id: xapianDB.php,v 1.13 2010/03/18 10:53:58 sebastien Exp $
 
 /**
   * Class CMS_XapianDB
@@ -150,7 +150,18 @@ class CMS_XapianDB extends CMS_grandFather {
 	function endTransaction() {
 		if ($this->_isWritable) {
 			//flush
-			$this->_db->flush();
+			try {
+				$this->_db->flush();
+			} catch (Exception $e) {
+				$this->raiseError('Can not flush database : '.$e->getMessage());
+			}
+			try{
+				foreach ( new DirectoryIterator($this->_getDSN()) as $file) {
+					if ($file->isFile()) {
+						@chmod($file->getPathname(),octdec(FILES_CHMOD));
+					}
+				}
+			} catch(Exception $e) {}
 			//remove lock
 			$this->_removeLock();
 			unset($this->_db);
@@ -224,6 +235,13 @@ class CMS_XapianDB extends CMS_grandFather {
 				clearstatcache();
 			}
 		}
+		try{
+			foreach ( new DirectoryIterator($this->_getDSN()) as $file) {
+				if ($file->isFile()) {
+					@chmod($file->getPathname(),octdec(FILES_CHMOD));
+				}
+			}
+		} catch(Exception $e) {}
 		try {
 			$this->_db = Xapian::flint_open($this->_getDSN(), Xapian::DB_CREATE_OR_OPEN);
 		} catch (Exception $e) {
