@@ -13,7 +13,7 @@
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
 //
-// $Id: standard.php,v 1.6 2009/11/13 17:31:14 sebastien Exp $
+// $Id: standard.php,v 1.7 2010/03/19 09:39:18 sebastien Exp $
 
 /**
   * Class CMS_standard_ase
@@ -513,7 +513,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : page does not exists : '.$matchInfo['uid']);
 					return false;
 				}
-				$pages[$matchInfo['uid']] =& $page;
+				$pages[$matchInfo['uid']] = $page;
 			}
 			
 			//page content
@@ -596,36 +596,31 @@ class CMS_standard_ase extends CMS_ase_interface {
 						unset($filename[0]);
 						$title = io::substr(implode('_',$filename),32);
 					}
-					return '<a href="'.PATH_MODULES_FILES_WR.'/'.MOD_STANDARD_CODENAME.'/public/'.$filesDatas[$matchInfo['uid']]['file'].'" title="'.htmlspecialchars($title).'">'.$this->strChop($title, 120).'</a> '.$iconHTML;
+					return '<a href="'.$this->getMatchValue($matchInfo, 'url').'" title="'.htmlspecialchars($title).'">'.$this->strChop($title, 120).'</a> '.$iconHTML;
 				break;
 				case 'fileType':
 					//check if file type match installed filters
 					$fileinfos = pathinfo(PATH_MODULES_FILES_FS.'/'.MOD_STANDARD_CODENAME.'/public/'.$filesDatas[$matchInfo['uid']]['file']);
 					return $fileinfos['extension'];
 				break;
-				case 'pageTitle':
-					if (!isset($pages[$matchInfo['uid']])) {
-						//get page
+				case 'page':
+					//get page
+					if (!isset($pages[$filesDatas[$matchInfo['uid']]['page']])) {
 						$page = CMS_tree::getPageByID($filesDatas[$matchInfo['uid']]['page']);
 						if ($page->hasError()) {
 							$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : page does not exists : '.$filesDatas[$matchInfo['uid']]['page']);
 							return false;
 						}
-						$pages[$matchInfo['uid']] =& $page;
+						$pages[$filesDatas[$matchInfo['uid']]['page']] = $page;
 					}
-					return $pages[$matchInfo['uid']]->getTitle(true);
+					return $pages[$filesDatas[$matchInfo['uid']]['page']];
+				break;
+				case 'pageTitle':
+					$page = $this->getMatchValue($matchInfo, 'page');
+					return $page->getTitle(true);
 				break;
 				case 'pageID':
 					return $filesDatas[$matchInfo['uid']]['page'];
-				break;
-				case 'page':
-					//get page
-					$page = CMS_tree::getPageByID($filesDatas[$matchInfo['uid']]['page']);
-					if ($page->hasError()) {
-						$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : page does not exists : '.$filesDatas[$matchInfo['uid']]['page']);
-						return false;
-					}
-					return $page;
 				break;
 				case 'fileTitle':
 					//title
@@ -658,22 +653,16 @@ class CMS_standard_ase extends CMS_ase_interface {
 					return $file->exists();
 				break;
 				case 'url':
-					return CMS_websitesCatalog::getMainURL().PATH_MODULES_FILES_WR.'/'.MOD_STANDARD_CODENAME.'/public/'.$filesDatas[$matchInfo['uid']]['file'];
+					$page = $this->getMatchValue($matchInfo, 'page');
+					$website = $page->getWebsite();
+					return $website->getURL().PATH_MODULES_FILES_WR.'/'.MOD_STANDARD_CODENAME.'/public/'.$filesDatas[$matchInfo['uid']]['file'];
 				break;
 				case 'absolutePath':
 					return PATH_MODULES_FILES_FS.'/'.MOD_STANDARD_CODENAME.'/public/'.$filesDatas[$matchInfo['uid']]['file'];
 				break;
 				case 'pubDate' :
-					if (!isset($pages[$matchInfo['uid']])) {
-						//get page
-						$page = CMS_tree::getPageByID($filesDatas[$matchInfo['uid']]['page']);
-						if ($page->hasError()) {
-							$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : page does not exists : '.$filesDatas[$matchInfo['uid']]['page']);
-							return false;
-						}
-						$pages[$matchInfo['uid']] =& $page;
-					}
-					$pubDate = $pages[$matchInfo['uid']]->getPublicationDateStart();
+					$page = $this->getMatchValue($matchInfo, 'page');
+					$pubDate = $page->getPublicationDateStart();
 					if (!$parameters['format']) {
 						return $pubDate->getTimestamp();
 					} else {

@@ -1,3 +1,6 @@
+v0.51
+[BUG] : In files inserted in a standard file row : Returned URL does not use the correct website URL.
+
 v0.50
 [BUG] : Xapian DB files does not have correct rights.
 
