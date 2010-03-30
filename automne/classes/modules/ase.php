@@ -122,7 +122,7 @@ if ($xapianExists) {
 			} elseif (class_exists('Xapian')) {
 				return Xapian::version_string();
 			} else {
-				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can\'t get Xapian version');
+				$this->raiseError('can\'t get Xapian version');
 				return false;
 			}
 		}
@@ -170,15 +170,15 @@ if ($xapianExists) {
 			switch ($treatmentMode) {
 				case MODULE_TREATMENT_BLOCK_TAGS:
 					if (!is_a($treatedObject,"CMS_row")) {
-						$this->_raiseError('CMS_module_'.MOD_ASE_CODENAME.' : treatWantedTag : $treatedObject must be a CMS_row object');
+						$this->raiseError('$treatedObject must be a CMS_row object');
 						return false;
 					}
 					if (!is_a($treatmentParameters["page"],"CMS_page")) {
-						$this->_raiseError('CMS_module_'.MOD_ASE_CODENAME.' : treatWantedTag : $treatmentParameters["page"] must be a CMS_page object');
+						$this->raiseError('$treatmentParameters["page"] must be a CMS_page object');
 						return false;
 					}
 					if (!is_a($treatmentParameters["language"],"CMS_language")) {
-						$this->_raiseError('CMS_module_'.MOD_ASE_CODENAME.' : treatWantedTag : $treatmentParameters["language"] must be a CMS_language object');
+						$this->raiseError('$treatmentParameters["language"] must be a CMS_language object');
 						return false;
 					}
 					//Call module clientspace content
@@ -189,7 +189,7 @@ if ($xapianExists) {
 				break;
 				case MODULE_TREATMENT_PAGEHEADER_TAGS:
 					if (!is_a($treatedObject,"CMS_page")) {
-						$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : $treatedObject must be a CMS_page object');
+						$this->raiseError('$treatedObject must be a CMS_page object');
 						return false;
 					}
 					
@@ -273,7 +273,7 @@ if ($xapianExists) {
 						if (CMS_ase_interface_catalog::moduleHasInterface($treatmentParameters['module'])) {
 							//get Interface
 							if (!($moduleInterface = CMS_ase_interface_catalog::getModuleInterface($treatmentParameters['module']))) {
-								$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no interface for module '.$treatmentParameters['module']);
+								$this->raiseError('no interface for module '.$treatmentParameters['module']);
 								return false;
 							}
 							$deleteInfos = array();
@@ -293,11 +293,11 @@ if ($xapianExists) {
 				break;
 				case MODULE_TREATMENT_AFTER_VALIDATION_TREATMENT :
 					if (!is_a($treatedObject, 'CMS_resource')) {
-						$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : $treatmentParameters[\'module\'] must be set');
+						$this->raiseError('$treatmentParameters[\'module\'] must be set');
 						return false;
 					}
 					if (!$treatmentParameters['module']) {
-						$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : $treatmentParameters[\'module\'] must be set');
+						$this->raiseError('$treatmentParameters[\'module\'] must be set');
 						return false;
 					}
 					//if validation is accepted and in case of ressource publication
@@ -307,7 +307,7 @@ if ($xapianExists) {
 						if (CMS_ase_interface_catalog::moduleHasInterface($treatmentParameters['module'])) {
 							//get Interface
 							if (!($moduleInterface = CMS_ase_interface_catalog::getModuleInterface($treatmentParameters['module']))) {
-								$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no interface for module '.$treatmentParameters['module']);
+								$this->raiseError('no interface for module '.$treatmentParameters['module']);
 								return false;
 							}
 							$indexInfos = array();
@@ -378,13 +378,25 @@ if ($xapianExists) {
 				}
 				return true;
 			} elseif ($parameters['task'] == 'reindex') {
-				if (!CMS_ase_interface_catalog::reindexModuleDocument($parameters)) {
-					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : cannot index document. Module : '.$parameters['module'].', uid : '.$parameters['uid']);
+				//get module interface
+				if (!($moduleInterface = CMS_ase_interface_catalog::getModuleInterface($parameters['module']))) {
+					$this->raiseError('no interface for module '.$parameters['module']);
+					return false;
+				}
+				//reindex document
+				if (!$moduleInterface->reindexModuleDocument($parameters)) {
+					$this->raiseError('cannot index document. Module : '.$parameters['module'].', uid : '.$parameters['uid']);
 				}
 				return true;
 			} elseif ($parameters['task'] == 'delete') {
-				if (!CMS_ase_interface_catalog::deleteModuleDocument($parameters)) {
-					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : cannot delete document. Module : '.$parameters['module'].', uid : '.$parameters['uid']);
+				//get module interface
+				if (!($moduleInterface = CMS_ase_interface_catalog::getModuleInterface($parameters['module']))) {
+					$this->raiseError('no interface for module '.$parameters['module']);
+					return false;
+				}
+				//delete document from index
+				if (!$moduleInterface->deleteModuleDocument($parameters)) {
+					$this->raiseError('cannot delete document. Module : '.$parameters['module'].', uid : '.$parameters['uid']);
 				}
 				return true;
 			} else {
@@ -409,7 +421,7 @@ if ($xapianExists) {
 			}
 			//get Interface
 			if (!($moduleInterface = CMS_ase_interface_catalog::getModuleInterface($parameters['module']))) {
-				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no interface for module '.$parameters['module']);
+				$this->_raiseError('no interface for module '.$parameters['module']);
 				return false;
 			}
 			if ($parameters['task'] == 'queryModule') {

@@ -1,3 +1,7 @@
+v0.52
+[BUG] : In files inserted in a standard file row : Old files are not properly deleted from index
+[REFACTOR] : Review module tag help
+
 v0.51
 [BUG] : In files inserted in a standard file row : Returned URL does not use the correct website URL.
 

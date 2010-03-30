@@ -60,19 +60,19 @@ class CMS_XapianDB extends CMS_grandFather {
 		if ($writable) {
 			//if we need a writable DB, try to open it before timeout
 			if (!$this->_loadWritableDatabase($timeout)) {
-				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not load writable database ...');
+				$this->raiseError('can not load writable database ...');
 				return;
 			}
 		} else {
 			if ($this->dbExists()) {
 				if (!$this->_loadDatabase()) {
-					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not load database ...');
+					$this->raiseError('can not load database ...');
 					return;
 				}
 			} else {
 				//we need to create DB, try to create it
 				if (!$this->_loadWritableDatabase($timeout)) {
-					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not create database ...');
+					$this->raiseError('can not create database ...');
 					return;
 				}
 				//remove lock
@@ -86,8 +86,15 @@ class CMS_XapianDB extends CMS_grandFather {
 	function reindex() {
 		//first erase DB files
 		CMS_file::deltree($this->_getDSN(), true);
+		
+		//get module interface
+		if (!($moduleInterface = CMS_ase_interface_catalog::getModuleInterface($this->_module))) {
+			$this->raiseError('no interface for module '.$this->_module);
+			return false;
+		}
+		
 		//then query complete module reindexation
-		return CMS_ase_interface_catalog::reindexModule($this->_module);
+		return $moduleInterface->reindexModule();
 	}
 	
 	function getDocCount() {
@@ -104,7 +111,7 @@ class CMS_XapianDB extends CMS_grandFather {
 	
 	function replaceDocument($xid, &$doc) {
 		if (!$this->_isWritable) {
-			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not replace document on non writable DB');
+			$this->raiseError('can not replace document on non writable DB');
 			return false;
 		}
 		return $this->_db->replace_document($xid, $doc);
@@ -112,7 +119,7 @@ class CMS_XapianDB extends CMS_grandFather {
 	
 	function addDocument(&$doc) {
 		if (!$this->_isWritable) {
-			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not add document on non writable DB');
+			$this->raiseError('can not add document on non writable DB');
 			return false;
 		}
 		return $this->_db->add_document($doc);
@@ -127,7 +134,7 @@ class CMS_XapianDB extends CMS_grandFather {
 	  */
 	function deleteDocuments($term) {
 		if (!$this->_isWritable) {
-			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not add document on non writable DB');
+			$this->raiseError('can not add document on non writable DB');
 			return false;
 		}
 		$this->_db->delete_document($term);
@@ -136,7 +143,7 @@ class CMS_XapianDB extends CMS_grandFather {
 	
 	function addDatabase($db) {
 		if ($this->_isWritable) {
-			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not add database on writable DB');
+			$this->raiseError('can not add database on writable DB');
 			return false;
 		}
 		$this->_db->add_database($db->getDatabase());
@@ -192,7 +199,7 @@ class CMS_XapianDB extends CMS_grandFather {
 		if (!is_dir($this->_dsn)) {
 			$dsnFolder = new CMS_file($this->_dsn, CMS_file::FILE_SYSTEM, CMS_file::TYPE_DIRECTORY);
 			if (!$dsnFolder->writeToPersistence()) {
-				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not create DB DSN : '.$this->_dsn);
+				$this->raiseError('can not create DB DSN : '.$this->_dsn);
 				return false;
 			}
 		}
@@ -201,7 +208,7 @@ class CMS_XapianDB extends CMS_grandFather {
 	
 	function _loadDatabase() {
 		if (!$this->_getDSN()) {
-			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get DB DSN');
+			$this->raiseError('can not get DB DSN');
 			return false;
 		}
 		try {
@@ -210,7 +217,7 @@ class CMS_XapianDB extends CMS_grandFather {
 			$this->raiseError('Can not open database : '.$e->getMessage());
 		}
 		if (!$this->_db) {
-			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get database ...');
+			$this->raiseError('can not get database ...');
 			return false;
 		}
 		return true;
@@ -219,7 +226,7 @@ class CMS_XapianDB extends CMS_grandFather {
 	function _loadWritableDatabase($timeout = 60) {
 		@set_time_limit(((int) $timeout) + 60);
 		if (!$this->_getDSN()) {
-			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get DB DSN');
+			$this->raiseError('can not get DB DSN');
 			return false;
 		}
 		//check for DB lock before opening in writing mode
@@ -248,7 +255,7 @@ class CMS_XapianDB extends CMS_grandFather {
 			$this->raiseError('Can not open database : '.$e->getMessage());
 		}
 		if (!$this->_db) {
-			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get writable database ...');
+			$this->raiseError('can not get writable database ...');
 			return false;
 		}
 		//create lock file
@@ -260,7 +267,7 @@ class CMS_XapianDB extends CMS_grandFather {
 	
 	function getDBSize() {
 		if (!$this->_getDSN()) {
-			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get DB DSN');
+			$this->raiseError('can not get DB DSN');
 			return false;
 		}
 		$dbSize = 0;
@@ -281,7 +288,7 @@ class CMS_XapianDB extends CMS_grandFather {
 	
 	function dbExists() {
 		if (!$this->_getDSN()) {
-			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get DB DSN');
+			$this->raiseError('can not get DB DSN');
 			return false;
 		}
 		$db_dir = dir($this->_getDSN());

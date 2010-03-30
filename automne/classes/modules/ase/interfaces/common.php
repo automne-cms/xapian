@@ -56,6 +56,51 @@ class CMS_ase_interface extends CMS_grandFather {
 	var $_codename;
 	var $_results;
 	
+	function reindexModule() {
+		//query module interface to get all objects to reindex
+		$indexableUIDs = $this->getShortUIDList();
+		//check if module use an indexation in two times 
+		if (method_exists($this, 'getIndexInfos')) {
+			//Two times methods : the first is to get objects infos
+			foreach ($indexableUIDs as $indexableUID) {
+				//add script to query object for precise indexable content
+				CMS_scriptsManager::addScript(MOD_ASE_CODENAME, array('task' => 'queryModule', 'uid' => $indexableUID, 'module' => $this->_codename));
+			}
+		} else {
+			//One times methods : directly index content
+			foreach ($indexableUIDs as $indexableUID) {
+				//add script to indexation
+				CMS_scriptsManager::addScript(MOD_ASE_CODENAME, array('task' => 'reindex', 'uid' => $indexableUID, 'module' => $this->_codename));
+			}
+		}
+		//then launch scripts execution
+		CMS_scriptsManager::startScript();
+		return true;
+	}
+	
+	function reindexModuleDocument($parameters) {
+		$document = new CMS_ase_document(array('uid' => $parameters['uid'], 'module' => $parameters['module']));
+		$indexer = new CMS_XapianIndexer($document);
+		return $indexer->index();
+	}
+	
+	function deleteModuleDocument($parameters) {
+		$return = true;
+		$db = new CMS_XapianDB($parameters['module'], true);
+		if (!$db->isWritable()) {
+			return false;
+		}
+		if (sizeof($parameters['deleteInfos'])) {
+			foreach ($parameters['deleteInfos'] as $name => $value) {
+				$return = (!$db->deleteDocuments('__'.io::strtoupper($name).'__:'.$value)) ? false : $return;
+			}
+		} else {
+			$return = (!$db->deleteDocuments('__XID__:'.$parameters['module'].$parameters['uid'])) ? false : $return;
+		}
+		$db->endTransaction();
+		return $return;
+	}
+	
 	function CMS_ase_interface($codename) {
 		$this->_codename = $codename;
 		return;

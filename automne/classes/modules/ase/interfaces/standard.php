@@ -179,7 +179,6 @@ class CMS_standard_ase extends CMS_ase_interface {
 			$this->_addDocumentInfosForPage($document, $page);
 			//set document title
 			$document->setValue('title', $fileDatas['label']);
-			//TODO : here we need to delete all documents with attribute page:pageID from database to take care of documents deletion in pages
 			return true;
 		}
 		return true;
@@ -260,17 +259,18 @@ class CMS_standard_ase extends CMS_ase_interface {
 			//set document language
 			$page = CMS_tree::getPageByID($uid);
 			//check page for error, print status and publication status
-			if ($page->hasError() || !$page->getPrintStatus() || $page->getPublication() != RESOURCE_PUBLICATION_PUBLIC) {
+			if ($page->hasError() || $page->getPublication() != RESOURCE_PUBLICATION_PUBLIC) {
 				return false;
 			}
-			//TODO : here we need to add pages without any print content. In this case, only title, description and keywords should be indexed
-			$infos = array(
-				//array('task' => 'delete', 'uid' => $uid, 'module' => MOD_STANDARD_CODENAME, 'deleteInfos' => array('page' => $uid)),
-				array('uid' => $uid, 'module' => MOD_STANDARD_CODENAME),
-			);
+			if ($page->getPrintStatus()) {
+				//TODO : here we need to add pages without any print content. In this case, only title, description and keywords should be indexed
+				$infos = array(
+					//array('task' => 'delete', 'uid' => $uid, 'module' => MOD_STANDARD_CODENAME, 'deleteInfos' => array('page' => $uid)),
+					array('uid' => $uid, 'module' => MOD_STANDARD_CODENAME),
+				);
+			}
 			//then get file documents for the given page.
-			//this is not a clean manner for doing that stuff but for now, no time to do better
-			$sql = "
+			/*$sql = "
 				select
 					distinct(id), blocksFiles_public.*
 				from
@@ -279,6 +279,20 @@ class CMS_standard_ase extends CMS_ase_interface {
 				where
 					page='".sensitiveIO::sanitizeSQLString($uid)."'
 					and rowsDefinition_cs = rowID
+			";*/
+			$sql = "
+			SELECT  
+				DISTINCT (blocksFiles_public.id), 
+				blocksFiles_public . *
+			FROM 
+				blocksFiles_public, 
+				mod_standard_clientSpaces_public,
+				pages
+			WHERE
+				id_pag = '".sensitiveIO::sanitizeSQLString($uid)."'
+				and template_pag = template_cs
+				AND rowsDefinition_cs = rowID
+				and PAGE = '".sensitiveIO::sanitizeSQLString($uid)."'
 			";
 			$q = new CMS_query($sql);
 			if ($q->getNumrows()) {
@@ -308,7 +322,24 @@ class CMS_standard_ase extends CMS_ase_interface {
 	}
 	
 	function getDeleteInfos($uid) {
+		//delete all indexed documents for page
 		return array(array('uid' => $uid, 'module' => MOD_STANDARD_CODENAME, 'deleteInfos' => array('page' => $uid)));
+	}
+	
+	function reindexModuleDocument($parameters) {
+		//if it is a page indexation, first delete all old documents for page
+		if (sensitiveIO::isPositiveInteger($parameters['uid'])) {
+			$db = new CMS_XapianDB($parameters['module'], true);
+			if (!$db->isWritable()) {
+				return false;
+			}
+			$db->deleteDocuments('__PAGE__:'.$parameters['uid']);
+			$db->endTransaction();
+		}
+		//then reindex page or document
+		$document = new CMS_ase_document(array('uid' => $parameters['uid'], 'module' => $parameters['module']));
+		$indexer = new CMS_XapianIndexer($document);
+		return $indexer->index();
 	}
 	
 	/*************************************************************
