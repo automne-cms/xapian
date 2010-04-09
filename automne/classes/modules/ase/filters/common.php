@@ -317,6 +317,7 @@ class CMS_filter_common extends CMS_grandFather
 	function stripTags($text) {
 		$search = array('@<script[^>]*?>.*?</script>@si',  // Strip out javascript
                '@<style[^>]*?>.*?</style>@siU',    // Strip style tags properly
+               '@<option[^>]*?>.*?</option>@siU',    // Strip option tags properly
                '@<![\s\S]*?--[ \t\n\r]*>@'         // Strip multi-line comments including CDATA
 		);
 		return strip_tags(preg_replace($search, '', $text)); 
