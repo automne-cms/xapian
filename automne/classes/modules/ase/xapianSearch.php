@@ -458,7 +458,11 @@ class CMS_XapianQuery extends CMS_grandFather {
 					foreach ($typeFilters as $value) {
 						$query = (is_object($query)) ? new XapianQuery(XAPIAN_QUERY_OP_OR, $query, new XapianQuery('__'.$type.'__:'.$value)) : new XapianQuery('__'.$type.'__:'.$value);
 					}
-					$typequery = (is_object($typequery)) ? new XapianQuery(XAPIAN_QUERY_OP_AND, $query, $typequery) : $query;
+					if ($status == 'in') {
+						$typequery = (is_object($typequery)) ? new XapianQuery(XAPIAN_QUERY_OP_AND, $query, $typequery) : $query;
+					} elseif ($status == 'out') {
+						$typequery = (is_object($typequery)) ? new XapianQuery(XAPIAN_QUERY_OP_OR, $query, $typequery) : $query;
+					}
 				}
 				if (is_object($typequery) && $status == 'in') {
 					$inquery = $typequery;

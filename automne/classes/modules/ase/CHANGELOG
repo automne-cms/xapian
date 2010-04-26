@@ -1,3 +1,6 @@
+v0.54
+[BUG] : Interfaces filters uses "AND" operator instead of "OR" in middle of "AND NOT" clause
+
 v0.53
 [BUG] : Content inside tags <option> are also indexed
 
