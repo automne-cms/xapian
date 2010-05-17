@@ -214,14 +214,14 @@ class CMS_XapianIndexer extends CMS_grandFather {
 			$return = CMS_patch::executeCommand($conversionCommand, $error);
 			$tmpFile->delete();
 			if ($error) {
-				CMS_gtandFather::raiseError('Conversion command "'.$conversionCommand.'" output with errors : '.print_r($error,true).'. Return is : '.print_r($return,true));
+				CMS_grandFather::raiseError('Conversion command "'.$conversionCommand.'" output with errors : '.print_r($error,true).'. Return is : '.print_r($return,true));
 				return false;
 			} else {
 				$text = $return;
 			}
 			$text = strtr($text, '[]', '  ');
 		} else {
-			CMS_gtandFather::raiseError('Cannot find chasen to properly tokenize japanese text ...');
+			CMS_grandFather::raiseError('Cannot find chasen to properly tokenize japanese text ...');
 			return false;
 		}
 		return $text;

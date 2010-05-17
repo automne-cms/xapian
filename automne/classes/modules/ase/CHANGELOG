@@ -1,3 +1,6 @@
+v0.55
+[BUG] : in xapianIndexer.php : call to class gtandFather instead of grandFather
+
 v0.54
 [BUG] : Interfaces filters uses "AND" operator instead of "OR" in middle of "AND NOT" clause
 
