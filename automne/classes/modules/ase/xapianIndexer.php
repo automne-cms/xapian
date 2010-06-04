@@ -110,8 +110,8 @@ class CMS_XapianIndexer extends CMS_grandFather {
 			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get valid XID for document');
 			return false;
 		}
-		//document datas (only first 500 caracters, more is useless), remove *, #, tags and trailing spaces also
-		$this->_xapianDocument->set_data(strtr(trim(str_replace(array('*','#'), '',io::substr($this->_document->getTextContent(),0,500))),"_’", " '"));
+		//document displayed datas (only first 500 caracters, more is useless), remove *, #, tags and trailing spaces also
+		$this->_xapianDocument->set_data(strtr(trim(str_replace(array('*','#'), '',io::substr($this->_document->getTextContent(),0,500))),"_", " "));
 		
 		/* 
 		 * document values
@@ -138,8 +138,6 @@ class CMS_XapianIndexer extends CMS_grandFather {
 		$this->_addPosting($xid);
 		//add document module as posting
 		$this->_addPosting('__MODULE__:'.$this->_document->getValue('module'));
-		//add a common posting for all documents (needed for all 'AND NOT' search)
-		//$this->_addPosting('__ALL__');
 		
 		//add all modules attributes
 		$this->_addAttributes($this->_document->getModuleAttributes());
@@ -158,11 +156,11 @@ class CMS_XapianIndexer extends CMS_grandFather {
 		$indexer->set_database($this->_db->getDatabase());
 		$indexer->set_document($this->_xapianDocument);
 		//index document content
-		$indexer->index_text($this->_prepareTextToIndex($this->_document->getTextContent()));
+		$indexer->index_text($this->prepareText($this->_document->getTextContent(), $this->_document->getValue('language')));
 		//index document title
 		//get WDF (within-document frequency) value for title from module parameters
 		$module = CMS_modulesCatalog::getByCodename(MOD_ASE_CODENAME);
-		$indexer->index_text($this->_prepareTextToIndex($this->_document->getValue('title')), (int) $module->getParameters('DOCUMENT_TITLE_WDF'));
+		$indexer->index_text($this->prepareText($this->_document->getValue('title'), $this->_document->getValue('language')), (int) $module->getParameters('DOCUMENT_TITLE_WDF'));
 		
 		//save document in Xapian DB
 		$this->_writeToPersistence();
@@ -171,26 +169,63 @@ class CMS_XapianIndexer extends CMS_grandFather {
 		if (!$returnIndexableContent) {
 			return true;
 		} else {
-			return $this->_document->getTextContent();
+			return $this->prepareText($this->_document->getTextContent(), $this->_document->getValue('language'));
 		}
 	}
 	
-	function _prepareTextToIndex($text) {
+	/**
+	  * This function prepare a string to be indexed or searched by Xapian
+	  * - Tokenize Japanese if needed and possible
+	  * - Strip underscore and quotes
+	  * - Encode in uf8 if needed
+	  * - Remove accents
+	  *
+	  * @param string $text : the text to prepare
+	  * @return string $text : the prepared text
+	  * @access public
+	  * @static
+	  */
+	function prepareText($text, $language) {
 		//eventually tokenize japanese text
-		if ($this->_document->getValue('language') == 'ja' || $this->_document->getValue('language') == 'jp') {
-			if ($return = $this->tokenizeJapanese($text)) {
+		if ($language == 'ja' || $language == 'jp') {
+			if ($return = CMS_XapianIndexer::tokenizeJapanese($text)) {
 				$text = $return;
 			}
 		}
-		$text = strtr($text,"_’'", 
-							"   ");
 		//convert text to utf-8 if needed
 		if (!io::isUTF8($text)) {
-			return utf8_encode($text);
-		} else {
-			return $text;
+			$text = utf8_encode($text);
 		}
-		
+		//remove accents, underscore and quotes
+		$text = CMS_XapianIndexer::removeAccents($text);
+		return $text;
+	}
+	
+	/**
+	  * Remove accents, underscore and quotes from an utf8 string
+	  *
+	  * @param string $text : the text to clean
+	  * @return string $text : the cleaned text
+	  * @access public
+	  * @static
+	  */
+	function removeAccents($string) {
+		//get caracters map
+		$map = io::sanitizeAsciiMap();
+		//convert map to utf8
+		$utfMap = array();
+		foreach ($map as $char => $ascii) {
+			$utfMap[utf8_encode($char)] = $ascii;
+		}
+		//remove underscore and quotes
+		$replace = array(
+			"_"				=> " ",
+			"'"				=> " ",
+			"\xE2\x80\x99"	=> " ",
+		);
+		$utfMap = array_merge($utfMap, $replace);
+		$string = strtr($string, $utfMap);
+		return $string;
 	}
 	
 	/**
@@ -201,6 +236,7 @@ class CMS_XapianIndexer extends CMS_grandFather {
 	  * @param string $text : the japanese text to tokenize
 	  * @return string $text : the japanese text tokenized
 	  * @access public
+	  * @static
 	  */
 	function tokenizeJapanese($text) {
 		$error = '';

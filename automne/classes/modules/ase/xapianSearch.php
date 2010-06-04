@@ -84,17 +84,7 @@ class CMS_XapianQuery extends CMS_grandFather {
 	
 	function CMS_XapianQuery($query, $modules = array(), $language, $returnUIDOnly = false) {
 		//sanitize query string
-		if ($language == 'ja' || $language == 'jp') {
-			if ($return = CMS_XapianIndexer::tokenizeJapanese($query)) {
-				$query = $return;
-			}
-		}
-		$query = strtr($query,"_’'", 
-							  "   ");
-		if (!io::isUTF8($query)) {
-			$query = utf8_encode($query);
-		}
-		$this->_query = $query;
+		$this->_query = CMS_XapianIndexer::prepareText($query, $language);
 		if (is_array($modules) && sizeof($modules)) {
 			$this->_modules = $modules;
 		} else {
