@@ -42,7 +42,9 @@ if (!$installed) {
 	//load destination module parameters
 	$module = CMS_modulesCatalog::getByCodename('ase');
 	$moduleParameters = $module->getParameters(false,true);
-	
+	if (!is_array($moduleParameters)) {
+		$moduleParameters = array();
+	}
 	//load the XML data of the source the files
 	$sourceXML = new CMS_file(PATH_TMP_FS.PATH_PACKAGES_WR.'/modules/ase_rc.xml');
 	$domdocument = new CMS_DOMDocument();
