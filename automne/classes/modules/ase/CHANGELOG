@@ -1,3 +1,6 @@
+v0.57
+[BUG] : during installation process : parameters merge does not work
+
 v0.56
 [BUG] : indexing and search were sensitive to accents, and they should not
 
