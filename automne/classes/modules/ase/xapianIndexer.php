@@ -110,8 +110,8 @@ class CMS_XapianIndexer extends CMS_grandFather {
 			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get valid XID for document');
 			return false;
 		}
-		//document displayed datas (only first 500 caracters, more is useless), remove *, #, tags and trailing spaces also
-		$this->_xapianDocument->set_data(strtr(trim(str_replace(array('*','#'), '',io::substr($this->_document->getTextContent(),0,500))),"_", " "));
+		//document displayed datas (only first 500 caracters, more is useless)
+		$this->_xapianDocument->set_data($this->prepareDisplayedText($this->_document->getTextContent()));
 		
 		/* 
 		 * document values
@@ -198,6 +198,29 @@ class CMS_XapianIndexer extends CMS_grandFather {
 		}
 		//remove accents, underscore and quotes
 		$text = CMS_XapianIndexer::removeAccents($text);
+		//strip whitespaces
+		$text = trim(preg_replace('/\s\s+/', ' ', $text));
+		return $text;
+	}
+	
+	/**
+	  * This function prepare a string to be stored in index as displayed text.
+	  * - Remove * and # and replace _ by spaces
+	  * - Strip whitespaces
+	  * - Cut to first 500 caracters
+	  *
+	  * @param string $text : the text to prepare
+	  * @return string $text : the prepared text
+	  * @access public
+	  * @static
+	  */
+	function prepareDisplayedText($text) {
+		//remove * and # and replace _ by spaces
+		$text = strtr(trim(str_replace(array('*','#'), '',$text)),"_", " ");
+		//strip whitespaces
+		$text = preg_replace('/\s\s+/', ' ', $text);
+		//cut to first 500 caracters
+		$text = io::substr($text,0,500);
 		return $text;
 	}
 	
