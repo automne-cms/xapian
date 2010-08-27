@@ -264,13 +264,24 @@ class CMS_XapianQuery extends CMS_grandFather {
 				$this->_rSet->add_document($docid);
 			}
 		}
-		//then get first $this->_maxResults matches (and at least first $this->_minMatchResultsCheck will be checked)
-		$this->_matches = @$this->_enquire->get_MSet(($page-1) * $this->_resultsPerPage,$this->_resultsPerPage, $this->_minMatchResultsCheck, $this->_rSet);
+		
+		try {
+			//then get first $this->_maxResults matches (and at least first $this->_minMatchResultsCheck will be checked)
+			$this->_matches = @$this->_enquire->get_MSet(($page-1) * $this->_resultsPerPage,$this->_resultsPerPage, $this->_minMatchResultsCheck, $this->_rSet);
+		} catch (Exception $e) {
+			CMS_grandFather::raiseError('Can not get match set : '.$e->getMessage().'. Query : '.$this->_query);
+			return false;
+		}
 		
 		//if pages is over match numbers, decrease page number until results are founded
 		while ($this->getMatchesNumbers() > 0 && $this->_matches->size() == 0 && $page > 1) {
 			$page = (int) ceil($this->getMatchesNumbers() / $this->_resultsPerPage);
-			$this->_matches = $this->_enquire->get_MSet(($page-1) * $this->_resultsPerPage,$this->_resultsPerPage, $this->_minMatchResultsCheck, $this->_rSet);
+			try {
+				$this->_matches = $this->_enquire->get_MSet(($page-1) * $this->_resultsPerPage,$this->_resultsPerPage, $this->_minMatchResultsCheck, $this->_rSet);
+			} catch (Exception $e) {
+				CMS_grandFather::raiseError('Can not get match set : '.$e->getMessage().'. Query : '.$this->_query);
+				return false;
+			}
 		}
 		return true;
 	}

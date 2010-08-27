@@ -41,7 +41,11 @@
 >	/sql/mod_ase.sql
 >	/sql/messages/fr/ase.sql
 >	/sql/messages/en/ase.sql
+>	/sql/messages/pt/ase.sql
+>	/sql/messages/es/ase.sql
 #execute ASE installation/update DB script
 x	/sql/messages/fr/ase.sql
 x	/sql/messages/en/ase.sql
+x	/sql/messages/pt/ase.sql
+x	/sql/messages/es/ase.sql
 x	/ase_install.php
