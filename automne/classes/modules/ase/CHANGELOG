@@ -1,3 +1,7 @@
+v0.61
+[BUG] : Correct a notice in standard interface
+[REFACTOR] : Add support for 4.1.0
+
 v0.60
 [FEATURE] : Add Spanish and Portuguese messages
 

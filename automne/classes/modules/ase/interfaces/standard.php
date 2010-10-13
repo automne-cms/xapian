@@ -256,6 +256,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 	  */
 	function getIndexInfos($uid) {
 		if (sensitiveIO::isPositiveInteger($uid)) {
+			$infos = array();
 			//set document language
 			$page = CMS_tree::getPageByID($uid);
 			//check page for error, print status and publication status
@@ -270,16 +271,6 @@ class CMS_standard_ase extends CMS_ase_interface {
 				);
 			}
 			//then get file documents for the given page.
-			/*$sql = "
-				select
-					distinct(id), blocksFiles_public.*
-				from
-					blocksFiles_public,
-					mod_standard_clientSpaces_public
-				where
-					page='".sensitiveIO::sanitizeSQLString($uid)."'
-					and rowsDefinition_cs = rowID
-			";*/
 			$sql = "
 			SELECT  
 				DISTINCT (blocksFiles_public.id), 
