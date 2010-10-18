@@ -26,26 +26,27 @@
 >	/automne/classes/modules/ase/interfaces/polymod.php
 >	/automne/classes/modules/ase/interfaces/standard.php
 >	/automne/classes/modules/ase.php
->	/automne_bin/sxwtoplain.sh	x
->	/automne_bin/docxtoplain.sh	x
->	/automne_bin/xlsxtoplain.sh	x
->	/automne_modules_files/ase/opensearch.php
->	/automne_modules_files/ase/chasenrc
->	/automne_modules_files/ase/databases/.htaccess
->	/automne_modules_files/ase/stopwords/.htaccess
->	/automne_modules_files/ase/stopwords/de.txt
->	/automne_modules_files/ase/stopwords/en.txt
->	/automne_modules_files/ase/stopwords/es.txt
->	/automne_modules_files/ase/stopwords/fr.txt
->	/automne_modules_files/ase/stopwords/ja.txt
->	/sql/mod_ase.sql
->	/sql/messages/fr/ase.sql
->	/sql/messages/en/ase.sql
->	/sql/messages/pt/ase.sql
->	/sql/messages/es/ase.sql
+>	/automne/bin/sxwtoplain.sh	x
+>	/automne/bin/docxtoplain.sh	x
+>	/automne/bin/xlsxtoplain.sh	x
+>	/automne/bin/chasenrc
+>	/automne/ase/.htaccess
+>	/automne/ase/opensearch.php
+>	/automne/ase/databases/.htaccess
+>	/automne/ase/stopwords/.htaccess
+>	/automne/ase/stopwords/de.txt
+>	/automne/ase/stopwords/en.txt
+>	/automne/ase/stopwords/es.txt
+>	/automne/ase/stopwords/fr.txt
+>	/automne/ase/stopwords/ja.txt
+>	/automne/sql/mod_ase.sql
+>	/automne/sql/messages/fr/ase.sql
+>	/automne/sql/messages/en/ase.sql
+>	/automne/sql/messages/pt/ase.sql
+>	/automne/sql/messages/es/ase.sql
 #execute ASE installation/update DB script
-x	/sql/messages/fr/ase.sql
-x	/sql/messages/en/ase.sql
-x	/sql/messages/pt/ase.sql
-x	/sql/messages/es/ase.sql
+x	/automne/sql/messages/fr/ase.sql
+x	/automne/sql/messages/en/ase.sql
+x	/automne/sql/messages/pt/ase.sql
+x	/automne/sql/messages/es/ase.sql
 x	/ase_install.php

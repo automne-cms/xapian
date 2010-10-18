@@ -195,7 +195,7 @@ class CMS_XapianDB extends CMS_grandFather {
 		if ($this->_dsn) {
 			return $this->_dsn;
 		}
-		$this->_dsn = PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME.'/databases/'.io::strtolower($this->_module).'_flint';
+		$this->_dsn = PATH_MAIN_FS.'/'.MOD_ASE_CODENAME.'/databases/'.io::strtolower($this->_module).'_flint';
 		if (!is_dir($this->_dsn)) {
 			$dsnFolder = new CMS_file($this->_dsn, CMS_file::FILE_SYSTEM, CMS_file::TYPE_DIRECTORY);
 			if (!$dsnFolder->writeToPersistence()) {

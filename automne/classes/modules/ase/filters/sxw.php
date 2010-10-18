@@ -68,11 +68,11 @@ class CMS_filter_sxw extends CMS_filter_common
 	  */
 	function _createConversionCommand() {
 		//check for shell script executable status
-		if (!CMS_file::fileIsExecutable(PATH_REALROOT_FS.'/automne_bin/sxwtoplain.sh') && !CMS_file::makeExecutable(PATH_REALROOT_FS.'/automne_bin/sxwtoplain.sh')) {
+		if (!CMS_file::fileIsExecutable(PATH_WINDOWS_BIN_FS.'/sxwtoplain.sh') && !CMS_file::makeExecutable(PATH_WINDOWS_BIN_FS.'/sxwtoplain.sh')) {
 			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : shell script sxwtoplain.sh is not executable ... ');
 			return false;
 		}
-		return  PATH_REALROOT_FS.'/automne_bin/sxwtoplain.sh '.$this->_sourceDocument.' > '.$this->_convertedDocument;
+		return PATH_WINDOWS_BIN_FS.'/sxwtoplain.sh '.$this->_sourceDocument.' > '.$this->_convertedDocument;
 	}
 	
 	/**
@@ -86,7 +86,7 @@ class CMS_filter_sxw extends CMS_filter_common
 			return false;
 		}
 		//check for shell script executable status
-		if (!CMS_file::fileIsExecutable(PATH_REALROOT_FS.'/automne_bin/sxwtoplain.sh') && !CMS_file::makeExecutable(PATH_REALROOT_FS.'/automne_bin/sxwtoplain.sh')) {
+		if (!CMS_file::fileIsExecutable(PATH_WINDOWS_BIN_FS.'/sxwtoplain.sh') && !CMS_file::makeExecutable(PATH_WINDOWS_BIN_FS.'/sxwtoplain.sh')) {
 			return false;
 		}
 		return true;

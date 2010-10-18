@@ -2,8 +2,6 @@
 ## Contains declaration for module installation : 
 ## All table creation (mandatory) : inject 1/2
 ##
-## @version $Id: mod_ase.sql,v 1.5 2009/12/03 08:27:37 sebastien Exp $
-
 # --------------------------------------------------------
 
 # 

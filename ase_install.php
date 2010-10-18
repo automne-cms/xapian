@@ -18,8 +18,8 @@ while ($table = $q->getValue(0)) {
 }
 if (!$installed) {
 	echo "ASE installation : Not installed : Launch installation ...<br />";
-	if (CMS_patch::executeSqlScript(PATH_REALROOT_FS.'/sql/mod_ase.sql',true)) {
-		CMS_patch::executeSqlScript(PATH_REALROOT_FS.'/sql/mod_ase.sql',false);
+	if (CMS_patch::executeSqlScript(PATH_MAIN_FS.'/sql/mod_ase.sql',true)) {
+		CMS_patch::executeSqlScript(PATH_MAIN_FS.'/sql/mod_ase.sql',false);
 		//copy module parameters file and module row
 		if (CMS_file::copyTo(PATH_TMP_FS.PATH_PACKAGES_WR.'/modules/ase_rc.xml',PATH_PACKAGES_FS.'/modules/ase_rc.xml')
 			&& CMS_file::copyTo(PATH_TMP_FS.PATH_TEMPLATES_ROWS_WR.'/mod_ase.xml',PATH_TEMPLATES_ROWS_FS.'/mod_ase.xml')
@@ -63,7 +63,18 @@ if (!$installed) {
 	//set new parameters to the module
 	if ($module->setAndWriteParameters($resultParameters)) {
 		echo 'Modules parameters successfully merged<br />';
-		echo "ASE installation : Update done.<br />";
+		//move databases if needed
+		if (is_dir(PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME.'/databases/')) {
+			if (!@rename (PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME.'/databases/' , PATH_MAIN_FS.'/'.MOD_ASE_CODENAME.'/databases/')) {
+				echo "Cannot move directory ".PATH_MODULES_FILES_WR.'/'.MOD_ASE_CODENAME.'/databases/'." to ".PATH_MAIN_WR.'/'.MOD_ASE_CODENAME.'/databases/'.". To end update process, please move it manually.<br />";
+			} else {
+				@unlink(PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME);
+				echo "Update directory structure : Done.<br />";
+				echo "ASE installation : Update done.<br />";
+			}
+		} else {
+			echo "ASE installation : Update done.<br />";
+		}
 	} else {
 		echo "ASE installation : UPDATE ERROR ! Problem for merging modules parameters ...";
 	}

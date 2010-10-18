@@ -68,11 +68,11 @@ class CMS_filter_xlsx extends CMS_filter_common
 	  */
 	function _createConversionCommand() {
 		//check for shell script executable status
-		if (!CMS_file::fileIsExecutable(PATH_REALROOT_FS.'/automne_bin/xlsxtoplain.sh') && !CMS_file::makeExecutable(PATH_REALROOT_FS.'/automne_bin/xlsxtoplain.sh')) {
+		if (!CMS_file::fileIsExecutable(PATH_WINDOWS_BIN_FS.'/xlsxtoplain.sh') && !CMS_file::makeExecutable(PATH_WINDOWS_BIN_FS.'/xlsxtoplain.sh')) {
 			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : shell script xlsxtoplain.sh is not executable ... ');
 			return false;
 		}
-		return  PATH_REALROOT_FS.'/automne_bin/xlsxtoplain.sh '.$this->_sourceDocument.' > '.$this->_convertedDocument;
+		return  PATH_WINDOWS_BIN_FS.'/xlsxtoplain.sh '.$this->_sourceDocument.' > '.$this->_convertedDocument;
 	}
 	
 	/**
@@ -86,7 +86,7 @@ class CMS_filter_xlsx extends CMS_filter_common
 			return false;
 		}
 		//check for shell script executable status
-		if (!CMS_file::fileIsExecutable(PATH_REALROOT_FS.'/automne_bin/xlsxtoplain.sh') && !CMS_file::makeExecutable(PATH_REALROOT_FS.'/automne_bin/xlsxtoplain.sh')) {
+		if (!CMS_file::fileIsExecutable(PATH_WINDOWS_BIN_FS.'/xlsxtoplain.sh') && !CMS_file::makeExecutable(PATH_WINDOWS_BIN_FS.'/xlsxtoplain.sh')) {
 			return false;
 		}
 		return true;

@@ -231,7 +231,7 @@ if ($xapianExists) {
 									$title .= ' ('.$pageWebsite->getLabel().')';
 								}
 								$tagContent .= "\n".
-								'	<link rel="search" href="'.$pageWebsite->getURL().PATH_MODULES_FILES_WR.'/'.MOD_ASE_CODENAME.'/opensearch.php?website='.$pageWebsite->getID().'&amp;search='.urlencode($searchs[$pageWebsite->getID()]).'" type="application/opensearchdescription+xml" title="'.htmlspecialchars($title).'" />'."\n";
+								'	<link rel="search" href="'.$pageWebsite->getURL().PATH_MAIN_WR.'/'.MOD_ASE_CODENAME.'/opensearch.php?website='.$pageWebsite->getID().'&amp;search='.urlencode($searchs[$pageWebsite->getID()]).'" type="application/opensearchdescription+xml" title="'.htmlspecialchars($title).'" />'."\n";
 							}
 						}
 					}

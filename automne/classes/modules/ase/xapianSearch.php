@@ -493,7 +493,7 @@ class CMS_XapianQuery extends CMS_grandFather {
 			//instanciate stoppper and add stopwords list
 			$stopper = new XapianSimpleStopper();
 			//get stop words for document language
-			$stoplist = new CMS_file(PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME.'/stopwords/'.$this->_language.'.txt');
+			$stoplist = new CMS_file(PATH_MAIN_FS.'/'.MOD_ASE_CODENAME.'/stopwords/'.$this->_language.'.txt');
 			if (!$stoplist->exists()) {
 				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no stopwords list founded for language : '.$this->_language);
 				return $stopper;
