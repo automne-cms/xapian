@@ -1,3 +1,6 @@
+v0.63
+[BUG] : Correct an XSS security issue on public search form
+
 v0.62
 [REFACTOR] : Use binary path from constant instead of hard coded value
 [REFACTOR] : Move binary, databases and stopwords pathes from /automne_modules_files/ase to /automne/ase
