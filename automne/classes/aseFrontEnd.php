@@ -24,5 +24,5 @@
   * Main Include File of the Frontend Package : ASE
   * Includes all of the package files.
   */
-require_once($_SERVER["DOCUMENT_ROOT"]."/cms_rc_frontend.php");
+require_once(dirname(__FILE__).'/../../cms_rc_frontend.php');
 ?>

@@ -27,8 +27,7 @@
   * @author Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>
   */
 
-//Include all needed classes for ASE module useage
-require_once($_SERVER["DOCUMENT_ROOT"]."/automne/classes/aseFrontEnd.php");
+require_once(dirname(__FILE__).'/../../cms_rc_frontend.php');
 
 //Get parameters
 $error = 0;

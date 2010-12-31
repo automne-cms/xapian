@@ -5,7 +5,7 @@
   * @version $Id: ase_install.php,v 1.7 2009/08/12 14:31:24 sebastien Exp $
   */
 
-require_once($_SERVER["DOCUMENT_ROOT"]."/cms_rc_admin.php");
+require_once(dirname(__FILE__).'/../../cms_rc_admin.php');
 
 //check if ASE is already installed (if so, it is an update)
 $sql = "show tables";
