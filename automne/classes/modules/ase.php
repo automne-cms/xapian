@@ -193,7 +193,7 @@ if ($xapianExists) {
 						return false;
 					}
 					
-					if ($visualizationMode == PAGE_VISUALMODE_HTML_PUBLIC && sensitiveIO::isPositiveInteger($this->getParameters('XAPIAN_SEARCH_OPENSEARCH_PAGES'))) {
+					if ($visualizationMode == PAGE_VISUALMODE_HTML_PUBLIC) {
 						//get page website
 						$pageWebsite = $treatedObject->getWebsite();
 						//search parameters

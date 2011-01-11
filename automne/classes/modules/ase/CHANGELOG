@@ -1,5 +1,6 @@
 v0.64
 [REFACTOR] : Add support for sub folder installation
+[BUG] : Correct an bug on opensearch queries
 
 v0.63
 [BUG] : Correct an XSS security issue on public search form

@@ -16,8 +16,6 @@
 // +----------------------------------------------------------------------+
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
-//
-// $Id: opensearch.php,v 1.4 2009/11/17 12:33:26 sebastien Exp $
 
 /**
   * PHP page : generate  OpenSearch description document
@@ -31,14 +29,17 @@ require_once(dirname(__FILE__).'/../../cms_rc_frontend.php');
 
 //Get parameters
 $error = 0;
-if (!isset($_REQUEST['search']) || !isset($_REQUEST['website']) || !(substr($_REQUEST['search'],0,1) == '/' || sensitiveIO::isPositiveInteger($_REQUEST['search'])) || !sensitiveIO::isPositiveInteger($_REQUEST['website'])) {
+$search = io::request('search');
+$websiteId = io::request('website', 'sensitiveIO::isPositiveInteger');
+
+if (!$search || !$websiteId || !(substr($search, 0, 1) == '/' || sensitiveIO::isPositiveInteger($search))) {
 	$error = 1;
 }
 
 if (!$error) {
-	$website = CMS_websitesCatalog::getByID($_REQUEST['website']);
+	$website = CMS_websitesCatalog::getByID($websiteId);
 	if ($website && !$website->hasError()) {
-		$searchURL = (sensitiveIO::isPositiveInteger($_REQUEST['search'])) ? CMS_tree::getPageValue($_REQUEST['search'],'url') : $website->getURL().$_REQUEST['search'];
+		$searchURL = (sensitiveIO::isPositiveInteger($search)) ? CMS_tree::getPageValue($search,'url') : $website->getURL().$search;
 		if ($searchURL) {
 			$title = APPLICATION_LABEL;
 			if (!$website->isMain()) {
