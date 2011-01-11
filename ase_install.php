@@ -65,12 +65,35 @@ if (!$installed) {
 		echo 'Modules parameters successfully merged<br />';
 		//move databases if needed
 		if (is_dir(PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME.'/databases/')) {
-			if (!@rename (PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME.'/databases/' , PATH_MAIN_FS.'/'.MOD_ASE_CODENAME.'/databases/')) {
-				echo "Cannot move directory ".PATH_MODULES_FILES_WR.'/'.MOD_ASE_CODENAME.'/databases/'." to ".PATH_MAIN_WR.'/'.MOD_ASE_CODENAME.'/databases/'.". To end update process, please move it manually.<br />";
+			//create new directory
+			if (!is_dir(PATH_MAIN_FS."/".MOD_ASE_CODENAME.'/databases/')) {
+				if (!CMS_file::makeDir(PATH_MAIN_FS."/".MOD_ASE_CODENAME.'/databases/')) {
+					echo 'Error : Cannot create directory '.PATH_MAIN_FS.'/'.MOD_ASE_CODENAME.'/databases/<br />';
+				}
+			}
+			//copy all files from old directory to new one if they do not already exists
+			$errorCopy = false;
+			try{
+				foreach ( new RecursiveIteratorIterator(new RecursiveDirectoryIterator(PATH_MODULES_FILES_FS."/".MOD_ASE_CODENAME.'/databases'), RecursiveIteratorIterator::SELF_FIRST) as $file) {
+					if ($file->isFile() && $file->getFilename() != '.htaccess') {
+						$to = str_replace(PATH_MODULES_FILES_FS."/".MOD_ASE_CODENAME, PATH_MAIN_FS."/".MOD_ASE_CODENAME, $file->getPathname());
+						if (!file_exists($to)) {
+							if (!CMS_file::copyTo($file->getPathname(), $to)) {
+								$errorCopy = true;
+							}
+						}
+					}
+				}
+			} catch(Exception $e) {}
+			//remove old dir
+			if (!$errorCopy) {
+				if (!CMS_file::deltree(PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME, true)) {
+					echo 'To end update, delete directory '.PATH_MODULES_FILES_WR.'/'.MOD_ASE_CODENAME.' <br/>';
+				} else {
+					echo "Update directory structure : Done.<br />";
+				}
 			} else {
-				@unlink(PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME);
-				echo "Update directory structure : Done.<br />";
-				echo "ASE installation : Update done.<br />";
+				echo 'To end update, copy all files from '.PATH_MODULES_FILES_WR.'/'.MOD_ASE_CODENAME.' to '.PATH_MAIN_WR."/".MOD_ASE_CODENAME.' then delete directory '.PATH_MODULES_FILES_WR.'/'.MOD_ASE_CODENAME.' <br/>';
 			}
 		} else {
 			echo "ASE installation : Update done.<br />";
