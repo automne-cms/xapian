@@ -66,39 +66,42 @@ if (!$installed) {
 		//move databases if needed
 		if (is_dir(PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME.'/databases/')) {
 			//create new directory
+			$errorUpdate = false;
 			if (!is_dir(PATH_MAIN_FS."/".MOD_ASE_CODENAME.'/databases/')) {
 				if (!CMS_file::makeDir(PATH_MAIN_FS."/".MOD_ASE_CODENAME.'/databases/')) {
-					echo 'Error : Cannot create directory '.PATH_MAIN_FS.'/'.MOD_ASE_CODENAME.'/databases/<br />';
+					$errorUpdate = true;
+					echo 'Error : Cannot create directory '.PATH_MAIN_WR.'/'.MOD_ASE_CODENAME.'/databases/<br />';
 				}
 			}
 			//copy all files from old directory to new one if they do not already exists
-			$errorCopy = false;
-			try{
-				foreach ( new RecursiveIteratorIterator(new RecursiveDirectoryIterator(PATH_MODULES_FILES_FS."/".MOD_ASE_CODENAME.'/databases'), RecursiveIteratorIterator::SELF_FIRST) as $file) {
-					if ($file->isFile() && $file->getFilename() != '.htaccess') {
-						$to = str_replace(PATH_MODULES_FILES_FS."/".MOD_ASE_CODENAME, PATH_MAIN_FS."/".MOD_ASE_CODENAME, $file->getPathname());
-						if (!file_exists($to) && !CMS_file::copyTo($file->getPathname(), $to)) {
-							echo "Error copy on ".$file->getPathname().' -> '.$to.'<br />';
-							$errorCopy = true;
+			if (!$errorUpdate) {
+				try{
+					foreach ( new RecursiveIteratorIterator(new RecursiveDirectoryIterator(PATH_MODULES_FILES_FS."/".MOD_ASE_CODENAME.'/databases'), RecursiveIteratorIterator::SELF_FIRST) as $file) {
+						if ($file->isFile() && $file->getFilename() != '.htaccess') {
+							$to = str_replace(PATH_MODULES_FILES_FS."/".MOD_ASE_CODENAME, PATH_MAIN_FS."/".MOD_ASE_CODENAME, $file->getPathname());
+							if (!file_exists($to) && !CMS_file::copyTo($file->getPathname(), $to)) {
+								//echo "Error copy on ".$file->getPathname().' -> '.$to.'<br />';
+								$errorUpdate = true;
+							}
 						}
 					}
-				}
-			} catch(Exception $e) {}
+				} catch(Exception $e) {}
+			}
 			//remove old dir
-			if (!$errorCopy) {
+			if (!$errorUpdate) {
 				if (!CMS_file::deltree(PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME, true)) {
-					echo '/!\ To end update, delete directory '.PATH_MODULES_FILES_WR.'/'.MOD_ASE_CODENAME.' <br/> <br/>';
+					echo '/!\ To complete module update, delete directory '.PATH_MODULES_FILES_WR.'/'.MOD_ASE_CODENAME.' <br/> <br/>';
 				} else {
-					echo "ASE installation : Update done.<br />";
+					echo "ASE installation : Update done.<br /><br />";
 				}
 			} else {
-				echo '/!\ To end update, copy all files from '.PATH_MODULES_FILES_WR.'/'.MOD_ASE_CODENAME.'/databases to '.PATH_MAIN_WR."/".MOD_ASE_CODENAME.'/databases then delete directory '.PATH_MODULES_FILES_WR.'/'.MOD_ASE_CODENAME.' <br/><br/>';
+				echo '/!\ To complete module update, copy all files from '.PATH_MODULES_FILES_WR.'/'.MOD_ASE_CODENAME.'/databases to '.PATH_MAIN_WR."/".MOD_ASE_CODENAME.'/databases then delete directory '.PATH_MODULES_FILES_WR.'/'.MOD_ASE_CODENAME.' <br/><br/>';
 			}
 		} else {
-			echo "ASE installation : Update done.<br />";
+			echo "ASE installation : Update done.<br /><br />";
 		}
 	} else {
-		echo "ASE installation : UPDATE ERROR ! Problem for merging modules parameters ...";
+		echo "ASE installation : UPDATE ERROR ! Problem for merging modules parameters ...<br /><br />";
 	}
 }
 $instruction = new CMS_file(PATH_TMP_FS.'/HOW_TO_INSTALL');
