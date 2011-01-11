@@ -77,10 +77,9 @@ if (!$installed) {
 				foreach ( new RecursiveIteratorIterator(new RecursiveDirectoryIterator(PATH_MODULES_FILES_FS."/".MOD_ASE_CODENAME.'/databases'), RecursiveIteratorIterator::SELF_FIRST) as $file) {
 					if ($file->isFile() && $file->getFilename() != '.htaccess') {
 						$to = str_replace(PATH_MODULES_FILES_FS."/".MOD_ASE_CODENAME, PATH_MAIN_FS."/".MOD_ASE_CODENAME, $file->getPathname());
-						if (!file_exists($to)) {
-							if (!CMS_file::copyTo($file->getPathname(), $to)) {
-								$errorCopy = true;
-							}
+						if (!file_exists($to) && !CMS_file::copyTo($file->getPathname(), $to)) {
+							echo "Error copy on ".$file->getPathname().' -> '.$to.'<br />';
+							$errorCopy = true;
 						}
 					}
 				}
@@ -88,12 +87,12 @@ if (!$installed) {
 			//remove old dir
 			if (!$errorCopy) {
 				if (!CMS_file::deltree(PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME, true)) {
-					echo 'To end update, delete directory '.PATH_MODULES_FILES_WR.'/'.MOD_ASE_CODENAME.' <br/>';
+					echo '/!\ To end update, delete directory '.PATH_MODULES_FILES_WR.'/'.MOD_ASE_CODENAME.' <br/> <br/>';
 				} else {
-					echo "Update directory structure : Done.<br />";
+					echo "ASE installation : Update done.<br />";
 				}
 			} else {
-				echo 'To end update, copy all files from '.PATH_MODULES_FILES_WR.'/'.MOD_ASE_CODENAME.' to '.PATH_MAIN_WR."/".MOD_ASE_CODENAME.' then delete directory '.PATH_MODULES_FILES_WR.'/'.MOD_ASE_CODENAME.' <br/>';
+				echo '/!\ To end update, copy all files from '.PATH_MODULES_FILES_WR.'/'.MOD_ASE_CODENAME.'/databases to '.PATH_MAIN_WR."/".MOD_ASE_CODENAME.'/databases then delete directory '.PATH_MODULES_FILES_WR.'/'.MOD_ASE_CODENAME.' <br/><br/>';
 			}
 		} else {
 			echo "ASE installation : Update done.<br />";
