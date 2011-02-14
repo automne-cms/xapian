@@ -29,25 +29,89 @@
 define("MOD_ASE_CODENAME", "ase");
 define("MOD_ASE_XAPIAN_MIN_VERSION", '1.0.2');
 
+//load minimal class to fill Automne requirements
+class CMS_module_ase_default extends CMS_moduleValidation {
+	const MESSAGE_TASK_QUERY_MODULE = 23;
+	const MESSAGE_TASK_INDEX_MODULE_DOCUMENT = 24;
+	const MESSAGE_TASK_DELETE_MODULE_DOCUMENT = 25;
+	const MESSAGE_MOD_ASE_ROWS_EXPLANATION = 42;
+	const MESSAGE_MOD_ASE_INDEXED_MODULES = 47;
+	const MESSAGE_MOD_ASE_INDEXED_MODULES_DESC = 48;
+	const MESSAGE_MOD_ASE_CONFIG = 49;
+	const MESSAGE_MOD_ASE_ENGINE_CONFIG = 50;
+	const MESSAGE_MOD_ASE_ENGINE_CONFIG_DESC = 51;
+	
+	/**
+	  * Get Xapian librairie version
+	  *
+	  * @return String : the complete version number
+	  * @access public
+	  */
+	function getXapianVersion() {
+		return false;
+	}
+	
+	/**
+	  * is module active ?
+	  *
+	  * @return boolean
+	  * @access public
+	  */
+	function isActive() {
+		return false;
+	}
+	
+	/**
+	  * Return a list of objects infos to be displayed in module index according to user privileges
+	  *
+	  * @return string : HTML scripts infos
+	  * @access public
+	  */
+	function getObjectsInfos($user) {
+		$objectsInfos = array();
+		$cms_language = $user->getLanguage();
+		$objectsInfos[] = array(
+			'label'			=> $cms_language->getMessage(self::MESSAGE_MOD_ASE_INDEXED_MODULES, false, MOD_ASE_CODENAME),
+			'adminLabel'	=> $cms_language->getMessage(self::MESSAGE_MOD_ASE_INDEXED_MODULES, false, MOD_ASE_CODENAME),
+			'description'	=> $cms_language->getMessage(self::MESSAGE_MOD_ASE_INDEXED_MODULES_DESC, false, MOD_ASE_CODENAME),
+			'objectId'		=> 'modules',
+			'url'			=> PATH_ADMIN_MODULES_WR.'/'.MOD_ASE_CODENAME.'/index.php',
+			'class'			=> 'atm-modules',
+		);
+		$objectsInfos[] = array(
+			'label'			=> $cms_language->getMessage(self::MESSAGE_MOD_ASE_CONFIG, false, MOD_ASE_CODENAME),
+			'adminLabel'	=> $cms_language->getMessage(self::MESSAGE_MOD_ASE_ENGINE_CONFIG, false, MOD_ASE_CODENAME),
+			'description'	=> $cms_language->getMessage(self::MESSAGE_MOD_ASE_ENGINE_CONFIG_DESC, false, MOD_ASE_CODENAME),
+			'objectId'		=> 'config',
+			'url'			=> PATH_ADMIN_MODULES_WR.'/'.MOD_ASE_CODENAME.'/config.php',
+			'class'			=> 'atm-server',
+		);
+		return $objectsInfos;
+	}
+}
+
+//Check if Xapian exists
 $xapianExists = false;
 // Try to load Xapian extension if it's not already loaded.
 if (!extension_loaded("xapian")) {
-	if (strtolower(substr(PHP_OS, 0, 3)) === 'win') {
-		if (@dl('php_xapian.dll')) $xapianExists = true;
-	} else {
-		// PHP_SHLIB_SUFFIX is available as of PHP 4.3.0, for older PHP assume 'so'.
-		// It gives 'dylib' on MacOS X which is for libraries, modules are 'so'.
-		if (PHP_SHLIB_SUFFIX === 'PHP_SHLIB_SUFFIX' || PHP_SHLIB_SUFFIX === 'dylib') {
-			if (@dl('xapian.so')) $xapianExists = true;
+	if (function_exists('dl')) {
+		if (APPLICATION_IS_WINDOWS) {
+			if (@dl('php_xapian.dll')) $xapianExists = true;
 		} else {
-			if (@dl('xapian.'.PHP_SHLIB_SUFFIX)) $xapianExists = true;
+			// PHP_SHLIB_SUFFIX is available as of PHP 4.3.0, for older PHP assume 'so'.
+			// It gives 'dylib' on MacOS X which is for libraries, modules are 'so'.
+			if (PHP_SHLIB_SUFFIX === 'PHP_SHLIB_SUFFIX' || PHP_SHLIB_SUFFIX === 'dylib') {
+				if (@dl('xapian.so')) $xapianExists = true;
+			} else {
+				if (@dl('xapian.'.PHP_SHLIB_SUFFIX)) $xapianExists = true;
+			}
 		}
 	}
 } else {
 	$xapianExists = true;
 }
 
-//if Xapian exists, load module
+//if Xapian exists, load full module
 if ($xapianExists) {
 	//Interfaces objects
 	require_once(PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/interfaces/common.php');
@@ -59,18 +123,8 @@ if ($xapianExists) {
 		}
 	}
 	
-	class CMS_module_ase extends CMS_moduleValidation
+	class CMS_module_ase extends CMS_module_ase_default 
 	{
-		const MESSAGE_TASK_QUERY_MODULE = 23;
-		const MESSAGE_TASK_INDEX_MODULE_DOCUMENT = 24;
-		const MESSAGE_TASK_DELETE_MODULE_DOCUMENT = 25;
-		const MESSAGE_MOD_ASE_ROWS_EXPLANATION = 42;
-		const MESSAGE_MOD_ASE_INDEXED_MODULES = 47;
-		const MESSAGE_MOD_ASE_INDEXED_MODULES_DESC = 48;
-		const MESSAGE_MOD_ASE_CONFIG = 49;
-		const MESSAGE_MOD_ASE_ENGINE_CONFIG = 50;
-		const MESSAGE_MOD_ASE_ENGINE_CONFIG_DESC = 51;
-		
 		/**
 		  * Module autoload handler
 		  *
@@ -444,57 +498,8 @@ if ($xapianExists) {
 		function isActive() {
 			return true;
 		}
-		
-		/**
-		  * Return a list of objects infos to be displayed in module index according to user privileges
-		  *
-		  * @return string : HTML scripts infos
-		  * @access public
-		  */
-		function getObjectsInfos($user) {
-			$objectsInfos = array();
-			$cms_language = $user->getLanguage();
-			$objectsInfos[] = array(
-				'label'			=> $cms_language->getMessage(self::MESSAGE_MOD_ASE_INDEXED_MODULES, false, MOD_ASE_CODENAME),
-				'adminLabel'	=> $cms_language->getMessage(self::MESSAGE_MOD_ASE_INDEXED_MODULES, false, MOD_ASE_CODENAME),
-				'description'	=> $cms_language->getMessage(self::MESSAGE_MOD_ASE_INDEXED_MODULES_DESC, false, MOD_ASE_CODENAME),
-				'objectId'		=> 'modules',
-				'url'			=> PATH_ADMIN_MODULES_WR.'/'.MOD_ASE_CODENAME.'/index.php',
-				'class'			=> 'atm-modules',
-			);
-			$objectsInfos[] = array(
-				'label'			=> $cms_language->getMessage(self::MESSAGE_MOD_ASE_CONFIG, false, MOD_ASE_CODENAME),
-				'adminLabel'	=> $cms_language->getMessage(self::MESSAGE_MOD_ASE_ENGINE_CONFIG, false, MOD_ASE_CODENAME),
-				'description'	=> $cms_language->getMessage(self::MESSAGE_MOD_ASE_ENGINE_CONFIG_DESC, false, MOD_ASE_CODENAME),
-				'objectId'		=> 'config',
-				'url'			=> PATH_ADMIN_MODULES_WR.'/'.MOD_ASE_CODENAME.'/config.php',
-				'class'			=> 'atm-server',
-			);
-			return $objectsInfos;
-		}
 	}
 } else {
-	//load fake class to fill Automne requirements
-	class CMS_module_ase extends CMS_moduleValidation {
-		/**
-		  * Get Xapian librairie version
-		  *
-		  * @return String : the complete version number
-		  * @access public
-		  */
-		function getXapianVersion() {
-			return false;
-		}
-		
-		/**
-		  * is module active ?
-		  *
-		  * @return boolean
-		  * @access public
-		  */
-		function isActive() {
-			return false;
-		}
-	}
+	class CMS_module_ase extends CMS_module_ase_default{}
 }
 ?>

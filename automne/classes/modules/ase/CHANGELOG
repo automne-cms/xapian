@@ -1,3 +1,6 @@
+v0.65
+[BUG] : Better handling of module if Xapian is not installed (do not crash Automne anymore)
+
 v0.64
 [REFACTOR] : Add support for sub folder installation
 [BUG] : Correct an bug on opensearch queries
