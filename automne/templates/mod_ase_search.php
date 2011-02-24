@@ -171,7 +171,7 @@ $content = '
 <div id="aseSearch">
 <form name="search" action="'.$_SERVER['SCRIPT_NAME'].'" method="get">
 <input type="text" style="width:60%;" name="q" value="'.(isset($_REQUEST['q']) ? htmlspecialchars($_REQUEST['q']) : '').'" />&nbsp;<input type="submit" class="button" value="'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_SEARCH, false, MOD_ASE_CODENAME).'" />
-&nbsp;&nbsp;&nbsp;<a href="#help" onclick="document.getElementById(\'aseHelp\').style.display=\'block\';">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_HELP, false, MOD_ASE_CODENAME).'</a>
+&nbsp;&nbsp;&nbsp;<a href="'.$_SERVER['SCRIPT_NAME'].($_SERVER["QUERY_STRING"] ? '?'.io::htmlspecialchars($_SERVER["QUERY_STRING"]) : '').'#help" onclick="document.getElementById(\'aseHelp\').style.display=\'block\';">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_HELP, false, MOD_ASE_CODENAME).'</a>
 </form>';
 
 if (isset($search) && is_object($search)) {
@@ -248,7 +248,7 @@ if (isset($search) && is_object($search)) {
 		<br />
 		<form name="searchbottom" action="'.$_SERVER['SCRIPT_NAME'].'" method="get">
 		<input type="text" style="width:60%;" name="q" value="'.(isset($_REQUEST['q']) ? htmlspecialchars($_REQUEST['q']) : '').'" />&nbsp;<input type="submit" class="button" value="'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_SEARCH, false, MOD_ASE_CODENAME).'" />
-		&nbsp;&nbsp;&nbsp;<a href="#help" onclick="document.getElementById(\'aseHelp\').style.display=\'block\';">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_HELP, false, MOD_ASE_CODENAME).'</a>
+		&nbsp;&nbsp;&nbsp;<a href="'.$_SERVER['SCRIPT_NAME'].($_SERVER["QUERY_STRING"] ? '?'.io::htmlspecialchars($_SERVER["QUERY_STRING"]) : '').'#help" onclick="document.getElementById(\'aseHelp\').style.display=\'block\';">'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_HELP, false, MOD_ASE_CODENAME).'</a>
 		</form><br />';
 		
 	} else {
