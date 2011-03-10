@@ -385,7 +385,7 @@ class CMS_XapianQuery extends CMS_grandFather {
 			    $term = $eSetI->get_termname();
 				//only words (starting with W) should compose expand set and it should not already in query nor in stopwords
 				if (io::substr($term,0,1) !== 'Z' && io::substr($term,0,2) !== '__' && io::strlen($term) > 3 && !in_array('Z'.$stemmer->apply($term), $this->_queryTerms) && !in_array($term, $this->_queryTerms) && !$stopper->apply($term)) {
-					$expandTerms[$stemmer->apply($term)] = strtolower(APPLICATION_DEFAULT_ENCODING) != 'utf-8' ? utf8_decode($term) : $term;
+					$expandTerms[$stemmer->apply($term)] = io::htmlspecialchars(strtolower(APPLICATION_DEFAULT_ENCODING) != 'utf-8' ? utf8_decode($term) : $term);
 				}
 				//iterate eSet
 				$eSetI->next();
@@ -395,7 +395,7 @@ class CMS_XapianQuery extends CMS_grandFather {
 	}
 	
 	function getCorrectedQueryString() {
-		return $this->_correctedQueryString;
+		return io::htmlspecialchars($this->_correctedQueryString);
 	}
 	
 	function getQueryTerms() {

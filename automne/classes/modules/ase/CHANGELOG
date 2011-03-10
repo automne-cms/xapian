@@ -1,3 +1,6 @@
+v0.66
+[BUG] : Correct an XSS security issue on public search form
+
 v0.65
 [BUG] : Better handling of module if Xapian is not installed (do not crash Automne anymore)
 [BUG] : Correct an anchor problem with version 4.1
