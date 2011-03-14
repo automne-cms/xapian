@@ -1,3 +1,6 @@
+v0.67
+[BUG] : Correct a bug at installation with mod_ase_document table which exists in Automne 4.1.0 and 4.1.1
+
 v0.66
 [BUG] : Correct an XSS security issue on public search form
 

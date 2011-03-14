@@ -13,7 +13,10 @@ $q = new CMS_query($sql);
 $installed = false;
 while ($table = $q->getValue(0)) {
 	if ($table == 'mod_ase_document') {
-		$installed = true;
+		$q = new CMS_query("select * from modules where codename_mod='ase'");
+		if ($q->getNumRows()) {
+			$installed = true;
+		}
 	}
 }
 if (!$installed) {
