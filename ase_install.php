@@ -42,6 +42,20 @@ if (!$installed) {
 	}
 } else {
 	echo "ASE installation : Already installed : Launch update ...<br />";
+	#change field language_mased of mod_ase_document to use a longer field size for 5 characters language code storage
+	$sql = "show columns from mod_ase_document";
+	$q = new CMS_query($sql);
+	$installed = false;
+	while($r = $q->getArray()) {
+		if ($r["Field"] == "language_mased" && $r["Type"] == 'char(5)') {
+			$installed = true;
+		}
+	}
+	if (!$installed) {
+		$q = new CMS_query('ALTER TABLE  mod_ase_document CHANGE  language_mased  language_mased CHAR( 5 ) NOT NULL');
+		echo 'Database successfuly updated (handle language codes of 5 characters)<br/>';
+	}
+	
 	//load destination module parameters
 	$module = CMS_modulesCatalog::getByCodename('ase');
 	$moduleParameters = $module->getParameters(false,true);

@@ -14,7 +14,7 @@ CREATE TABLE `mod_ase_document` (
   `xid_mased` varchar(255) NOT NULL default '',
   `uid_mased` varchar(255) NOT NULL default '',
   `module_mased` varchar(20) NOT NULL default '',
-  `language_mased` char(2) NOT NULL default '',
+  `language_mased` char(5) NOT NULL default '',
   `type_mased` varchar(10) NOT NULL default '',
   PRIMARY KEY  (`id_mased`),
   UNIQUE KEY `mod-uid` (`uid_mased`,`module_mased`),
