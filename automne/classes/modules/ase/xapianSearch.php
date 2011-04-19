@@ -223,8 +223,15 @@ class CMS_XapianQuery extends CMS_grandFather {
 		/*if (io::strpos($this->_query, '"') !== false) {
 			$this->_query = $this->_filterStopWords($this->_query);
 		}*/
-		//set user query and enumerators then parse query
-		$query = @$queryParser->parse_query($this->_query,$this->_enumerators);
+		
+		try {
+			//set user query and enumerators then parse query
+			$query = @$queryParser->parse_query($this->_query, $this->_enumerators);
+		} catch (Exception $e) {
+			CMS_grandFather::raiseError('Can not parse_query : '.$e->getMessage().'. Query : '.$this->_query);
+			return false;
+		}
+		
 		//get corrected query string if any
 		$this->_correctedQueryString = strtolower(APPLICATION_DEFAULT_ENCODING) != 'utf-8' ? utf8_decode($queryParser->get_corrected_query_string()) : $queryParser->get_corrected_query_string();
 		if (!is_object($query) || !$query->get_length()) {
