@@ -213,7 +213,7 @@ class CMS_polymod_ase extends CMS_ase_interface {
 	function getDeleteInfos($uid) {
 		//check for indexable object
 		$definition = CMS_poly_object_catalog::getObjectDefinitionByID($uid,true);
-		if(!$definition->getValue('indexable')){
+		if(!is_object($definition) || !$definition->getValue('indexable')){
 			return array();
 		}
 		return array(array('uid' => $uid, 'module' => $this->_codename, 'deleteInfos' => array()));
@@ -222,7 +222,7 @@ class CMS_polymod_ase extends CMS_ase_interface {
 	function getIndexInfos($uid) {
 		//check for indexable object
 		$definition = CMS_poly_object_catalog::getObjectDefinitionByID($uid,true);
-		if(!$definition->getValue('indexable')){
+		if(!is_object($definition) || !$definition->getValue('indexable')){
 			return array();
 		}
 		return array(array('uid' => $uid, 'module' => $this->_codename));

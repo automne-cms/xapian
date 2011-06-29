@@ -1,3 +1,7 @@
+v0.70
+[BUG] : Correct a bug in installation process if Automne is installed in a subfolder
+[BUG] : Correct a bug in polymod indexation
+
 v0.69
 [BUG] : If a xapian query parsing has an error, exception was not catched
 
