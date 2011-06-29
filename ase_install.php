@@ -24,7 +24,7 @@ if (!$installed) {
 	if (CMS_patch::executeSqlScript(PATH_MAIN_FS.'/sql/mod_ase.sql',true)) {
 		CMS_patch::executeSqlScript(PATH_MAIN_FS.'/sql/mod_ase.sql',false);
 		//copy module parameters file and module row
-		if (CMS_file::copyTo(PATH_TMP_FS.'/automne/tmp/modules/ase_rc.xml',PATH_PACKAGES_FS.'/modules/ase_rc.xml')
+		if (CMS_file::copyTo(PATH_TMP_FS.'/automne/classes/modules/ase_rc.xml',PATH_PACKAGES_FS.'/modules/ase_rc.xml')
 			&& CMS_file::copyTo(PATH_TMP_FS.'/automne/templates/rows/mod_ase.xml',PATH_TEMPLATES_ROWS_FS.'/mod_ase.xml')
 			&& CMS_file::copyTo(PATH_TMP_FS.'/css/modules/ase.css',PATH_REALROOT_FS.'/css/modules/ase.css')
 			&& CMS_file::copyTo(PATH_TMP_FS.'/automne/templates/mod_ase_search.php',PATH_TEMPLATES_FS.'/mod_ase_search.php')
@@ -57,6 +57,7 @@ if (!$installed) {
 	}
 	//check modules parameters
 	if (!file_exists(PATH_PACKAGES_FS.'/modules/ase_rc.xml')) {
+		//copy missing parameters file
 		CMS_file::copyTo(PATH_TMP_FS.'/automne/tmp/modules/ase_rc.xml',PATH_PACKAGES_FS.'/modules/ase_rc.xml');
 		CMS_file::chmodFile(FILES_CHMOD, PATH_PACKAGES_FS.'/modules/ase_rc.xml');
 		echo "ASE installation : Update done.<br /><br />";
