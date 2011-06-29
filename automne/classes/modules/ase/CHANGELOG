@@ -1,4 +1,5 @@
 v0.70
+[BUG] : Correct bug number: 2216 (see http://www.automne-cms.org/bug/)
 [BUG] : Correct a bug in installation process if Automne is installed in a subfolder
 [BUG] : Correct a bug in polymod indexation
 

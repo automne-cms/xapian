@@ -52,7 +52,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 		} elseif (io::substr($uid,0,4) == 'file') {
 			$fileID = (int) array_pop(explode('_',$uid));
 			if (!$fileID) {
-				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no file ID found for uid : '.$uid);
+				$this->raiseError('no file ID found for uid : '.$uid);
 				return false;
 			}
 			$sql = "
@@ -65,7 +65,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 			";
 			$q = new CMS_query($sql);
 			if (!$q->getNumrows()) {
-				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no file found in DB for uid : '.$uid);
+				$this->raiseError('no file found in DB for uid : '.$uid);
 				return false;
 			}
 			$fileDatas = $q->getArray();
@@ -89,11 +89,12 @@ class CMS_standard_ase extends CMS_ase_interface {
 			//page content
 			$page = CMS_tree::getPageByID($document->getValue('uid'));
 			if ($page->hasError()) {
-				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : given page id does not exists ... ');
+				$this->raiseError('given page id does not exists ... ');
 				return false;
 			}
-			if (!$page->getPrintStatus()) {
-				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : can not get infos from page which hasn\'t anything to print ... ');
+			$tpl = $page->getTemplate();
+			if (!$tpl || $tpl->hasError() || !$tpl->getPrintingClientSpaces()) {
+				$this->raiseError('can not get infos from page : template error or no print clientspaces set... ');
 				return false;
 			}
 			//set all page attributes and values
@@ -128,7 +129,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 		if (io::substr($document->getValue('uid'),0,4) == 'file') {
 			$fileID = (int) array_pop(explode('_',$document->getValue('uid')));
 			if (!$fileID) {
-				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no file ID found for uid : '.$document->getValue('uid'));
+				$this->raiseError('no file ID found for uid : '.$document->getValue('uid'));
 				return false;
 			}
 			$sql = "
@@ -141,7 +142,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 			";
 			$q = new CMS_query($sql);
 			if (!$q->getNumrows()) {
-				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no file found in DB for uid : '.$document->getValue('uid'));
+				$this->raiseError('no file found in DB for uid : '.$document->getValue('uid'));
 				return false;
 			}
 			$fileDatas = $q->getArray();
@@ -151,7 +152,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 			$file = new CMS_file($filePath, CMS_file::FILE_SYSTEM, CMS_file::TYPE_FILE);
 			//check file
 			if (!$file->exists()) {
-				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : given file does not exists in file system : '.$filePath);
+				$this->raiseError('given file does not exists in file system : '.$filePath);
 				return false;
 			}
 			//add document filename
@@ -172,7 +173,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 			//set document language from page
 			$page = CMS_tree::getPageByID($pageId);
 			if ($page->hasError()) {
-				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : document page does not exists : '.$pageId);
+				$this->raiseError('document page does not exists : '.$pageId);
 				return false;
 			}
 			//set all page attributes and values
@@ -263,7 +264,8 @@ class CMS_standard_ase extends CMS_ase_interface {
 			if ($page->hasError() || $page->getPublication() != RESOURCE_PUBLICATION_PUBLIC) {
 				return false;
 			}
-			if ($page->getPrintStatus()) {
+			$tpl = $page->getTemplate();
+			if ($tpl && !$tpl->hasError() && $tpl->getPrintingClientSpaces()) {
 				//TODO : here we need to add pages without any print content. In this case, only title, description and keywords should be indexed
 				$infos = array(
 					//array('task' => 'delete', 'uid' => $uid, 'module' => MOD_STANDARD_CODENAME, 'deleteInfos' => array('page' => $uid)),
@@ -348,34 +350,34 @@ class CMS_standard_ase extends CMS_ase_interface {
 		switch ($type) {
 			case 'root':
 				if (!sensitiveIO::isPositiveInteger($value)) {
-					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : root filter value must be a valid page ID : '.$value);
+					$this->raiseError('root filter value must be a valid page ID : '.$value);
 					return false;
 				}
 				$this->_filters['root'][] = $value;
 			break;
 			case 'excludedroot':
 				if (!sensitiveIO::isPositiveInteger($value)) {
-					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : root filter value must be a valid page ID : '.$value);
+					$this->raiseError('root filter value must be a valid page ID : '.$value);
 					return false;
 				}
 				$this->_filters['excludedroot'][] = $value;
 			break;
 			case 'publication date after':
 				if (!is_a($value,'CMS_date')) {
-					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : publication date after filter value must be a valid CMS_date : '.$value);
+					$this->raiseError('publication date after filter value must be a valid CMS_date : '.$value);
 					return false;
 				}
 				$this->_filters['publication date after'] = $value;
 			break;
 			case 'publication date before':
 				if (!is_a($value,'CMS_date')) {
-					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : publication date after filter value must be a valid CMS_date : '.$value);
+					$this->raiseError('publication date after filter value must be a valid CMS_date : '.$value);
 					return false;
 				}
 				$this->_filters['publication date before'] = $value;
 			break;
 			default:
-				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : unknown filter type : '.$type);
+				$this->raiseError('unknown filter type : '.$type);
 				return false;
 			break;
 		}
@@ -532,7 +534,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 				//get page
 				$page = CMS_tree::getPageByID($matchInfo['uid']);
 				if (!$page || $page->hasError()) {
-					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : page does not exists : '.$matchInfo['uid']);
+					$this->raiseError('page does not exists : '.$matchInfo['uid']);
 					return false;
 				}
 				$pages[$matchInfo['uid']] = $page;
@@ -580,7 +582,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 			//get file ID
 			$fileID = (int) array_pop(explode('_',$matchInfo['uid']));
 			if (!$fileID) {
-				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no file ID found for uid : '.$matchInfo['uid']);
+				$this->raiseError('no file ID found for uid : '.$matchInfo['uid']);
 				return false;
 			}
 			if (!isset($filesDatas[$matchInfo['uid']])) {
@@ -594,7 +596,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 				";
 				$q = new CMS_query($sql);
 				if (!$q->getNumrows()) {
-					$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no file found in DB for uid : '.$matchInfo['uid']);
+					$this->raiseError('no file found in DB for uid : '.$matchInfo['uid']);
 					return false;
 				}
 				$filesDatas[$matchInfo['uid']] = $q->getArray();
@@ -630,7 +632,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 					if (!isset($pages[$filesDatas[$matchInfo['uid']]['page']])) {
 						$page = CMS_tree::getPageByID($filesDatas[$matchInfo['uid']]['page']);
 						if ($page->hasError()) {
-							$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : page does not exists : '.$filesDatas[$matchInfo['uid']]['page']);
+							$this->raiseError('page does not exists : '.$filesDatas[$matchInfo['uid']]['page']);
 							return false;
 						}
 						$pages[$filesDatas[$matchInfo['uid']]['page']] = $page;
@@ -712,7 +714,7 @@ class CMS_standard_ase extends CMS_ase_interface {
 		if (io::substr($matchInfo['uid'],0,4) == 'file') {
 			$fileID = (int) array_pop(explode('_',$matchInfo['uid']));
 			if (!$fileID) {
-				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no file ID found for uid : '.$matchInfo['uid']);
+				$this->raiseError('no file ID found for uid : '.$matchInfo['uid']);
 				return false;
 			}
 			return array('fileType', 'pageTitle', 'documentTitle', 'fileSize', 'exists', 'path', 'absolutePath', 'pubDate');
