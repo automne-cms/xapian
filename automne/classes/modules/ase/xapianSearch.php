@@ -402,6 +402,10 @@ class CMS_XapianQuery extends CMS_grandFather {
 	}
 	
 	function getCorrectedQueryString() {
+		//strip language if it is the same as search language
+		if (io::strpos($this->_correctedQueryString, ' language:'.$this->_language) !== false) {
+			return io::htmlspecialchars(str_replace(' language:'.$this->_language, '', $this->_correctedQueryString)); 
+		}
 		return io::htmlspecialchars($this->_correctedQueryString);
 	}
 	

@@ -294,7 +294,7 @@ if ($xapianExists) {
 						if (file_exists(PATH_REALROOT_FS.'/css/modules/'.MOD_ASE_CODENAME.'.css')) {
 							$tagContent .= 
 							'	<!-- load the style of '.MOD_ASE_CODENAME.' module -->'."\n".
-							'	<link rel="stylesheet" type="text/css" href="/css/modules/'.MOD_ASE_CODENAME.'.css" />'."\n";
+							'	<link rel="stylesheet" type="text/css" href="'.PATH_REALROOT_WR.'/css/modules/'.MOD_ASE_CODENAME.'.css" />'."\n";
 						}
 					}
 					return $tagContent;
