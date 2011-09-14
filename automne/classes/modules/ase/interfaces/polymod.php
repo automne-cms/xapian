@@ -81,67 +81,117 @@ class CMS_polymod_ase extends CMS_ase_interface {
 	  * @access public
 	  */
 	function getDocumentInfos(&$document) {
-		//this UID is an object
-		if (!sensitiveIO::isPositiveInteger($document->getValue('uid'))) {
-			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : uid must be a positive integer : '.$document->getValue('uid'));
-			return false;
-		}
 		//if no user founded, instanciate super administrator to allow full document content to be indexed without worry about rights
 		global $cms_user, $cms_language;
 		if (!is_object($cms_user)) {
 			$cms_user = new CMS_profile_user(1);
 		}
 		//get item to index
-		$item = CMS_poly_object_catalog::getObjectByID($document->getValue('uid'), false, true);
-		if (!$item || $item->hasError()) {
-			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : given object id does not exists : '.$document->getValue('uid'));
-			return false;
-		}
-		//set object language
-		$language = $item->getLanguage();
-		$document->setValue('language', $language);
-		$document->setModuleAttribute('language', $language);
-		//instanciate object language as general language
-		$cms_language = new CMS_language($language);
-		//get item label (in first, because a strange bug cause item _objectValues to be reseted next)
-		$itemLabel = $item->getLabel();
-		//add object type id as a module attribute
-		$document->setModuleAttribute('objecttype', $item->getObjectID());
-		//add item id as a module attribute
-		$document->setModuleAttribute('itemid', $item->getID());
-		//set all object attributes and plain text values then get files objets if any
-		$content = '';
-		$files = array();
-		$this->_getFieldsContent($item, $content, $files);
-		//remove all HTML from content
-		$content = CMS_filter_common::stripTags($content);
-		//then set it as plain text content for document
-		$document->addPlainTextContent($content);
-		//add files
-		$type = '';
-		if (sizeof($files)) {
-			foreach($files as $file) {
-				if (!$type) {
-					$type = $file['extension'];
-				} elseif ($file['extension'] != $type) {
-					$type = 'mix';
-				}
-				//then add file
-				$document->addFile($file['file'], $file['extension'], CMS_file::WEBROOT);
+		$uid = $document->getValue('uid');
+		if (io::isPositiveInteger($uid)) {
+			$item = CMS_poly_object_catalog::getObjectByID($document->getValue('uid'), false, true);
+			if (!$item || $item->hasError()) {
+				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : given object id does not exists : '.$document->getValue('uid'));
+				return false;
 			}
+			//set object language
+			$language = $item->getLanguage();
+			
+			$document->setValue('language', $language);
+			$document->setModuleAttribute('language', $language);
+			//instanciate object language as general language
+			$cms_language = new CMS_language($language);
+			//get item label (in first, because a strange bug cause item _objectValues to be reseted next)
+			$itemLabel = $item->getLabel();
+			//add object type id as a module attribute
+			$document->setModuleAttribute('objecttype', $item->getObjectID());
+			//add item id as a module attribute
+			$document->setModuleAttribute('itemid', $item->getID());
+			//set all object attributes and plain text values then get files objets if any
+			$content = '';
+			$files = array();
+			$this->_getFieldsContent($item, null, $content, $files);
+			//remove all HTML from content
+			$content = CMS_filter_common::stripTags($content);
+			//then set it as plain text content for document
+			$document->addPlainTextContent($content);
+			//add files
+			$type = '';
+			if (sizeof($files)) {
+				foreach($files as $file) {
+					if (!$type) {
+						$type = $file['extension'];
+					} elseif ($file['extension'] != $type) {
+						$type = 'mix';
+					}
+					//then add file
+					$document->addFile($file['file'], $file['extension'], CMS_file::WEBROOT);
+				}
+			} else {
+				$type = 'txt';
+			}
+			//set document type
+			$document->setValue('type', $type);
+			//add document type as a module attribute
+			$document->setModuleAttribute('type', $type);
+			//set document title
+			$document->setValue('title', $itemLabel);
 		} else {
-			$type = 'txt';
+			list($itemId, $language) = explode('_', $uid);
+			if (!io::isPositiveInteger($itemId)) {
+				$this->raiseError('Incorrect uid : '.$uid.', must be itemId or itemId and language code');
+				return false;
+			}
+			$item = CMS_poly_object_catalog::getObjectByID($itemId, false, true);
+			if (!$item || $item->hasError()) {
+				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : given object id does not exists : '.$document->getValue('uid'));
+				return false;
+			}
+			
+			$document->setValue('language', $language);
+			$document->setModuleAttribute('language', $language);
+			//instanciate object language as general language
+			$cms_language = new CMS_language($language);
+			//get item label (in first, because a strange bug cause item _objectValues to be reseted next)
+			$itemLabel = $item->getLabel();
+			//add object type id as a module attribute
+			$document->setModuleAttribute('objecttype', $item->getObjectID());
+			//add item id as a module attribute
+			$document->setModuleAttribute('itemid', $item->getID());
+			//set all object attributes and plain text values then get files objets if any
+			$content = '';
+			$files = array();
+			$this->_getFieldsContent($item, $language, $content, $files);
+			//remove all HTML from content
+			$content = CMS_filter_common::stripTags($content);
+			//then set it as plain text content for document
+			$document->addPlainTextContent($content);
+			//add files
+			$type = '';
+			if (sizeof($files)) {
+				foreach($files as $file) {
+					if (!$type) {
+						$type = $file['extension'];
+					} elseif ($file['extension'] != $type) {
+						$type = 'mix';
+					}
+					//then add file
+					$document->addFile($file['file'], $file['extension'], CMS_file::WEBROOT);
+				}
+			} else {
+				$type = 'txt';
+			}
+			//set document type
+			$document->setValue('type', $type);
+			//add document type as a module attribute
+			$document->setModuleAttribute('type', $type);
+			//set document title
+			$document->setValue('title', $itemLabel);
 		}
-		//set document type
-		$document->setValue('type', $type);
-		//add document type as a module attribute
-		$document->setModuleAttribute('type', $type);
-		//set document title
-		$document->setValue('title', $itemLabel);
 		return true;
 	}
 
-	function _getFieldsContent($item, &$content, &$files) {
+	function _getFieldsContent($item, $language, &$content, &$files) {
 		//get object fields definitions
 		$objectFields = CMS_poly_object_catalog::getFieldsDefinition($item->getObjectID());
 		$itemFieldsObjects =& $item->getFieldsObjects();
@@ -153,17 +203,19 @@ class CMS_polymod_ase extends CMS_ase_interface {
 				$fieldType = $objectFields[$fieldID]->getValue('type');
 				if (sensitiveIO::isPositiveInteger($fieldType)) {
 					//this field is a poly_object so recurse on his values
-					$this->_getFieldsContent($itemField, $content, $files);
+					$this->_getFieldsContent($itemField, $language, $content, $files);
 				} elseif (io::strpos($fieldType,"multi|") !== false) {
 					//this field is a multi_poly_object so recurse on all poly_objects it contain
 					$params = $itemField->getParamsValues();
 					if ($itemField->getValue('count')) {
 						$items = $itemField->getValue('fields');
 						if ($params['indexOnlyLastSubObjects']) {
-							$this->_getFieldsContent(array_shift($items), $content, $files);
+							$this->_getFieldsContent(array_shift($items), $language, $content, $files);
 						} else {
 							foreach ($items as $anItem) {
-								$this->_getFieldsContent($anItem, $content, $files);
+								if (!$language || $anItem->getLanguage() == $language) {
+									$this->_getFieldsContent($anItem, $language, $content, $files);
+								}
 							}
 						}
 					}
@@ -216,7 +268,21 @@ class CMS_polymod_ase extends CMS_ase_interface {
 		if(!is_object($definition) || !$definition->getValue('indexable')){
 			return array();
 		}
-		return array(array('uid' => $uid, 'module' => $this->_codename, 'deleteInfos' => array()));
+		if (!$definition->getValue('multilanguage')) {
+			return array(array('uid' => $uid, 'module' => $this->_codename, 'deleteInfos' => array()));
+		} else {
+			//get item to index
+			$item = CMS_poly_object_catalog::getObjectByID($uid, false, true);
+			if (!$item || $item->hasError()) {
+				return array(array('uid' => $uid, 'module' => $this->_codename, 'deleteInfos' => array()));
+			}
+			$languages = $item->getLanguages();
+			$return = array();
+			foreach ($languages as $language) {
+				$return[] = array('uid' => $uid.'_'.$language, 'module' => $this->_codename, 'deleteInfos' => array());
+			}
+			return $return;
+		}
 	}
 
 	function getIndexInfos($uid) {
@@ -225,7 +291,22 @@ class CMS_polymod_ase extends CMS_ase_interface {
 		if(!is_object($definition) || !$definition->getValue('indexable')){
 			return array();
 		}
-		return array(array('uid' => $uid, 'module' => $this->_codename));
+		if (!$definition->getValue('multilanguage')) {
+			return array(array('uid' => $uid, 'module' => $this->_codename));
+		} else {
+			//get item to index
+			$item = CMS_poly_object_catalog::getObjectByID($uid, false, true);
+			if (!$item || $item->hasError()) {
+				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : given object id does not exists : '.$uid);
+				return false;
+			}
+			$languages = $item->getLanguages();
+			$return = array();
+			foreach ($languages as $language) {
+				$return[] = array('uid' => $uid.'_'.$language, 'module' => $this->_codename);
+			}
+			return $return;
+		}
 	}
 
 	/*************************************************************
@@ -324,6 +405,17 @@ class CMS_polymod_ase extends CMS_ase_interface {
 	  * @access public
 	  */
 	function setResultsUID($resultsUID) {
+		//get results ids
+		$itemsIds = array();
+		foreach ($resultsUID as $resultUID) {
+			if (io::isPositiveInteger($resultUID)) {
+				$itemsIds[$resultUID] = $resultUID;
+			} else {
+				list($itemId, $language) = explode('_', $resultUID);
+				$itemsIds[$itemId] = $itemId;
+			}
+		}
+		
 		//get results objetIDs
 		$sql = "
 			select
@@ -332,7 +424,7 @@ class CMS_polymod_ase extends CMS_ase_interface {
 			from
 				mod_object_polyobjects
 			where
-				id_moo in (".implode(',',$resultsUID).")
+				id_moo in (".io::sanitizeSQLString(implode(',',$itemsIds)).")
 		";
 		$q = new CMS_query($sql);
 		$objectsIDs = array();
@@ -368,12 +460,20 @@ class CMS_polymod_ase extends CMS_ase_interface {
 	  */
 	function getMatchValue(&$matchInfo, $value, $parameters = array()) {
 		global $cms_user, $cms_language;
-		//this UID is an object
-		if (!sensitiveIO::isPositiveInteger($matchInfo['uid'])) {
-			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : uid must be a positive integer : '.$matchInfo['uid']);
-			return false;
+		if (!isset($matchInfo['uid'])) {
+			return;
 		}
-		if (!isset($matchInfo['uid']) || !isset($this->_results[$matchInfo['uid']]) || !is_object($this->_results[$matchInfo['uid']])) {
+		//this UID is an object
+		if (io::isPositiveInteger($matchInfo['uid'])) {
+			$itemId = $matchInfo['uid'];
+		} else {
+			list($itemId, $language) = explode('_', $matchInfo['uid']);
+			if (!sensitiveIO::isPositiveInteger($itemId)) {
+				$this->raiseError('uid must have a positive integer : '.$matchInfo['uid']);
+				return false;
+			}
+		}
+		if (!isset($itemId) || !isset($this->_results[$itemId]) || !is_object($this->_results[$itemId])) {
 			return;
 		}
 		//page content
@@ -388,23 +488,23 @@ class CMS_polymod_ase extends CMS_ase_interface {
 					$iconHTML = ($icon->exists()) ? '<img src="'.PATH_MODULES_FILES_WR.'/'.MOD_STANDARD_CODENAME.'/icons/'.$type.'.gif" alt="'.$type.'" title="'.$type.'" /> ' : '';
 				}
 				//title
-				$title = $this->_results[$matchInfo['uid']]->getLabel();
+				$title = $this->_results[$itemId]->getLabel();
 				$url = $this->getMatchValue($matchInfo, 'url', $parameters);
 				return '<a href="'.$url.'" title="'.htmlspecialchars($title).'">'.$this->strChop($title, 120).'</a> '.$iconHTML;
 			break;
 			case 'itemID':
-				return $this->_results[$matchInfo['uid']]->getID();
+				return $this->_results[$itemId]->getID();
 			break;
 			case 'item':
-				return $this->_results[$matchInfo['uid']];
+				return $this->_results[$itemId];
 			break;
 			case 'description':
 				//TODO
 				return '';
 			break;
 			case 'pubDate' :
-				if (method_exists($this->_results[$matchInfo['uid']], 'getPublicationDate')) {
-					$pubDate = $this->_results[$matchInfo['uid']]->getPublicationDate();
+				if (method_exists($this->_results[$itemId], 'getPublicationDate')) {
+					$pubDate = $this->_results[$itemId]->getPublicationDate();
 					if ($pubDate && is_object($pubDate)) {
 						if (!$parameters['format']) {
 							return $pubDate->getTimestamp();
@@ -413,8 +513,8 @@ class CMS_polymod_ase extends CMS_ase_interface {
 						}
 					}
 				} else {
-					if ($this->_results[$matchInfo['uid']]->getObjectResourceStatus() == 1) {
-						$pubDate = $this->_results[$matchInfo['uid']]->getPublicationDateStart();
+					if ($this->_results[$itemId]->getObjectResourceStatus() == 1) {
+						$pubDate = $this->_results[$itemId]->getPublicationDateStart();
 						if (!$parameters['format']) {
 							return $pubDate->getTimestamp();
 						} else {
@@ -428,10 +528,10 @@ class CMS_polymod_ase extends CMS_ase_interface {
 					return $parameters['url'];
 				} else {
 					//if indexURL exists for object, use it
-					$objectDefinition = $this->_results[$matchInfo['uid']]->getObjectDefinition();
+					$objectDefinition = $this->_results[$itemId]->getObjectDefinition();
 					if ($objectDefinition->getValue('indexURL')) {
 						//create object var used by compiledIndexURL
-						$object[$this->_results[$matchInfo['uid']]->getObjectID()] = $this->_results[$matchInfo['uid']];
+						$object[$this->_results[$itemId]->getObjectID()] = $this->_results[$itemId];
 						//set public status to true
 						$parameters['public'] = true;
 						//then execute compiled link definition
@@ -446,7 +546,7 @@ class CMS_polymod_ase extends CMS_ase_interface {
 						return $data;
 					} else {
 						//try to get URL from previz URL
-						$itemURL = $this->_results[$matchInfo['uid']]->getPrevizPageURL(false);
+						$itemURL = $this->_results[$itemId]->getPrevizPageURL(false);
 						return $itemURL;
 					}
 				}
