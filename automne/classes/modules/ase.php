@@ -144,6 +144,7 @@ if ($xapianExists) {
 					'cms_xapiandb' 				=> PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/xapianDB.php',
 					'cms_xapianindexer' 		=> PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/xapianIndexer.php',
 					'cms_xapianquery' 			=> PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/xapianSearch.php',
+					'cms_cjktokenizer'			=> PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/cjkTokenizer.php',
 					'cms_filter_common' 		=> PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/filters/common.php',
 					'cms_filter_catalog' 		=> PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/filters/catalog.php',
 					'cms_ase_interface_catalog' => PATH_MODULES_FS.'/'.MOD_ASE_CODENAME.'/interfaces/catalog.php',
@@ -202,6 +203,15 @@ if ($xapianExists) {
 					$return = array (
 						"block" => array("selfClosed" => false, "parameters" => array("module" => MOD_ASE_CODENAME)),
 					);
+				break;
+				case MODULE_TREATMENT_PAGECONTENT_TAGS :
+					switch ($visualizationMode) {
+						default:
+							$return = array (
+								"atm-noindex" 			=> array("selfClosed" => false, "parameters" => array()),
+							);
+						break;
+					}
 				break;
 			}
 			return $return;
@@ -298,6 +308,21 @@ if ($xapianExists) {
 						}
 					}
 					return $tagContent;
+				break;
+				case MODULE_TREATMENT_PAGECONTENT_TAGS:
+					if (!is_a($treatedObject,"CMS_page")) {
+						$this->raiseError('$treatedObject must be a CMS_page object');
+						return false;
+					}
+					switch ($tag->getName()) {
+						case 'atm-noindex':
+							if ($visualizationMode == PAGE_VISUALMODE_HTML_PUBLIC_INDEXABLE) {
+								return '';
+							} else {
+								return $tag->getInnerContent();
+							}
+						break;
+					}
 				break;
 			}
 			//in case of no tag treatment, simply return it

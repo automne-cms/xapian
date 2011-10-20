@@ -127,11 +127,6 @@ if (!($xapianVersion = $module->getXapianVersion())) {
 	}
 	$error = '';
 	$content .= '</table><br />';
-	if (io::substr(CMS_patch::executeCommand('which chasen 2>&1', $error),0,1) == '/' && !$error) {
-		$content .= '<h2>'.$cms_language->getMessage(MESSAGE_PAGE_XAPIAN_JAPANESE_SUPPORT, false, MOD_ASE_CODENAME).' : '.$cms_language->getMessage(MESSAGE_PAGE_YES).'</h2>';
-	} else {
-		$content .= '<h2>'.$cms_language->getMessage(MESSAGE_PAGE_XAPIAN_JAPANESE_SUPPORT, false, MOD_ASE_CODENAME).' : '.$cms_language->getMessage(MESSAGE_PAGE_NO).', '.$cms_language->getMessage(MESSAGE_PAGE_MISSING_BINARY, false, MOD_ASE_CODENAME).' : <em>Chasen</em></h2>';
-	}
 	$content .= '<br /><h2>'.$cms_language->getMessage(MESSAGE_PAGE_XAPIAN_EXCLUDED_ROOTS, false, MOD_ASE_CODENAME).'</h2>';
 	$excludedPages = '';
 	$excludedRoots = preg_split('#[,;]#', $module->getParameters('XAPIAN_RESULTS_EXCLUDED_ROOTS'));

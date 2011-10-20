@@ -187,8 +187,8 @@ class CMS_XapianIndexer extends CMS_grandFather {
 	  */
 	function prepareText($text, $language) {
 		//eventually tokenize japanese text
-		if ($language == 'ja' || $language == 'jp') {
-			if ($return = CMS_XapianIndexer::tokenizeJapanese($text)) {
+		if (in_array($language, array('zh', 'ja', 'jp', 'ko'))) { //Chinese, Japanese, Korean
+			if ($return = CMS_CJKTokenizer::tokenize($text)) {
 				$text = $return;
 			}
 		}
@@ -249,41 +249,6 @@ class CMS_XapianIndexer extends CMS_grandFather {
 		$utfMap = array_merge($utfMap, $replace);
 		$string = strtr($string, $utfMap);
 		return $string;
-	}
-	
-	/**
-	  * Tokenize Japanese text to be used by Xapian
-	  * This method use ChaSen binary (which must be available on the server)
-	  * This does not handle mixed languages pretty well so avoid mixing japanese with other than pure ascii characters
-	  *
-	  * @param string $text : the japanese text to tokenize
-	  * @return string $text : the japanese text tokenized
-	  * @access public
-	  * @static
-	  */
-	function tokenizeJapanese($text) {
-		$error = '';
-		if (io::substr(CMS_patch::executeCommand('which chasen 2>&1',$error),0,1) == '/' && !$error) {
-			$text = preg_replace('/[\w\d\b .&,;:_()"*\'-]{2,}/s', "[$0]", $text);
-			//get tmp path
-			$tmpFile = new CMS_file(PATH_TMP_FS.'/chasen_'.md5(mt_rand().microtime()).'.tmp');
-			$tmpFile->setContent($text);
-			$tmpFile->writeTopersistence();
-			$conversionCommand = 'chasen -F "%m " -r '.PATH_MODULES_FILES_FS.'/'.MOD_ASE_CODENAME.'/chasenrc -i w '.$tmpFile->getName();
-			$return = CMS_patch::executeCommand($conversionCommand, $error);
-			$tmpFile->delete();
-			if ($error) {
-				CMS_grandFather::raiseError('Conversion command "'.$conversionCommand.'" output with errors : '.print_r($error,true).'. Return is : '.print_r($return,true));
-				return false;
-			} else {
-				$text = $return;
-			}
-			$text = strtr($text, '[]', '  ');
-		} else {
-			CMS_grandFather::raiseError('Cannot find chasen to properly tokenize japanese text ...');
-			return false;
-		}
-		return $text;
 	}
 	
 	/**

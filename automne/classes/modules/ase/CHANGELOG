@@ -1,3 +1,7 @@
+v0.72
+[FEATURE] : Handle CJK (Chinese, Japanese, Korean) texts
+[FEATURE] : Add atm-noindex tag to avoid indexation of some content in rows
+
 v0.71
 [REFACTOR] : Handle multilanguage polymod objects (4.2.0b2 minimum)
 

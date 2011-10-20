@@ -10,6 +10,7 @@
 >	/automne/classes/modules/ase/xapian.php
 >	/automne/classes/modules/ase/xapianIndexer.php
 >	/automne/classes/modules/ase/xapianSearch.php
+>	/automne/classes/modules/ase/cjkTokenizer.php
 >	/automne/classes/modules/ase/filters/catalog.php
 >	/automne/classes/modules/ase/filters/common.php
 >	/automne/classes/modules/ase/filters/doc.php

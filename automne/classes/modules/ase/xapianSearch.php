@@ -378,6 +378,10 @@ class CMS_XapianQuery extends CMS_grandFather {
 			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : Expand set can\'t be get before results. Use getMatches method first.');
 			return false;
 		}
+		if (in_array($this->_language, array('zh', 'ja', 'jp', 'ko'))) { //Chinese, Japanese, Korean
+			//cannot get expand set for CJK tokenized texts
+			return array();
+		}
 		if (!isset($expandTerms)) {
 			//then get relevant expand set from rSet
 			$expands = $this->_enquire->get_eset(($this->_expandSetNumber*3),$this->_rSet,0);
@@ -506,7 +510,7 @@ class CMS_XapianQuery extends CMS_grandFather {
 			//get stop words for document language
 			$stoplist = new CMS_file(PATH_MAIN_FS.'/'.MOD_ASE_CODENAME.'/stopwords/'.$this->_language.'.txt');
 			if (!$stoplist->exists()) {
-				$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no stopwords list founded for language : '.$this->_language);
+				//$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : no stopwords list founded for language : '.$this->_language);
 				return $stopper;
 			}
 			$stopwords = $stoplist->readContent('array');
