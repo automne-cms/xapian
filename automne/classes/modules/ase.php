@@ -289,7 +289,7 @@ if ($xapianExists) {
 								}
 							}
 							//if a parameter exists for page website, add link tag to metas
-							if ($searchs[$pageWebsite->getID()]) {
+							if (isset($searchs[$pageWebsite->getID()]) && $searchs[$pageWebsite->getID()]) {
 								$title = APPLICATION_LABEL;
 								if (!$pageWebsite->isMain()) {
 									$title .= ' ('.$pageWebsite->getLabel().')';

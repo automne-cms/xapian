@@ -1,3 +1,7 @@
+v0.73
+[BUG] : Correct a PHP notice
+[FEATURE] : Handle Xapian version 1.2.x
+
 v0.72
 [FEATURE] : Handle CJK (Chinese, Japanese, Korean) texts
 [FEATURE] : Add atm-noindex tag to avoid indexation of some content in rows
