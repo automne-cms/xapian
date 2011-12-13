@@ -1,5 +1,6 @@
 v0.73
 [BUG] : Correct a PHP notice
+[BUG] : Correct indexation problem for multilanguage items
 [FEATURE] : Handle Xapian version 1.2.x
 
 v0.72

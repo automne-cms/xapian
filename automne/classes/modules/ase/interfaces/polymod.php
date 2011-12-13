@@ -294,6 +294,11 @@ class CMS_polymod_ase extends CMS_ase_interface {
 		if (!$definition->getValue('multilanguage')) {
 			return array(array('uid' => $uid, 'module' => $this->_codename));
 		} else {
+			global $cms_user;
+			if (!isset($cms_user) || !$cms_user) {
+				//force cms_user
+				$cms_user = new CMS_profile_user(ROOT_PROFILEUSER_ID);
+			}
 			//get item to index
 			$item = CMS_poly_object_catalog::getObjectByID($uid, false, true);
 			if (!$item || $item->hasError()) {
