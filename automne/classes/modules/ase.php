@@ -266,6 +266,7 @@ if ($xapianExists) {
 							//allowed format is /search.php or websiteID,/search.php or websiteID,pageID
 							//you can add more couple of values separated with semi-colon
 							$websitesSearch = explode(';',$opensearch);
+							$searchs = array();
 							foreach ($websitesSearch as $websiteSearch) {
 								$website = $page = $url = '';
 								$search = explode(',',$websiteSearch);
