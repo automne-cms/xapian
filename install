@@ -2,7 +2,6 @@
 >	/automne/admin/modules/ase/index.php
 >	/automne/admin/modules/ase/config.php
 >	/automne/admin/modules/ase/controler.php
->	/automne/classes/aseFrontEnd.php
 >	/automne/classes/modules/ase/CHANGELOG
 >	/automne/classes/modules/ase/VERSION
 >	/automne/classes/modules/ase/document.php
@@ -30,7 +29,6 @@
 >	/automne/bin/sxwtoplain.sh	x
 >	/automne/bin/docxtoplain.sh	x
 >	/automne/bin/xlsxtoplain.sh	x
->	/automne/bin/chasenrc
 >	/automne/ase/.htaccess
 >	/automne/ase/opensearch.php
 >	/automne/ase/databases/.htaccess
@@ -45,9 +43,11 @@
 >	/automne/sql/messages/en/ase.sql
 >	/automne/sql/messages/pt/ase.sql
 >	/automne/sql/messages/es/ase.sql
+>	/automne/sql/messages/de/ase.sql
 #execute ASE installation/update DB script
 x	/automne/sql/messages/fr/ase.sql
 x	/automne/sql/messages/en/ase.sql
 x	/automne/sql/messages/pt/ase.sql
 x	/automne/sql/messages/es/ase.sql
+x	/automne/sql/messages/de/ase.sql
 x	/ase_install.php

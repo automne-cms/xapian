@@ -16,11 +16,9 @@
 ## +----------------------------------------------------------------------+
 ## | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 ## +----------------------------------------------------------------------+
-##
-## $Id: xlsxtoplain.sh,v 1.1 2009/11/13 17:31:14 sebastien Exp $
 
 ##
-## Convert Microsoft Word 2007 documents (docx format) into plain text
+## Convert Microsoft Excel 2007 documents (xlsx format) into plain text
 ##
 
 ## +----------------------------------------------------------------------+

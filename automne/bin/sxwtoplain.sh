@@ -16,8 +16,6 @@
 ## +----------------------------------------------------------------------+
 ## | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 ## +----------------------------------------------------------------------+
-##
-## $Id: sxwtoplain.sh,v 1.3 2009/11/13 17:31:14 sebastien Exp $
 
 ##
 ## Convert Open Office documents (open document format) into plain text

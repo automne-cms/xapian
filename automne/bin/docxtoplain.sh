@@ -16,8 +16,6 @@
 ## +----------------------------------------------------------------------+
 ## | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 ## +----------------------------------------------------------------------+
-##
-## $Id: docxtoplain.sh,v 1.2 2009/11/13 17:31:14 sebastien Exp $
 
 ##
 ## Convert Microsoft Word 2007 documents (docx format) into plain text
