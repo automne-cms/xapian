@@ -16,8 +16,6 @@
 // +----------------------------------------------------------------------+
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
-//
-// $Id: mod_ase_search.php,v 1.18 2009/11/13 17:31:14 sebastien Exp $
 
 /**
   * Template CMS_ase_search
@@ -80,7 +78,15 @@ if (isset($_REQUEST['q']) && trim($_REQUEST['q'])) {
 	
 	$modules = array();
 	//restrict search to given modules if any
-	if (isset($_REQUEST['modules']) && is_array($_REQUEST['modules']) ) {
+	if (isset($mod_ase["modules"]) && $mod_ase["modules"]) {
+		$mod_ase["modules"] = explode(';', str_replace(',', ';', $mod_ase["modules"]));
+		$availableModules = CMS_ase_interface_catalog::getActiveModules();
+		foreach($mod_ase["modules"] as $module) {
+			if (trim($module) && isset($availableModules[trim($module)])) {
+				$modules[] = trim($module);
+			}
+		}
+	} elseif (isset($_REQUEST['modules']) && is_array($_REQUEST['modules']) ) {
 		$availableModules = CMS_ase_interface_catalog::getActiveModules();
 		foreach($_REQUEST['modules'] as $module) {
 			if (isset($availableModules[$module])) {
@@ -126,10 +132,15 @@ if (isset($_REQUEST['q']) && trim($_REQUEST['q'])) {
 	//////////////////////////////////////////////////////////////////
 	
 	//Filters on pages
-	if ((isset($_REQUEST['pageRoot']) && sensitiveIO::isPositiveInteger($_REQUEST['pageRoot'])) || isset($_REQUEST['PublicAfter']) || isset($_REQUEST['PublicBefore'])) {
+	if ((isset($_REQUEST['pageRoot']) && sensitiveIO::isPositiveInteger($_REQUEST['pageRoot']))
+		 || isset($_REQUEST['PublicAfter']) || isset($_REQUEST['PublicBefore']) || isset($mod_ase["root"])) {
+		
 		//load module interface
 		if ($moduleInterface = CMS_ase_interface_catalog::getModuleInterface(MOD_STANDARD_CODENAME)) {
-			if (isset($_REQUEST['pageRoot']) && sensitiveIO::isPositiveInteger($_REQUEST['pageRoot'])) {
+			if (isset($mod_ase["root"]) && sensitiveIO::isPositiveInteger($mod_ase["root"])) {
+				//add filter on root page ID
+				$moduleInterface->addFilter('root', $mod_ase["root"]);
+			} elseif (isset($_REQUEST['pageRoot']) && sensitiveIO::isPositiveInteger($_REQUEST['pageRoot'])) {
 				//add filter on root page ID
 				$moduleInterface->addFilter('root', $_REQUEST['pageRoot']);
 			}
@@ -269,30 +280,6 @@ $content .= '
 	<h2>'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_HELP, false, MOD_ASE_CODENAME).'</h2>
 	'.$cms_language->getMessage(MESSAGE_ASE_RESULTS_HELP_DETAIL, array(implode(', ',CMS_filter_catalog::getTypes())), MOD_ASE_CODENAME).'
 </div>
-<!--
-<h4>Operators :</h4>
-<ul>
-	<li><strong>AND : </strong><p>Matches documents that are matched by both operand</p></li>
-	<li><strong>OR : </strong><p>Matches documents that are matched by either operand</p></li>
-	<li><strong>NOT : </strong><p>Matches documents that are matched only by the left operand</p></li>
-	<li><strong>XOR : </strong><p>Matches documents that are matched by one of the operand but not both</p></li>
-	<li><strong>( and ) : </strong><p>Allows for the subgrouping of expressions</p></li>
-	<li><strong>+ and - : </strong><p>Unary operators. Match terms that contain all operands prefixed by a plus sign and none of the words prefixed by a minus sign. <br />Example : CMS +Automne -Isens</p></li>
-	<li><strong>NEAR : </strong><p>Matches documents in which the two operands are whitin ten words of each other</p></li>
-	<li><strong>" " : </strong><p>Allow for phrase search</p></li>
-	<li><strong>* : </strong><p>Wildcard (Joker sign).</p></li>
-</ul>
-<h4>Prefixes :</h4>
-The following prefixes allow you to restrict your search on document\'s characteristics. Operand must follow the prefix (without spaces).
-<ul>
-	<li><strong>"title:" : </strong><p>Operand following this prefix will be into document\'s title <br />Example : title:Automne</p></li>
-	<li><strong>"filetype:" : </strong><p>Matches documents will be in the given file format <br />Available filetypes are : '.implode(', ',CMS_filter_catalog::getTypes()).' <br />Example : filetype:pdf</p></li>
-	<li><strong>"language:" : </strong><p>Matches documents will be in the given language code <br />Available languages are : fr, en <br />Example : language:fr</p></li>
-	<li><strong>"page:" : </strong><p>Matches documents will be in the given page ID <br />Example : page:12</p></li>
-	<li><strong>"root:" : </strong><p>Matches documents will be below the given page ID <br />Example : root:12</p></li>
-</ul>
--->
-
 <br /><br />';
 if (defined('SYSTEM_DEBUG') && SYSTEM_DEBUG && isset($search) && is_object($search) && !$error && isset($cms_user) && is_object($cms_user) && $cms_user->getUserId() == ROOT_PROFILEUSER_ID) {
 	$resultstime = getmicrotime() - $startresultstime;

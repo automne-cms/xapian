@@ -16,14 +16,11 @@
 // +----------------------------------------------------------------------+
 // | Author: Sébastien Pauchet <sebastien.pauchet@ws-interactive.fr>      |
 // +----------------------------------------------------------------------+
-//
-// $Id: null.php,v 1.2 2009/06/08 14:22:13 sebastien Exp $
 
 /**
-  * Class CMS_filter_null
+  * Class CMS_filter_pages
   *
-  * Represent a null filter (
-  * This is a filter which take in input a file which does need to be filtered like text, csv, etc.
+  * Represent a filter for Pages formats.
   *
   * @package CMS
   * @subpackage module
@@ -33,9 +30,9 @@
 /**
   * ASE Messages
   */
-define('MESSAGE_NULL_FILTER_LABEL', 12);
+define('MESSAGE_PAGES_FILTER_LABEL', 44);
 
-class CMS_filter_null extends CMS_filter_common
+class CMS_filter_pages extends CMS_filter_common
 {
 	/**
 	  * Filter label
@@ -43,7 +40,7 @@ class CMS_filter_null extends CMS_filter_common
 	  * @var constant
 	  * @access private
 	  */
-	var $_label = MESSAGE_NULL_FILTER_LABEL;
+	var $_label = MESSAGE_PAGES_FILTER_LABEL;
 	
 	/**
 	  * Supported documents extension (must be in lowercase)
@@ -51,7 +48,7 @@ class CMS_filter_null extends CMS_filter_common
 	  * @var array
 	  * @access private
 	  */
-	var $_supportedExtensions = array('txt','csv');
+	var $_supportedExtensions = array('pages');
 	
 	/**
 	  * All binaries needed to the filter
@@ -59,7 +56,7 @@ class CMS_filter_null extends CMS_filter_common
 	  * @var array
 	  * @access private
 	  */
-	var $_binaries = array();
+	var $_binaries = array('unzip','sed','iconv','pdftotext');
 	
 	/**
 	  * Create conversion command line
@@ -68,7 +65,37 @@ class CMS_filter_null extends CMS_filter_common
 	  * @access private
 	  */
 	function _createConversionCommand() {
-		return  'cat '.$this->_sourceDocument.' > '.$this->_convertedDocument;
+		//check for shell script executable status
+		if (!CMS_file::fileIsExecutable(PATH_WINDOWS_BIN_FS.'/pagestoplain.sh') && !CMS_file::makeExecutable(PATH_WINDOWS_BIN_FS.'/pagestoplain.sh')) {
+			$this->_raiseError(__CLASS__.' : '.__FUNCTION__.' : shell script xlsxtoplain.sh is not executable ... ');
+			return false;
+		}
+		return  PATH_WINDOWS_BIN_FS.'/pagestoplain.sh '.$this->_sourceDocument.' > '.$this->_convertedDocument;
+	}
+	
+	/**
+	  * Check if filter is active (all needed binaries exists on the system)
+	  *
+	  * @return boolean true if filter is active, false otherwise
+	  * @access public
+	  */
+	function isActive() {
+		if (!parent::isActive()) {
+			return false;
+		}
+		//check for shell script executable status
+		if (!CMS_file::fileIsExecutable(PATH_WINDOWS_BIN_FS.'/pagestoplain.sh') && !CMS_file::makeExecutable(PATH_WINDOWS_BIN_FS.'/pagestoplain.sh')) {
+			return false;
+		}
+		return true;
+	}
+	
+	function _cleanConverted() {
+		//transcode document content
+		if (!file_put_contents($this->_convertedDocument, iconv("UTF-8", (strtolower(APPLICATION_DEFAULT_ENCODING) != 'utf-8' ? 'ISO-8859-1' : 'UTF-8')."//IGNORE", file_get_contents($this->_convertedDocument)))) {
+			$this->_raiseError(get_class($this).' : '.__FUNCTION__.' : can\'t convert XLSX document ... ');
+			return false;
+		}
 	}
 }
 ?>
