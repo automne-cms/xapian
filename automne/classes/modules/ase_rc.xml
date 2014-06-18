@@ -9,5 +9,5 @@
 	<param name="XAPIAN_SEARCH_MIN_MATCH_RESULTS_CHECK">100</param>
 	<param name="XAPIAN_SEARCH_EXPAND_SET_MAX_NUMBER">10</param>
 	<param name="DOCUMENT_TITLE_WDF">2</param>
-	<param name="USER_AGENT_REJECTED">Googlebot;msnbot;Yahoo! Slurp</param>
+	<param name="USER_AGENT_REJECTED">Googlebot;bingbot;msnbot;Yahoo! Slurp</param>
 </cms-module-parameters>
